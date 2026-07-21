@@ -1,10 +1,14 @@
-import { eq } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull } from "drizzle-orm";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { groupMembers, groups } from "@/db/schema";
+import { expensePayers, expenses, groupMembers, groups } from "@/db/schema";
+import { deleteExpense } from "@/lib/actions/expenses";
+import { formatCents } from "@/lib/money/cents";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { InviteLink } from "@/components/invite-link";
 
 export default async function GroupPage({
@@ -29,6 +33,32 @@ export default async function GroupPage({
   const isMember = members.some((m) => m.userId === session.user.id);
   if (!isMember) {
     redirect("/groups");
+  }
+
+  const memberName = new Map(members.map((m) => [m.id, m.displayName]));
+
+  const expenseRows = await db
+    .select()
+    .from(expenses)
+    .where(and(eq(expenses.groupId, id), isNull(expenses.deletedAt)))
+    .orderBy(desc(expenses.expenseDate));
+
+  const payersByExpense = new Map<string, string[]>();
+  if (expenseRows.length > 0) {
+    const payerRows = await db
+      .select()
+      .from(expensePayers)
+      .where(
+        inArray(
+          expensePayers.expenseId,
+          expenseRows.map((e) => e.id),
+        ),
+      );
+    for (const p of payerRows) {
+      const names = payersByExpense.get(p.expenseId) ?? [];
+      names.push(memberName.get(p.memberId) ?? "Unknown");
+      payersByExpense.set(p.expenseId, names);
+    }
   }
 
   return (
@@ -62,6 +92,56 @@ export default async function GroupPage({
           ))}
         </CardContent>
       </Card>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Expenses</h2>
+          <Link href={`/groups/${id}/expenses/new`}>
+            <Button size="sm">Add expense</Button>
+          </Link>
+        </div>
+
+        {expenseRows.length === 0 && (
+          <p className="text-sm text-muted-foreground">No expenses yet.</p>
+        )}
+
+        {expenseRows.map((expense) => (
+          <Card key={expense.id} data-testid={`expense-row-${expense.id}`}>
+            <CardContent className="flex items-center justify-between gap-4 py-4">
+              <div className="min-w-0">
+                <p className="truncate font-medium" data-testid="expense-title">
+                  {expense.title}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {expense.expenseDate.toLocaleDateString()} · {expense.splitMethod}
+                  {expense.category ? ` · ${expense.category}` : ""} · Paid by{" "}
+                  {(payersByExpense.get(expense.id) ?? []).join(", ")}
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <p className="font-medium" data-testid="expense-amount">
+                  {formatCents(expense.totalAmountCents, expense.currency)}
+                </p>
+                <Link href={`/groups/${id}/expenses/${expense.id}/edit`}>
+                  <Button variant="ghost" size="sm">
+                    Edit
+                  </Button>
+                </Link>
+                <form
+                  action={async () => {
+                    "use server";
+                    await deleteExpense({ expenseId: expense.id });
+                  }}
+                >
+                  <Button type="submit" variant="ghost" size="sm" data-testid="delete-expense">
+                    Delete
+                  </Button>
+                </form>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }

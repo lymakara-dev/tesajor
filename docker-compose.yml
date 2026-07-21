@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tesajor
+      POSTGRES_PASSWORD: tesajor
+      POSTGRES_DB: tesajor
+    ports:
+      - "5433:5432"
+    volumes:
+      - tesajor_db_data:/var/lib/postgresql/data
+
+volumes:
+  tesajor_db_data:

@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tesajor
 
-## Getting Started
+A bill-splitting web app: track shared expenses, see who owes whom, and
+settle up with the fewest payments possible. See `CLAUDE.md` for the full
+product/technical plan and build phases.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Next.js 15 (App Router) + TypeScript, Tailwind CSS + shadcn/ui, PostgreSQL
+via Drizzle ORM, Auth.js v5 (email/password + Google), Zod, Vitest.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Copy the env file and fill in secrets:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   cp .env.example .env
+   ```
 
-## Learn More
+   - `AUTH_SECRET`: generate with `openssl rand -base64 33`.
+   - `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET`: optional for local dev; leave
+     blank to disable Google sign-in and use email/password only.
+   - `DATABASE_URL` defaults to the Docker Compose Postgres on port 5433
+     (5432 is often already taken locally — adjust if needed).
 
-To learn more about Next.js, take a look at the following resources:
+2. Start Postgres:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```bash
+   docker compose up -d
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Run migrations and seed demo data:
 
-## Deploy on Vercel
+   ```bash
+   pnpm db:migrate
+   pnpm db:seed
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   Seeds 4 demo users (`anna@example.com` … `dev@example.com`, password
+   `password123`) in a group called "Friday Dinner Crew".
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. Start the dev server:
+
+   ```bash
+   pnpm dev
+   ```
+
+## Scripts
+
+- `pnpm dev` / `pnpm build` / `pnpm start` — Next.js dev/build/start.
+- `pnpm lint` — ESLint.
+- `pnpm test` — Vitest.
+- `pnpm db:generate` — generate a Drizzle migration from `src/db/schema.ts`.
+- `pnpm db:migrate` — apply pending migrations.
+- `pnpm db:push` — push schema directly (local prototyping only).
+- `pnpm db:studio` — Drizzle Studio.
+- `pnpm db:seed` — seed demo users/group.
+
+## Architecture
+
+- `src/db/schema.ts` — Drizzle schema: users, groups, group_members,
+  expenses (+ payers/shares/items/assignees), settlements, activity_log,
+  plus the Auth.js adapter tables.
+- `src/lib/auth.ts` — Auth.js v5 config (Credentials + Google, Drizzle
+  adapter).
+- `src/lib/actions/` — server actions (mutations), each validated with Zod
+  from `src/lib/validation/`.
+- `src/app/` — routes: `/`, `/login`, `/register`, `/groups`,
+  `/groups/[id]`, `/groups/join/[code]`.
+
+Money is always stored as integer cents — never floats — per the invariants
+in `CLAUDE.md`.

@@ -63,9 +63,23 @@ export default async function GroupPage({
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold">{group.name}</h1>
-        <p className="text-muted-foreground">Base currency: {group.baseCurrency}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold">{group.name}</h1>
+          <p className="text-muted-foreground">Base currency: {group.baseCurrency}</p>
+        </div>
+        <div className="flex shrink-0 gap-2">
+          <Link href={`/groups/${id}/balances`}>
+            <Button variant="outline" size="sm">
+              Balances
+            </Button>
+          </Link>
+          <Link href={`/groups/${id}/activity`}>
+            <Button variant="outline" size="sm">
+              Activity
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <InviteLink inviteCode={group.inviteCode} />

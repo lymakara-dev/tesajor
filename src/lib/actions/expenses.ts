@@ -9,10 +9,10 @@ import {
   expensePayers,
   expenseShares,
   expenses,
-  groupMembers,
   itemAssignees,
 } from "@/db/schema";
 import { auth } from "@/lib/auth";
+import { requireGroupMemberIds, requireUserIsMember } from "@/lib/actions/group-membership";
 import {
   computeExpenseShares,
   payersSumMatches,
@@ -28,26 +28,6 @@ import {
 export type ActionResult<T = undefined> =
   | { ok: true; data: T }
   | { ok: false; error: string };
-
-async function requireGroupMemberIds(groupId: string): Promise<Set<string>> {
-  const members = await db
-    .select({ id: groupMembers.id })
-    .from(groupMembers)
-    .where(eq(groupMembers.groupId, groupId));
-  return new Set(members.map((m) => m.id));
-}
-
-async function requireUserIsMember(
-  groupId: string,
-  userId: string,
-): Promise<boolean> {
-  const [membership] = await db
-    .select({ id: groupMembers.id })
-    .from(groupMembers)
-    .where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, userId)))
-    .limit(1);
-  return Boolean(membership);
-}
 
 function memberIdsReferencedByExpense(input: CreateExpenseInput): string[] {
   const ids = new Set<string>(input.payers.map((p) => p.memberId));

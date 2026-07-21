@@ -11,6 +11,7 @@ import {
   sessions,
   verificationTokens,
 } from "@/db/schema";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { loginSchema } from "@/lib/validation/auth";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -31,7 +32,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: {},
         password: {},
       },
-      authorize: async (rawCredentials) => {
+      authorize: async (rawCredentials, request) => {
+        const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+        if (!checkRateLimit(`login:${ip}`, 10, 15 * 60 * 1000)) return null;
+
         const parsed = loginSchema.safeParse(rawCredentials);
         if (!parsed.success) return null;
         const { email, password } = parsed.data;

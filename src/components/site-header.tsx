@@ -17,6 +17,9 @@ export async function SiteHeader() {
               <Link href="/groups" className="text-sm">
                 Groups
               </Link>
+              <Link href="/account" className="text-sm">
+                Account
+              </Link>
               <form
                 action={async () => {
                   "use server";

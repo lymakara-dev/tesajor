@@ -2,9 +2,11 @@
 
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
 import type { z } from "zod";
 import { db } from "@/db";
 import { users } from "@/db/schema";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { registerSchema } from "@/lib/validation/auth";
 
 export type RegisterResult =
@@ -14,6 +16,12 @@ export type RegisterResult =
 export async function registerUser(
   input: z.infer<typeof registerSchema>,
 ): Promise<RegisterResult> {
+  const requestHeaders = await headers();
+  const ip = requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  if (!checkRateLimit(`register:${ip}`, 5, 15 * 60 * 1000)) {
+    return { ok: false, error: "Too many registration attempts. Try again later." };
+  }
+
   const parsed = registerSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: "Invalid registration details." };

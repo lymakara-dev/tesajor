@@ -36,6 +36,16 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local file uploads (not committed; use cloud storage in production)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

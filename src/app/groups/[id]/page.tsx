@@ -63,12 +63,12 @@ export default async function GroupPage({
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 space-y-8">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold">{group.name}</h1>
           <p className="text-muted-foreground">Base currency: {group.baseCurrency}</p>
         </div>
-        <div className="flex shrink-0 gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link href={`/groups/${id}/balances`}>
             <Button variant="outline" size="sm">
               Balances
@@ -79,6 +79,11 @@ export default async function GroupPage({
               Activity
             </Button>
           </Link>
+          <a href={`/api/groups/${id}/export`}>
+            <Button variant="outline" size="sm">
+              Export CSV
+            </Button>
+          </a>
         </div>
       </div>
 
@@ -130,6 +135,20 @@ export default async function GroupPage({
                   {expense.expenseDate.toLocaleDateString()} · {expense.splitMethod}
                   {expense.category ? ` · ${expense.category}` : ""} · Paid by{" "}
                   {(payersByExpense.get(expense.id) ?? []).join(", ")}
+                  {expense.receiptUrl && (
+                    <>
+                      {" "}
+                      ·{" "}
+                      <a
+                        href={expense.receiptUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline"
+                      >
+                        Receipt
+                      </a>
+                    </>
+                  )}
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2">

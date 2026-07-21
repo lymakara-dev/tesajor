@@ -49,7 +49,10 @@ via Drizzle ORM, Auth.js v5 (email/password + Google), Zod, Vitest.
 
 - `pnpm dev` / `pnpm build` / `pnpm start` — Next.js dev/build/start.
 - `pnpm lint` — ESLint.
-- `pnpm test` — Vitest.
+- `pnpm test` — Vitest (unit tests for the money/split/balance math).
+- `pnpm test:e2e` — Playwright smoke test (`e2e/`); starts its own dev
+  server if one isn't already running on port 3000, and needs the DB from
+  step 2 above to be up.
 - `pnpm db:generate` — generate a Drizzle migration from `src/db/schema.ts`.
 - `pnpm db:migrate` — apply pending migrations.
 - `pnpm db:push` — push schema directly (local prototyping only).
@@ -63,10 +66,18 @@ via Drizzle ORM, Auth.js v5 (email/password + Google), Zod, Vitest.
   plus the Auth.js adapter tables.
 - `src/lib/auth.ts` — Auth.js v5 config (Credentials + Google, Drizzle
   adapter).
+- `src/lib/splits/` — pure expense-splitting math (equal/exact/percent/
+  shares/itemized), `src/lib/balances/` — pure net-balance and debt-
+  simplification math. Both framework-free with full Vitest coverage.
 - `src/lib/actions/` — server actions (mutations), each validated with Zod
   from `src/lib/validation/`.
 - `src/app/` — routes: `/`, `/login`, `/register`, `/groups`,
-  `/groups/[id]`, `/groups/join/[code]`.
+  `/groups/[id]` (+ `expenses/new`, `expenses/[expenseId]/edit`,
+  `balances`, `activity`), `/groups/join/[code]`.
+- `src/app/api/uploads/` — local receipt-photo upload (saved under
+  `public/uploads/`, not committed). Swap for cloud storage before
+  production.
+- `src/app/api/groups/[id]/export/` — CSV export of a group's expenses.
 
 Money is always stored as integer cents — never floats — per the invariants
 in `CLAUDE.md`.

@@ -29,6 +29,13 @@ export type ActionResult<T = undefined> =
   | { ok: true; data: T }
   | { ok: false; error: string };
 
+function firstZodErrorMessage(error: { issues: { path: PropertyKey[]; message: string }[] }): string {
+  const issue = error.issues[0];
+  if (!issue) return "Invalid expense.";
+  const path = issue.path.join(".");
+  return path ? `${path}: ${issue.message}` : issue.message;
+}
+
 function memberIdsReferencedByExpense(input: CreateExpenseInput): string[] {
   const ids = new Set<string>(input.payers.map((p) => p.memberId));
   switch (input.splitMethod) {
@@ -76,7 +83,7 @@ export async function createExpense(
 
   const parsed = createExpenseSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid expense." };
+    return { ok: false, error: firstZodErrorMessage(parsed.error) };
   }
   const expense = parsed.data;
 
@@ -182,7 +189,7 @@ export async function updateExpense(
 
   const parsed = updateExpenseSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid expense." };
+    return { ok: false, error: firstZodErrorMessage(parsed.error) };
   }
   const { expenseId, expense } = parsed.data;
 

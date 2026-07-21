@@ -12,7 +12,9 @@ const baseExpenseFields = {
   currency: z.string().trim().length(3),
   category: z.string().trim().max(60).optional(),
   note: z.string().trim().max(2000).optional(),
-  receiptUrl: z.url().optional(),
+  // A same-origin path from our upload route (e.g. "/uploads/xyz.jpg"),
+  // not necessarily an absolute URL.
+  receiptUrl: z.string().trim().min(1).max(2048).optional(),
   expenseDate: z.coerce.date(),
   payers: z.array(payerSchema).min(1),
 };

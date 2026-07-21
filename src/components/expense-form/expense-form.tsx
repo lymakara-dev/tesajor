@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createExpense, updateExpense } from "@/lib/actions/expenses";
 import { centsToDollarsInput, dollarsToCents } from "@/lib/money/cents";
@@ -64,6 +65,8 @@ export function ExpenseForm({
   );
   const [category, setCategory] = useState(initial?.category ?? "");
   const [note, setNote] = useState(initial?.note ?? "");
+  const [receiptUrl, setReceiptUrl] = useState(initial?.receiptUrl ?? "");
+  const [uploadingReceipt, setUploadingReceipt] = useState(false);
   const [splitMethod, setSplitMethod] = useState<SplitMethod>(
     initial?.splitMethod ?? "equal",
   );
@@ -162,6 +165,28 @@ export function ExpenseForm({
     );
   }
 
+  async function onReceiptSelected(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    setUploadingReceipt(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await fetch("/api/uploads", { method: "POST", body: formData });
+      const body = await response.json();
+      if (!response.ok) {
+        setError(body.error ?? "Failed to upload receipt.");
+        return;
+      }
+      setReceiptUrl(body.url);
+    } finally {
+      setUploadingReceipt(false);
+    }
+  }
+
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
@@ -258,6 +283,7 @@ export function ExpenseForm({
       currency,
       category: category.trim() || undefined,
       note: note.trim() || undefined,
+      receiptUrl: receiptUrl || undefined,
       expenseDate: new Date(date),
       payers: payerEntries,
       ...splitPayload,
@@ -342,6 +368,28 @@ export function ExpenseForm({
               maxLength={2000}
               rows={2}
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="receipt">Receipt photo</Label>
+            {receiptUrl && (
+              <Image
+                src={receiptUrl}
+                alt="Receipt"
+                width={96}
+                height={96}
+                className="h-24 w-24 rounded-md border object-cover"
+              />
+            )}
+            <Input
+              id="receipt"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={onReceiptSelected}
+              disabled={uploadingReceipt}
+            />
+            {uploadingReceipt && (
+              <p className="text-sm text-muted-foreground">Uploading...</p>
+            )}
           </div>
         </CardContent>
       </Card>

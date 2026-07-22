@@ -7,5 +7,22 @@
     "account": "គណនី",
     "signOut": "ចាកចេញ",
     "tagline": "ទេសចរណ៍ · ធ្វើដំណើរ និងចែករំលែកជាមួយគ្នា"
+  },
+  "balances": {
+    "baseCurrency": "រូបិយប័ណ្ណគោល៖ {currency}",
+    "youAreOwed": "អ្នកត្រូវទទួល",
+    "youOwe": "អ្នកជំពាក់",
+    "youSettledUp": "គណនីរបស់អ្នកស្មើគ្នា",
+    "netBalances": "សមតុល្យសុទ្ធ",
+    "isOwed": "ត្រូវទទួល",
+    "owes": "ជំពាក់",
+    "settledUp": "ស្មើគ្នា",
+    "suggestedSettlements": "ការទូទាត់ដែលបានស្នើ",
+    "everyoneSettledUp": "អ្នកគ្រប់គ្នាបានទូទាត់រួចរាល់។",
+    "paysLine": "{from} បង់ឱ្យ {to}",
+    "confirm": "បញ្ជាក់",
+    "paymentClaimsToConfirm": "ការទាមទារទូទាត់ដែលត្រូវបញ្ជាក់",
+    "claimLine": "{name} បានប្រាប់ថាបានបង់ឱ្យអ្នក",
+    "viaTelegram": "តាមរយៈ Telegram"
   }
 }

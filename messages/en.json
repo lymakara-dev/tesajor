@@ -7,5 +7,22 @@
     "account": "Account",
     "signOut": "Sign out",
     "tagline": "ទេសចរណ៍ · travel & split together"
+  },
+  "balances": {
+    "baseCurrency": "Base currency: {currency}",
+    "youAreOwed": "You are owed",
+    "youOwe": "You owe",
+    "youSettledUp": "You're settled up",
+    "netBalances": "Net balances",
+    "isOwed": "is owed",
+    "owes": "owes",
+    "settledUp": "settled up",
+    "suggestedSettlements": "Suggested settlements",
+    "everyoneSettledUp": "Everyone is settled up.",
+    "paysLine": "{from} pays {to}",
+    "confirm": "Confirm",
+    "paymentClaimsToConfirm": "Payment claims to confirm",
+    "claimLine": "{name} says they paid you",
+    "viaTelegram": "via Telegram"
   }
 }

@@ -1,5 +1,6 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { groupMembers, groups, paymentRequests } from "@/db/schema";
@@ -7,11 +8,18 @@ import { recordSettlement } from "@/lib/actions/settlements";
 import { confirmPaymentRequest } from "@/lib/actions/payment-requests";
 import { simplifyDebts } from "@/lib/balances/calculate";
 import { getGroupNets } from "@/lib/queries/balances";
-import { formatCents } from "@/lib/money/cents";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Money, type MoneyTone } from "@/components/money";
 import { RecordPaymentForm } from "@/components/record-payment-form";
 import { RequestPaymentsButton } from "@/components/request-payments-button";
+import { Scale, HandCoins } from "lucide-react";
+
+function netTone(netCents: number): MoneyTone {
+  if (netCents > 0) return "owed";
+  if (netCents < 0) return "owe";
+  return "settled";
+}
 
 export default async function BalancesPage({
   params,
@@ -21,6 +29,7 @@ export default async function BalancesPage({
   const { id } = await params;
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+  const t = await getTranslations("balances");
 
   const [group] = await db.select().from(groups).where(eq(groups.id, id)).limit(1);
   if (!group) notFound();
@@ -38,6 +47,9 @@ export default async function BalancesPage({
   const suggestions = simplifyDebts(nets);
 
   const currentMember = members.find((m) => m.userId === session.user.id);
+  const myNetCents = currentMember
+    ? (nets.find((n) => n.memberId === currentMember.id)?.netCents ?? 0)
+    : 0;
 
   const pendingClaims = currentMember
     ? await db
@@ -55,13 +67,31 @@ export default async function BalancesPage({
   return (
     <div className="mx-auto max-w-[480px] px-4 py-10 space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">{group.name} — Balances</h1>
-        <p className="text-muted-foreground">Base currency: {group.baseCurrency}</p>
+        <h1 className="text-2xl font-semibold">{group.name}</h1>
+        <p className="text-muted-foreground">{t("baseCurrency", { currency: group.baseCurrency })}</p>
       </div>
+
+      {currentMember && (
+        <Card>
+          <CardContent className="flex flex-col items-center gap-2 py-6 text-center">
+            <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Scale className="size-4" strokeWidth={1.5} />
+              {myNetCents === 0 ? t("youSettledUp") : myNetCents > 0 ? t("youAreOwed") : t("youOwe")}
+            </span>
+            <Money
+              cents={Math.abs(myNetCents)}
+              currency={group.baseCurrency}
+              tone={netTone(myNetCents)}
+              layout="stacked"
+              size="xl"
+            />
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Net balances</CardTitle>
+          <CardTitle className="text-base">{t("netBalances")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           {nets.map((n) => (
@@ -71,20 +101,22 @@ export default async function BalancesPage({
               data-testid={`net-${n.memberId}`}
             >
               <span>{memberName.get(n.memberId)}</span>
-              <span
-                className={
-                  n.netCents > 0
-                    ? "text-emerald-600 dark:text-emerald-400"
-                    : n.netCents < 0
-                      ? "text-destructive"
-                      : "text-muted-foreground"
-                }
-              >
-                {n.netCents === 0
-                  ? "settled up"
-                  : n.netCents > 0
-                    ? `is owed ${formatCents(n.netCents, group.baseCurrency)}`
-                    : `owes ${formatCents(-n.netCents, group.baseCurrency)}`}
+              <span className="flex items-center gap-1">
+                {n.netCents === 0 ? (
+                  <span className="text-muted-foreground">{t("settledUp")}</span>
+                ) : (
+                  <>
+                    <span className="text-muted-foreground">
+                      {n.netCents > 0 ? t("isOwed") : t("owes")}
+                    </span>
+                    <Money
+                      cents={Math.abs(n.netCents)}
+                      currency={group.baseCurrency}
+                      tone={netTone(n.netCents)}
+                      size="sm"
+                    />
+                  </>
+                )}
               </span>
             </div>
           ))}
@@ -93,17 +125,17 @@ export default async function BalancesPage({
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Suggested settlements</CardTitle>
+          <CardTitle className="text-base">{t("suggestedSettlements")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {suggestions.length === 0 && (
-            <p className="text-sm text-muted-foreground">Everyone is settled up.</p>
+            <p className="text-sm text-muted-foreground">{t("everyoneSettledUp")}</p>
           )}
           {suggestions.map((s, i) => (
             <div key={i} className="flex items-center justify-between gap-3 text-sm">
               <span>
-                {memberName.get(s.fromMemberId)} pays {memberName.get(s.toMemberId)}{" "}
-                <span className="font-medium">{formatCents(s.amountCents, group.baseCurrency)}</span>
+                {t("paysLine", { from: memberName.get(s.fromMemberId) ?? "", to: memberName.get(s.toMemberId) ?? "" })}{" "}
+                <Money cents={s.amountCents} currency={group.baseCurrency} tone="neutral" />
               </span>
               <form
                 action={async () => {
@@ -122,7 +154,7 @@ export default async function BalancesPage({
                   size="sm"
                   data-testid={`confirm-suggestion-${s.fromMemberId}-${s.toMemberId}`}
                 >
-                  Confirm
+                  {t("confirm")}
                 </Button>
               </form>
             </div>
@@ -133,17 +165,18 @@ export default async function BalancesPage({
       {pendingClaims.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Payment claims to confirm</CardTitle>
+            <CardTitle className="flex items-center gap-1.5 text-base">
+              <HandCoins className="size-4" strokeWidth={1.5} />
+              {t("paymentClaimsToConfirm")}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {pendingClaims.map((claim) => (
               <div key={claim.id} className="flex items-center justify-between gap-3 text-sm">
                 <span>
-                  {memberName.get(claim.debtorMember)} says they paid you{" "}
-                  <span className="font-medium">
-                    {formatCents(claim.amountCents, group.baseCurrency)}
-                  </span>{" "}
-                  via Telegram
+                  {t("claimLine", { name: memberName.get(claim.debtorMember) ?? "" })}{" "}
+                  <Money cents={claim.amountCents} currency={group.baseCurrency} tone="neutral" />{" "}
+                  {t("viaTelegram")}
                 </span>
                 <form
                   action={async () => {
@@ -152,7 +185,7 @@ export default async function BalancesPage({
                   }}
                 >
                   <Button type="submit" size="sm" data-testid={`confirm-claim-${claim.id}`}>
-                    Confirm
+                    {t("confirm")}
                   </Button>
                 </form>
               </div>

@@ -63,7 +63,7 @@ export function CreateTripForm({ groups }: { groups: { id: string; name: string 
           </div>
           <div className="space-y-2">
             <Label htmlFor="baseCurrency">Currency</Label>
-            <Input id="baseCurrency" name="baseCurrency" defaultValue="USD" maxLength={3} className="w-20 uppercase" />
+            <Input id="baseCurrency" name="baseCurrency" defaultValue="USD" maxLength={3} className="w-20" />
           </div>
           {groups.length > 0 && (
             <div className="space-y-2">

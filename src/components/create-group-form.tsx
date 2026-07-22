@@ -56,7 +56,7 @@ export function CreateGroupForm() {
               name="baseCurrency"
               defaultValue="USD"
               maxLength={3}
-              className="w-20 uppercase"
+              className="w-20"
             />
           </div>
           <Button type="submit" disabled={loading}>

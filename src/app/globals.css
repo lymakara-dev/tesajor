@@ -157,7 +157,10 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    /* Khmer script rule: line-height >= 1.65 so subscript stacking and
+       diacritics never clip; also removes reliance on text-transform
+       uppercase anywhere (labels use weight/color instead, per spec). */
+    @apply bg-background text-foreground leading-[1.65];
   }
   html {
     @apply font-sans;

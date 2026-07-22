@@ -61,7 +61,7 @@ export default async function AgendaItemPage({
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 space-y-6">
+    <div className="mx-auto max-w-[480px] px-4 py-10 space-y-6">
       <div>
         <Link href={`/trips/${id}`} className="text-sm text-muted-foreground hover:underline">
           ← Back to trip

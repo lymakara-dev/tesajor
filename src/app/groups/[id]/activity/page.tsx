@@ -63,7 +63,7 @@ export default async function ActivityPage({
     .orderBy(desc(activityLog.createdAt));
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 space-y-6">
+    <div className="mx-auto max-w-[480px] px-4 py-10 space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">{group.name} — Activity</h1>
         <p className="text-muted-foreground">Every expense and settlement, in order.</p>

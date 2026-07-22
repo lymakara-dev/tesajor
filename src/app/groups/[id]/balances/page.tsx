@@ -53,7 +53,7 @@ export default async function BalancesPage({
     : [];
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 space-y-8">
+    <div className="mx-auto max-w-[480px] px-4 py-10 space-y-8">
       <div>
         <h1 className="text-2xl font-semibold">{group.name} — Balances</h1>
         <p className="text-muted-foreground">Base currency: {group.baseCurrency}</p>

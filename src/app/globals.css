@@ -7,9 +7,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-kantumruy);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-kantumruy);
+  --font-display: var(--font-moul);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -39,6 +40,19 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
+  /* Krama design system — named palette, usable directly (bg-mekong,
+     text-krama, etc.) and reused below to drive the semantic tokens
+     above, so every existing bg-background/text-foreground/border-border
+     usage repaints automatically. */
+  --color-rice: var(--rice);
+  --color-sandstone: var(--sandstone);
+  --color-palm-ink: var(--palm-ink);
+  --color-mekong: var(--mekong);
+  --color-saffron: var(--saffron);
+  --color-krama: var(--krama);
+  --color-paddy: var(--paddy);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -49,72 +63,93 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Krama palette — light "Rice Paper" theme */
+  --rice: #fcfaf4;
+  --sandstone: #e9dfcb;
+  --palm-ink: #21221d;
+  --mekong: #27357e;
+  --saffron: #f08a00;
+  --krama: #d42a34;
+  --paddy: #1f8a5d;
+
+  --background: var(--rice);
+  --foreground: var(--palm-ink);
+  --card: var(--rice);
+  --card-foreground: var(--palm-ink);
+  --popover: var(--rice);
+  --popover-foreground: var(--palm-ink);
+  --primary: var(--mekong);
+  --primary-foreground: var(--rice);
+  --secondary: var(--sandstone);
+  --secondary-foreground: var(--palm-ink);
+  --muted: var(--sandstone);
+  --muted-foreground: #6e6d5f;
+  --accent: var(--sandstone);
+  --accent-foreground: var(--palm-ink);
+  --destructive: var(--krama);
+  --border: var(--sandstone);
+  --input: var(--sandstone);
+  --ring: var(--mekong);
+  --chart-1: var(--mekong);
+  --chart-2: var(--saffron);
+  --chart-3: var(--paddy);
+  --chart-4: var(--krama);
+  --chart-5: var(--sandstone);
+  --radius: calc(16px / 1.4);
+  --sidebar: var(--rice);
+  --sidebar-foreground: var(--palm-ink);
+  --sidebar-primary: var(--mekong);
+  --sidebar-primary-foreground: var(--rice);
+  --sidebar-accent: var(--sandstone);
+  --sidebar-accent-foreground: var(--palm-ink);
+  --sidebar-border: var(--sandstone);
+  --sidebar-ring: var(--mekong);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Krama palette — dark "Night Market" theme. Saffron/krama/paddy are
+     brightened for AA contrast on the dark background; mekong, rice,
+     sandstone, palm-ink stay as fixed brand values but are reassigned to
+     the Night Market bg/surface/text roles below. */
+  --rice: #12162b;
+  --sandstone: #1b2140;
+  --palm-ink: #e8e6dd;
+  --mekong: #27357e;
+  --saffron: #ffa733;
+  --krama: #ff5c64;
+  --paddy: #2fcb86;
+
+  --background: var(--rice);
+  --foreground: var(--palm-ink);
+  --card: var(--sandstone);
+  --card-foreground: var(--palm-ink);
+  --popover: var(--sandstone);
+  --popover-foreground: var(--palm-ink);
+  --primary: #4c63c9;
+  --primary-foreground: #f4f6ff;
+  --secondary: var(--sandstone);
+  --secondary-foreground: var(--palm-ink);
+  --muted: var(--sandstone);
+  --muted-foreground: #a6a48f;
+  --accent: #242b52;
+  --accent-foreground: var(--palm-ink);
+  --destructive: var(--krama);
+  --border: rgba(232, 230, 221, 0.14);
+  --input: rgba(232, 230, 221, 0.14);
+  --ring: #4c63c9;
+  --chart-1: #4c63c9;
+  --chart-2: var(--saffron);
+  --chart-3: var(--paddy);
+  --chart-4: var(--krama);
+  --chart-5: var(--sandstone);
+  --sidebar: var(--sandstone);
+  --sidebar-foreground: var(--palm-ink);
+  --sidebar-primary: #4c63c9;
+  --sidebar-primary-foreground: #f4f6ff;
+  --sidebar-accent: #242b52;
+  --sidebar-accent-foreground: var(--palm-ink);
+  --sidebar-border: rgba(232, 230, 221, 0.14);
+  --sidebar-ring: #4c63c9;
 }
 
 @layer base {
@@ -127,4 +162,34 @@
   html {
     @apply font-sans;
   }
+}
+
+/* Money amounts: bold + tabular figures everywhere a value renders. */
+.amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+/* Krama gingham check — used in exactly 3 places: the app-shell top
+   ribbon, progress-bar fill, and achievement badge frame. Not a
+   general-purpose decorative pattern. */
+.krama-pattern {
+  background-color: #ffffff;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(212, 42, 52, 0.55) 0,
+      rgba(212, 42, 52, 0.55) 4px,
+      transparent 4px,
+      transparent 8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(212, 42, 52, 0.55) 0,
+      rgba(212, 42, 52, 0.55) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+  background-blend-mode: multiply;
+  background-size: 8px 8px;
 }

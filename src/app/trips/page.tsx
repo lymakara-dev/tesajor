@@ -30,7 +30,7 @@ export default async function TripsPage() {
     .where(eq(groupMembers.userId, session.user.id));
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 space-y-8">
+    <div className="mx-auto max-w-[480px] px-4 py-10 space-y-8">
       <div>
         <h1 className="text-2xl font-semibold">Your trips</h1>
         <p className="text-muted-foreground">Plan a trip as a day-by-day agenda of stops.</p>

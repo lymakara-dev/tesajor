@@ -1,9 +1,17 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
+import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { groupMembers, groups, paymentRequests } from "@/db/schema";
+import {
+  expenseShares,
+  expenses,
+  groupMembers,
+  groups,
+  paymentMethods,
+  paymentRequests,
+} from "@/db/schema";
 import { recordSettlement } from "@/lib/actions/settlements";
 import { confirmPaymentRequest } from "@/lib/actions/payment-requests";
 import { simplifyDebts } from "@/lib/balances/calculate";
@@ -11,6 +19,7 @@ import { getGroupNets } from "@/lib/queries/balances";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Money, type MoneyTone } from "@/components/money";
+import { MemberAvatar } from "@/components/member-avatar";
 import { RecordPaymentForm } from "@/components/record-payment-form";
 import { RequestPaymentsButton } from "@/components/request-payments-button";
 import { Scale, HandCoins } from "lucide-react";
@@ -51,6 +60,30 @@ export default async function BalancesPage({
     ? (nets.find((n) => n.memberId === currentMember.id)?.netCents ?? 0)
     : 0;
 
+  // How many expenses each member shares in — presentation-only context on
+  // the balance rows, not used in any balance/settlement math.
+  const groupExpenseIds = (
+    await db
+      .select({ id: expenses.id })
+      .from(expenses)
+      .where(and(eq(expenses.groupId, id), isNull(expenses.deletedAt)))
+  ).map((e) => e.id);
+  const shareRows = groupExpenseIds.length
+    ? await db
+        .select({ memberId: expenseShares.memberId })
+        .from(expenseShares)
+        .where(inArray(expenseShares.expenseId, groupExpenseIds))
+    : [];
+  const expenseCountByMember = new Map<string, number>();
+  for (const row of shareRows) {
+    expenseCountByMember.set(row.memberId, (expenseCountByMember.get(row.memberId) ?? 0) + 1);
+  }
+
+  const myPaymentMethods = session.user.id
+    ? await db.select().from(paymentMethods).where(eq(paymentMethods.userId, session.user.id))
+    : [];
+  const myDefaultMethod = myPaymentMethods.find((m) => m.isDefault) ?? myPaymentMethods[0] ?? null;
+
   const pendingClaims = currentMember
     ? await db
         .select()
@@ -89,6 +122,31 @@ export default async function BalancesPage({
         </Card>
       )}
 
+      {currentMember && myDefaultMethod && (
+        <div className="flex items-center gap-3 rounded-2xl bg-krama p-3.5 text-rice">
+          <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-rice p-1">
+            {myDefaultMethod.qrImageUrl ? (
+              <Image
+                src={myDefaultMethod.qrImageUrl}
+                alt={myDefaultMethod.label}
+                width={48}
+                height={48}
+                className="size-full rounded-sm object-cover"
+              />
+            ) : (
+              <span className="text-[10px] font-medium text-krama">QR</span>
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="amount truncate text-sm font-bold">
+              {myDefaultMethod.label || t("khqrDefaultLabel")}
+            </p>
+            <p className="truncate text-xs text-rice/80">{currentMember.displayName}</p>
+          </div>
+          <RequestPaymentsButton groupId={id} variant="khqr" />
+        </div>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">{t("netBalances")}</CardTitle>
@@ -97,11 +155,19 @@ export default async function BalancesPage({
           {nets.map((n) => (
             <div
               key={n.memberId}
-              className="flex items-center justify-between text-sm"
+              className="flex items-center gap-3 text-sm"
               data-testid={`net-${n.memberId}`}
             >
-              <span>{memberName.get(n.memberId)}</span>
-              <span className="flex items-center gap-1">
+              <MemberAvatar id={n.memberId} name={memberName.get(n.memberId) ?? "?"} size="sm" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate">{memberName.get(n.memberId)}</span>
+                {(expenseCountByMember.get(n.memberId) ?? 0) > 0 && (
+                  <span className="block truncate text-xs text-muted-foreground">
+                    {t("expenseCount", { count: expenseCountByMember.get(n.memberId) ?? 0 })}
+                  </span>
+                )}
+              </span>
+              <span className="flex shrink-0 items-center gap-1">
                 {n.netCents === 0 ? (
                   <span className="text-muted-foreground">{t("settledUp")}</span>
                 ) : (
@@ -133,9 +199,25 @@ export default async function BalancesPage({
           )}
           {suggestions.map((s, i) => (
             <div key={i} className="flex items-center justify-between gap-3 text-sm">
-              <span>
-                {t("paysLine", { from: memberName.get(s.fromMemberId) ?? "", to: memberName.get(s.toMemberId) ?? "" })}{" "}
-                <Money cents={s.amountCents} currency={group.baseCurrency} tone="neutral" />
+              <span className="flex min-w-0 items-center gap-2">
+                <span className="-space-x-2 flex shrink-0">
+                  <MemberAvatar
+                    id={s.fromMemberId}
+                    name={memberName.get(s.fromMemberId) ?? "?"}
+                    size="sm"
+                    className="ring-2 ring-background"
+                  />
+                  <MemberAvatar
+                    id={s.toMemberId}
+                    name={memberName.get(s.toMemberId) ?? "?"}
+                    size="sm"
+                    className="ring-2 ring-background"
+                  />
+                </span>
+                <span className="min-w-0">
+                  {t("paysLine", { from: memberName.get(s.fromMemberId) ?? "", to: memberName.get(s.toMemberId) ?? "" })}{" "}
+                  <Money cents={s.amountCents} currency={group.baseCurrency} tone="neutral" />
+                </span>
               </span>
               <form
                 action={async () => {
@@ -194,7 +276,7 @@ export default async function BalancesPage({
         </Card>
       )}
 
-      {currentMember && <RequestPaymentsButton groupId={id} />}
+      {currentMember && !myDefaultMethod && <RequestPaymentsButton groupId={id} />}
 
       <RecordPaymentForm
         groupId={id}

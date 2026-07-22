@@ -39,6 +39,7 @@ export default async function TripPage({
 
   const items = await db.select().from(agendaItems).where(eq(agendaItems.tripId, id));
   items.sort((a, b) => a.dayNumber - b.dayNumber || a.sortOrder - b.sortOrder);
+  const nextUpItemId = items.find((i) => i.status === "todo")?.id ?? null;
 
   const dayCount = Math.max(1, dayOffsetBetween(trip.startDate, trip.endDate) + 1);
   const tripProgress = computeTripProgress(items);
@@ -118,8 +119,9 @@ export default async function TripPage({
         return (
           <Card key={day}>
             <CardHeader>
+              <p className="text-xs font-bold text-saffron">{t("dayEyebrow", { day, dayCount })}</p>
               <CardTitle className="text-base">
-                {t("dayHeading", { day, completed: dayProgress.completed, total: dayProgress.total })}
+                {t("dayHeading", { completed: dayProgress.completed, total: dayProgress.total })}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -132,6 +134,7 @@ export default async function TripPage({
                   key={item.id}
                   item={{ ...item, tripId: id }}
                   canComplete={canEditTrip(role)}
+                  isNext={item.id === nextUpItemId}
                 />
               ))}
             </CardContent>

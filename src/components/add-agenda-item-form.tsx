@@ -2,14 +2,18 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { addAgendaItem } from "@/lib/actions/agenda-items";
 import { dollarsToCents } from "@/lib/money/cents";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus } from "lucide-react";
 
 const CATEGORIES = ["food", "sight", "transport", "hotel", "activity", "other"] as const;
+const selectClass =
+  "h-10 w-full rounded-lg border border-input bg-transparent px-3 text-base capitalize md:text-sm";
 
 export function AddAgendaItemForm({
   tripId,
@@ -23,6 +27,7 @@ export function AddAgendaItemForm({
   currency: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("addAgendaItem");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -57,61 +62,54 @@ export function AddAgendaItemForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Add a stop</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Plus className="size-4 text-mekong" strokeWidth={1.5} />
+          {t("title")}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="space-y-2">
-            <Label htmlFor="item-title">Title</Label>
-            <Input id="item-title" name="title" placeholder="Fushimi Inari Shrine" required maxLength={160} />
+            <Label htmlFor="item-title">{t("stopTitle")}</Label>
+            <Input id="item-title" name="title" placeholder={t("stopTitlePlaceholder")} required maxLength={160} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="dayNumber">Day</Label>
-              <select
-                id="dayNumber"
-                name="dayNumber"
-                defaultValue={defaultDay}
-                className="h-9 w-full rounded-md border border-input bg-transparent px-2.5 text-sm"
-              >
+              <Label htmlFor="dayNumber">{t("day")}</Label>
+              <select id="dayNumber" name="dayNumber" defaultValue={defaultDay} className={selectClass}>
                 {Array.from({ length: dayCount }, (_, i) => i + 1).map((day) => (
                   <option key={day} value={day}>
-                    Day {day}
+                    {t("dayOption", { day })}
                   </option>
                 ))}
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <select
-                id="category"
-                name="category"
-                defaultValue="other"
-                className="h-9 w-full rounded-md border border-input bg-transparent px-2.5 text-sm capitalize"
-              >
+              <Label htmlFor="category">{t("category")}</Label>
+              <select id="category" name="category" defaultValue="other" className={selectClass}>
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>
-                    {c}
+                    {t(`categories.${c}`)}
                   </option>
                 ))}
               </select>
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="plannedCost">Planned cost ({currency})</Label>
+            <Label htmlFor="plannedCost">{t("plannedCost", { currency })}</Label>
             <Input id="plannedCost" name="plannedCost" type="number" inputMode="decimal" step="0.01" min="0" placeholder="0.00" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="placeName">Place (optional)</Label>
-            <Input id="placeName" name="placeName" placeholder="Place name" maxLength={200} />
+            <Label htmlFor="placeName">{t("place")}</Label>
+            <Input id="placeName" name="placeName" placeholder={t("placePlaceholder")} maxLength={200} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="address">Address (optional)</Label>
-            <Input id="address" name="address" placeholder="Address" maxLength={300} />
+            <Label htmlFor="address">{t("address")}</Label>
+            <Input id="address" name="address" placeholder={t("addressPlaceholder")} maxLength={300} />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" disabled={submitting}>
-            {submitting ? "Adding..." : "Add stop"}
+            {submitting ? t("adding") : t("addStop")}
           </Button>
         </form>
       </CardContent>

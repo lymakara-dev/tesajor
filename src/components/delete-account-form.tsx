@@ -2,13 +2,16 @@
 
 import { useState, type FormEvent } from "react";
 import { signOut } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { deleteAccount } from "@/lib/actions/account";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TriangleAlert } from "lucide-react";
 
 export function DeleteAccountForm({ email }: { email: string }) {
+  const t = useTranslations("deleteAccount");
   const [confirmation, setConfirmation] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -18,7 +21,7 @@ export function DeleteAccountForm({ email }: { email: string }) {
     setError(null);
 
     if (confirmation !== email) {
-      setError("Type your email exactly to confirm.");
+      setError(t("typeExactly"));
       return;
     }
 
@@ -35,19 +38,17 @@ export function DeleteAccountForm({ email }: { email: string }) {
   return (
     <Card className="border-destructive/50">
       <CardHeader>
-        <CardTitle className="text-base text-destructive">Delete account</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-base text-destructive">
+          <TriangleAlert className="size-4" strokeWidth={1.5} />
+          {t("title")}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <p className="text-sm text-muted-foreground">
-          This removes your name, email, and login from your account and any
-          groups you belong to. Expenses and settlements you were part of
-          stay so other members&apos; balances remain accurate, but are no
-          longer linked to your identity. This can&apos;t be undone.
-        </p>
+        <p className="text-sm text-muted-foreground">{t("explanation")}</p>
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="space-y-2">
             <Label htmlFor="confirmation">
-              Type <span className="font-mono">{email}</span> to confirm
+              {t("confirmPrefix")} <span className="font-mono">{email}</span> {t("confirmSuffix")}
             </Label>
             <Input
               id="confirmation"
@@ -58,7 +59,7 @@ export function DeleteAccountForm({ email }: { email: string }) {
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" variant="destructive" disabled={submitting}>
-            {submitting ? "Deleting..." : "Delete my account"}
+            {submitting ? t("deleting") : t("deleteMyAccount")}
           </Button>
         </form>
       </CardContent>

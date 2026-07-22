@@ -2,12 +2,17 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { recordSettlement } from "@/lib/actions/settlements";
 import { dollarsToCents } from "@/lib/money/cents";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { HandCoins } from "lucide-react";
+
+const selectClass =
+  "h-10 w-full rounded-lg border border-input bg-transparent px-3 text-base md:text-sm";
 
 interface Member {
   id: string;
@@ -22,6 +27,7 @@ export function RecordPaymentForm({
   members: Member[];
 }) {
   const router = useRouter();
+  const t = useTranslations("recordPayment");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -36,11 +42,11 @@ export function RecordPaymentForm({
     const amountCents = dollarsToCents(String(formData.get("amount") ?? ""));
 
     if (fromMemberId === toMemberId) {
-      setError("Payer and recipient must be different people.");
+      setError(t("samePerson"));
       return;
     }
     if (!amountCents || amountCents <= 0) {
-      setError("Enter a valid amount.");
+      setError(t("invalidAmount"));
       return;
     }
 
@@ -66,22 +72,19 @@ export function RecordPaymentForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Record a payment</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <HandCoins className="size-4 text-mekong" strokeWidth={1.5} />
+          {t("title")}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="from">From</Label>
-              <select
-                id="from"
-                name="from"
-                required
-                defaultValue=""
-                className="h-9 w-full rounded-md border border-input bg-transparent px-2.5 text-sm"
-              >
+              <Label htmlFor="from">{t("from")}</Label>
+              <select id="from" name="from" required defaultValue="" className={selectClass}>
                 <option value="" disabled>
-                  Select member
+                  {t("selectMember")}
                 </option>
                 {members.map((m) => (
                   <option key={m.id} value={m.id}>
@@ -91,16 +94,10 @@ export function RecordPaymentForm({
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="to">To</Label>
-              <select
-                id="to"
-                name="to"
-                required
-                defaultValue=""
-                className="h-9 w-full rounded-md border border-input bg-transparent px-2.5 text-sm"
-              >
+              <Label htmlFor="to">{t("to")}</Label>
+              <select id="to" name="to" required defaultValue="" className={selectClass}>
                 <option value="" disabled>
-                  Select member
+                  {t("selectMember")}
                 </option>
                 {members.map((m) => (
                   <option key={m.id} value={m.id}>
@@ -112,7 +109,7 @@ export function RecordPaymentForm({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="amount">Amount</Label>
+              <Label htmlFor="amount">{t("amount")}</Label>
               <Input
                 id="amount"
                 name="amount"
@@ -125,17 +122,17 @@ export function RecordPaymentForm({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="method">Method</Label>
-              <Input id="method" name="method" placeholder="Cash, Venmo..." maxLength={60} />
+              <Label htmlFor="method">{t("method")}</Label>
+              <Input id="method" name="method" placeholder={t("methodPlaceholder")} maxLength={60} />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="note">Note</Label>
+            <Label htmlFor="note">{t("note")}</Label>
             <Input id="note" name="note" maxLength={500} />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" disabled={submitting}>
-            {submitting ? "Recording..." : "Record payment"}
+            {submitting ? t("recording") : t("recordPayment")}
           </Button>
         </form>
       </CardContent>

@@ -72,7 +72,7 @@ export function CreateTripForm({ groups }: { groups: { id: string; name: string 
                 id="groupId"
                 name="groupId"
                 defaultValue=""
-                className="h-9 w-full rounded-md border border-input bg-transparent px-2.5 text-sm"
+                className="h-10 w-full rounded-lg border border-input bg-transparent px-3 text-base md:text-sm"
               >
                 <option value="">No group — just for me</option>
                 {groups.map((g) => (

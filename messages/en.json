@@ -132,5 +132,77 @@
     "title": "Your trips",
     "subtitle": "Plan a trip as a day-by-day agenda of stops.",
     "empty": "No trips yet."
+  },
+  "recordPayment": {
+    "title": "Record a payment",
+    "from": "From",
+    "to": "To",
+    "selectMember": "Select member",
+    "amount": "Amount",
+    "method": "Method",
+    "methodPlaceholder": "Cash, Venmo...",
+    "note": "Note",
+    "samePerson": "Payer and recipient must be different people.",
+    "invalidAmount": "Enter a valid amount.",
+    "recording": "Recording...",
+    "recordPayment": "Record payment"
+  },
+  "requestPayments": {
+    "requestViaTelegram": "Request payments via Telegram",
+    "sending": "Sending...",
+    "sentTo": "Sent to {names}.",
+    "oneUnlinked": "{names} hasn't connected Telegram yet.",
+    "manyUnlinked": "{names} haven't connected Telegram yet.",
+    "nothingToSend": "Nothing to send."
+  },
+  "deleteAccount": {
+    "title": "Delete account",
+    "explanation": "This removes your name, email, and login from your account and any groups you belong to. Expenses and settlements you were part of stay so other members' balances remain accurate, but are no longer linked to your identity. This can't be undone.",
+    "confirmPrefix": "Type",
+    "confirmSuffix": "to confirm",
+    "typeExactly": "Type your email exactly to confirm.",
+    "deleting": "Deleting...",
+    "deleteMyAccount": "Delete my account"
+  },
+  "journal": {
+    "title": "Journal this stop",
+    "mood": "Mood",
+    "notes": "Notes",
+    "notesPlaceholder": "How was it?",
+    "tags": "Tags",
+    "actualCost": "Actual price paid",
+    "achievementUnlocked": "Achievement unlocked: {keys}",
+    "saving": "Saving...",
+    "saveEntry": "Save journal entry"
+  },
+  "cloneTrip": {
+    "useThisTemplate": "Use this template",
+    "title": "Clone this trip",
+    "startDate": "Your start date",
+    "cloning": "Cloning...",
+    "cloneTrip": "Clone trip"
+  },
+  "addAgendaItem": {
+    "title": "Add a stop",
+    "stopTitle": "Title",
+    "stopTitlePlaceholder": "Fushimi Inari Shrine",
+    "day": "Day",
+    "dayOption": "Day {day}",
+    "category": "Category",
+    "categories": {
+      "food": "Food",
+      "sight": "Sight",
+      "transport": "Transport",
+      "hotel": "Hotel",
+      "activity": "Activity",
+      "other": "Other"
+    },
+    "plannedCost": "Planned cost ({currency})",
+    "place": "Place (optional)",
+    "placePlaceholder": "Place name",
+    "address": "Address (optional)",
+    "addressPlaceholder": "Address",
+    "adding": "Adding...",
+    "addStop": "Add stop"
   }
 }

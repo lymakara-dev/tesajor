@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { addItemNote } from "@/lib/actions/item-notes";
 import { dollarsToCents } from "@/lib/money/cents";
 import { Button } from "@/components/ui/button";
@@ -9,12 +10,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { NotebookPen } from "lucide-react";
+import { displayForAchievementKey } from "@/lib/trips/achievement-icons";
 
 const TAGS = ["environment", "scenery", "food", "price", "tip"] as const;
 const MOODS = ["😞", "😕", "😐", "🙂", "😄"];
 
 export function JournalForm({ agendaItemId }: { agendaItemId: string }) {
   const router = useRouter();
+  const t = useTranslations("journal");
   const [mood, setMood] = useState<number | null>(null);
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
@@ -62,12 +66,15 @@ export function JournalForm({ agendaItemId }: { agendaItemId: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Journal this stop</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <NotebookPen className="size-4 text-mekong" strokeWidth={1.5} />
+          {t("title")}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="space-y-2">
-            <Label>Mood</Label>
+            <Label>{t("mood")}</Label>
             <div className="flex gap-2">
               {MOODS.map((emoji, i) => (
                 <button
@@ -82,11 +89,11 @@ export function JournalForm({ agendaItemId }: { agendaItemId: string }) {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="noteText">Notes</Label>
-            <Textarea id="noteText" name="noteText" rows={3} maxLength={2000} placeholder="How was it?" />
+            <Label htmlFor="noteText">{t("notes")}</Label>
+            <Textarea id="noteText" name="noteText" rows={3} maxLength={2000} placeholder={t("notesPlaceholder")} />
           </div>
           <div className="space-y-2">
-            <Label>Tags</Label>
+            <Label>{t("tags")}</Label>
             <div className="flex flex-wrap gap-2">
               {TAGS.map((tag) => (
                 <button
@@ -101,17 +108,19 @@ export function JournalForm({ agendaItemId }: { agendaItemId: string }) {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="actualCost">Actual price paid</Label>
+            <Label htmlFor="actualCost">{t("actualCost")}</Label>
             <Input id="actualCost" name="actualCost" type="number" inputMode="decimal" step="0.01" min="0" placeholder="0.00" />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           {unlocked.length > 0 && (
-            <p className="text-sm text-emerald-600 dark:text-emerald-400">
-              🏆 Achievement unlocked: {unlocked.join(", ")}
+            <p className="text-sm text-paddy">
+              🏆 {t("achievementUnlocked", {
+                keys: unlocked.map((key) => displayForAchievementKey(key).label).join(", "),
+              })}
             </p>
           )}
           <Button type="submit" disabled={submitting}>
-            {submitting ? "Saving..." : "Save journal entry"}
+            {submitting ? t("saving") : t("saveEntry")}
           </Button>
         </form>
       </CardContent>

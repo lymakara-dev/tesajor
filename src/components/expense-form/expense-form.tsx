@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createExpense, updateExpense } from "@/lib/actions/expenses";
 import { centsToDollarsInput, dollarsToCents } from "@/lib/money/cents";
 import { computeExpenseShares, payersSumMatches } from "@/lib/splits/calculate";
@@ -14,6 +15,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Money } from "@/components/money";
+import { Receipt, Users, SplitSquareHorizontal } from "lucide-react";
 import type { ExpenseFormInitialValues, ExpenseFormMember } from "./types";
 
 interface ExpenseFormProps {
@@ -59,6 +62,7 @@ export function ExpenseForm({
   prefill,
 }: ExpenseFormProps) {
   const router = useRouter();
+  const t = useTranslations("expenseForm");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -187,7 +191,7 @@ export function ExpenseForm({
       const response = await fetch("/api/uploads", { method: "POST", body: formData });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error ?? "Failed to upload receipt.");
+        setError(body.error ?? t("uploadFailed"));
         return;
       }
       setReceiptUrl(body.url);
@@ -201,14 +205,14 @@ export function ExpenseForm({
     setError(null);
 
     if (!title.trim()) {
-      setError("Title is required.");
+      setError(t("titleRequired"));
       return;
     }
 
     const totalAmountCents =
       splitMethod === "itemized" ? itemizedTotalCents : dollarsToCents(totalInput) ?? 0;
     if (totalAmountCents <= 0) {
-      setError("Total amount must be greater than zero.");
+      setError(t("totalMustBePositive"));
       return;
     }
 
@@ -216,11 +220,11 @@ export function ExpenseForm({
       .filter(([, v]) => v.included)
       .map(([memberId, v]) => ({ memberId, paidAmountCents: dollarsToCents(v.amount) ?? 0 }));
     if (payerEntries.length === 0) {
-      setError("Select at least one payer.");
+      setError(t("selectAtLeastOnePayer"));
       return;
     }
     if (!payersSumMatches(payerEntries, totalAmountCents)) {
-      setError("Payer amounts must sum to the total.");
+      setError(t("payerAmountsMustMatch"));
       return;
     }
 
@@ -316,23 +320,26 @@ export function ExpenseForm({
     <form onSubmit={onSubmit} className="space-y-6 pb-16">
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Details</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Receipt className="size-4 text-mekong" strokeWidth={1.5} />
+            {t("detailsTitle")}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
+            <Label htmlFor="title">{t("titleLabel")}</Label>
             <Input
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Dinner at Nomz"
+              placeholder={t("titlePlaceholder")}
               required
               maxLength={120}
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="date">Date</Label>
+              <Label htmlFor="date">{t("dateLabel")}</Label>
               <Input
                 id="date"
                 type="date"
@@ -342,19 +349,19 @@ export function ExpenseForm({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">{t("categoryLabel")}</Label>
               <Input
                 id="category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                placeholder="Food"
+                placeholder={t("categoryPlaceholder")}
                 maxLength={60}
               />
             </div>
           </div>
           {splitMethod !== "itemized" && (
             <div className="space-y-2">
-              <Label htmlFor="total">Total ({currency})</Label>
+              <Label htmlFor="total">{t("totalLabel", { currency })}</Label>
               <Input
                 id="total"
                 type="number"
@@ -369,7 +376,7 @@ export function ExpenseForm({
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="note">Note</Label>
+            <Label htmlFor="note">{t("noteLabel")}</Label>
             <Textarea
               id="note"
               value={note}
@@ -379,14 +386,14 @@ export function ExpenseForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="receipt">Receipt photo</Label>
+            <Label htmlFor="receipt">{t("receiptLabel")}</Label>
             {receiptUrl && (
               <Image
                 src={receiptUrl}
-                alt="Receipt"
+                alt={t("receiptLabel")}
                 width={96}
                 height={96}
-                className="h-24 w-24 rounded-md border object-cover"
+                className="h-24 w-24 rounded-md border border-sandstone object-cover"
               />
             )}
             <Input
@@ -397,7 +404,7 @@ export function ExpenseForm({
               disabled={uploadingReceipt}
             />
             {uploadingReceipt && (
-              <p className="text-sm text-muted-foreground">Uploading...</p>
+              <p className="text-sm text-muted-foreground">{t("uploading")}</p>
             )}
           </div>
         </CardContent>
@@ -405,7 +412,10 @@ export function ExpenseForm({
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Who paid?</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Users className="size-4 text-mekong" strokeWidth={1.5} />
+            {t("whoPaidTitle")}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {members.map((m) => (
@@ -445,7 +455,10 @@ export function ExpenseForm({
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Split method</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <SplitSquareHorizontal className="size-4 text-mekong" strokeWidth={1.5} />
+            {t("splitMethodTitle")}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <RadioGroup
@@ -456,10 +469,10 @@ export function ExpenseForm({
             {(["equal", "exact", "percent", "shares", "itemized"] as const).map((method) => (
               <label
                 key={method}
-                className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm capitalize has-[[data-state=checked]]:border-primary"
+                className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm has-[[data-state=checked]]:border-primary"
               >
                 <RadioGroupItem value={method} data-testid={`split-method-${method}`} />
-                {method}
+                {t(`splitMethods.${method}`)}
               </label>
             ))}
           </RadioGroup>
@@ -567,7 +580,7 @@ export function ExpenseForm({
                       data-testid={`item-name-${index}`}
                       value={item.name}
                       onChange={(e) => updateItem(item.clientId, { name: e.target.value })}
-                      placeholder="Item name"
+                      placeholder={t("itemNamePlaceholder")}
                       className="flex-1"
                     />
                     <Input
@@ -588,7 +601,7 @@ export function ExpenseForm({
                       onClick={() => setItems((prev) => prev.filter((i) => i.clientId !== item.clientId))}
                       disabled={items.length === 1}
                     >
-                      Remove
+                      {t("removeItem")}
                     </Button>
                   </div>
                   <div className="flex flex-wrap gap-3">
@@ -612,11 +625,11 @@ export function ExpenseForm({
                 data-testid="add-item"
                 onClick={() => setItems((prev) => [...prev, newItemRow()])}
               >
-                Add item
+                {t("addItem")}
               </Button>
               <div className="flex items-center gap-3">
                 <Label htmlFor="taxTip" className="w-28">
-                  Tax &amp; tip
+                  {t("taxTip")}
                 </Label>
                 <Input
                   id="taxTip"
@@ -630,7 +643,7 @@ export function ExpenseForm({
                 />
               </div>
               <p className="text-sm text-muted-foreground">
-                Total: {(itemizedTotalCents / 100).toFixed(2)} {currency}
+                {t("total")} <Money cents={itemizedTotalCents} currency={currency} size="sm" />
               </p>
             </div>
           )}
@@ -641,10 +654,10 @@ export function ExpenseForm({
 
       <div className="flex gap-3">
         <Button type="submit" disabled={submitting} data-testid="submit-expense">
-          {submitting ? "Saving..." : mode === "edit" ? "Save changes" : "Add expense"}
+          {submitting ? t("saving") : mode === "edit" ? t("saveChanges") : t("addExpense")}
         </Button>
         <Button type="button" variant="ghost" onClick={() => router.back()}>
-          Cancel
+          {t("cancel")}
         </Button>
       </div>
     </form>

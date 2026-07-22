@@ -4,10 +4,33 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { accounts, groupMembers, sessions, users } from "@/db/schema";
 import { auth } from "@/lib/auth";
+import { updateProfileSchema } from "@/lib/validation/account";
 
 export type ActionResult<T = undefined> =
   | { ok: true; data: T }
   | { ok: false; error: string };
+
+export async function updateProfile(
+  input: unknown,
+): Promise<ActionResult<{ name: string; image: string | null }>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { ok: false, error: "You must be signed in." };
+  }
+
+  const parsed = updateProfileSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid profile." };
+  }
+
+  const [updated] = await db
+    .update(users)
+    .set({ name: parsed.data.name, image: parsed.data.image ?? null })
+    .where(eq(users.id, session.user.id))
+    .returning({ name: users.name, image: users.image });
+
+  return { ok: true, data: updated };
+}
 
 /**
  * GDPR-style deletion: anonymizes personal identifiers everywhere (account

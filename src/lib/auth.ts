@@ -134,8 +134,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) token.sub = user.id;
+      // Populated by useSession().update({ name, image }) after a profile
+      // edit — without this, the JWT keeps showing the name/avatar from
+      // the moment the user last signed in.
+      if (trigger === "update" && session) {
+        if (typeof session.name === "string") token.name = session.name;
+        if ("image" in session) token.picture = session.image;
+      }
       return token;
     },
     async session({ session, token }) {

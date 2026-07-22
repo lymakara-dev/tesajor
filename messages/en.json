@@ -71,6 +71,11 @@
     "profile": "Profile",
     "name": "Name",
     "email": "Email",
+    "changePhoto": "Change photo",
+    "uploading": "Uploading...",
+    "uploadFailed": "Failed to upload photo.",
+    "saving": "Saving...",
+    "saveProfile": "Save changes",
     "preferences": "Preferences",
     "appearance": "Appearance",
     "language": "Language"

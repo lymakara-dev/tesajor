@@ -71,6 +71,11 @@
     "profile": "ប្រវត្តិរូប",
     "name": "ឈ្មោះ",
     "email": "អ៊ីមែល",
+    "changePhoto": "ប្តូររូបភាព",
+    "uploading": "កំពុងផ្ទុកឡើង...",
+    "uploadFailed": "បរាជ័យក្នុងការផ្ទុករូបភាព។",
+    "saving": "កំពុងរក្សាទុក...",
+    "saveProfile": "រក្សាទុកការផ្លាស់ប្តូរ",
     "preferences": "ចំណូលចិត្ត",
     "appearance": "រូបរាង",
     "language": "ភាសា"

@@ -3,8 +3,9 @@ import { redirect } from "next/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { paymentMethods, telegramAccounts } from "@/db/schema";
+import { paymentMethods, telegramAccounts, users } from "@/db/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EditProfileForm } from "@/components/edit-profile-form";
 import { DeleteAccountForm } from "@/components/delete-account-form";
 import { TelegramConnectCard } from "@/components/telegram-connect-card";
 import { PaymentMethodsCard } from "@/components/payment-methods-card";
@@ -18,6 +19,8 @@ export default async function AccountPage() {
   if (!session?.user?.id) redirect("/login");
   const t = await getTranslations("account");
   const locale = (await getLocale()) as Locale;
+
+  const [me] = await db.select().from(users).where(eq(users.id, session.user.id)).limit(1);
 
   const [telegramAccount] = await db
     .select()
@@ -41,15 +44,12 @@ export default async function AccountPage() {
             {t("profile")}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-1 text-sm">
-          <p>
-            <span className="text-muted-foreground">{t("name")}: </span>
-            {session.user.name}
-          </p>
-          <p>
-            <span className="text-muted-foreground">{t("email")}: </span>
-            {session.user.email}
-          </p>
+        <CardContent>
+          <EditProfileForm
+            name={me?.name ?? session.user.name ?? ""}
+            email={me?.email ?? session.user.email ?? ""}
+            image={me?.image ?? null}
+          />
         </CardContent>
       </Card>
 

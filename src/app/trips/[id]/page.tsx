@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { agendaItems, trips, achievements } from "@/db/schema";
@@ -16,6 +17,8 @@ import { PublishTripControls } from "@/components/publish-trip-controls";
 import { CloneTripButton } from "@/components/clone-trip-button";
 import { YouAreHere } from "@/components/you-are-here";
 import { TripDayMap } from "@/components/trip-day-map";
+import { TripProgressCard } from "@/components/trip-progress-card";
+import { MapPin } from "lucide-react";
 
 export default async function TripPage({
   params,
@@ -25,6 +28,7 @@ export default async function TripPage({
   const { id } = await params;
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+  const t = await getTranslations("trip");
 
   const [trip] = await db.select().from(trips).where(eq(trips.id, id)).limit(1);
   if (!trip) notFound();
@@ -63,36 +67,28 @@ export default async function TripPage({
         )}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Progress</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-            <div
-              className="h-full bg-primary transition-all"
-              style={{ width: `${tripProgress.percent}%` }}
-            />
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {tripProgress.completed}/{tripProgress.total} stops done · {xp.totalXp} XP
-            {tripAchievements.length > 0 &&
-              ` · 🏆 ${tripAchievements.map((a) => a.key.split(":")[0]).join(", ")}`}
-          </p>
-        </CardContent>
-      </Card>
+      <TripProgressCard
+        completed={tripProgress.completed}
+        total={tripProgress.total}
+        percent={tripProgress.percent}
+        xpTotal={xp.totalXp}
+        earnedKeys={tripAchievements.map((a) => a.key)}
+      />
 
       {canManageTrip(role) && (
         <>
           <PublishTripControls tripId={id} visibility={trip.visibility} />
-          <InviteLink inviteCode={trip.inviteCode} joinPath="/trips/join" title="Invite collaborators" />
+          <InviteLink inviteCode={trip.inviteCode} joinPath="/trips/join" title={t("inviteCollaborators")} />
         </>
       )}
 
       {items.some((i) => i.status === "todo" && i.lat != null && i.lng != null) && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Live position</CardTitle>
+            <CardTitle className="flex items-center gap-1.5 text-base">
+              <MapPin className="size-4 text-mekong" strokeWidth={1.5} />
+              {t("livePosition")}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <YouAreHere
@@ -120,12 +116,12 @@ export default async function TripPage({
           <Card key={day}>
             <CardHeader>
               <CardTitle className="text-base">
-                Day {day} — {dayProgress.completed}/{dayProgress.total} done
+                {t("dayHeading", { day, completed: dayProgress.completed, total: dayProgress.total })}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {dayItems.length === 0 && (
-                <p className="text-sm text-muted-foreground">No stops yet.</p>
+                <p className="text-sm text-muted-foreground">{t("noStopsYet")}</p>
               )}
               {dayItems.length > 0 && <TripDayMap stops={dayItems} />}
               {dayItems.map((item) => (

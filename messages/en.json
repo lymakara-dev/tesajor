@@ -70,5 +70,21 @@
     "setAsDefault": "Set as default",
     "adding": "Adding...",
     "addPaymentMethod": "Add payment method"
+  },
+  "trip": {
+    "progress": "Progress",
+    "stopsDone": "{completed}/{total} stops done",
+    "xp": "{xp} XP",
+    "inviteCollaborators": "Invite collaborators",
+    "livePosition": "Live position",
+    "dayHeading": "Day {day} — {completed}/{total} done",
+    "noStopsYet": "No stops yet.",
+    "navigate": "Navigate",
+    "done": "✅ Done",
+    "skip": "Skip",
+    "doneLabel": "Done",
+    "skippedLabel": "Skipped",
+    "undo": "Undo",
+    "achievementUnlocked": "🏆 Achievement unlocked: {keys}"
   }
 }

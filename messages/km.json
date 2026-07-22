@@ -70,5 +70,21 @@
     "setAsDefault": "កំណត់ជាលំនាំដើម",
     "adding": "កំពុងបន្ថែម...",
     "addPaymentMethod": "បន្ថែមវិធីបង់ប្រាក់"
+  },
+  "trip": {
+    "progress": "វឌ្ឍនភាព",
+    "stopsDone": "{completed}/{total} ចំណតបានបញ្ចប់",
+    "xp": "{xp} XP",
+    "inviteCollaborators": "អញ្ជើញអ្នកសហការ",
+    "livePosition": "ទីតាំងផ្ទាល់",
+    "dayHeading": "ថ្ងៃទី {day} — បានបញ្ចប់ {completed}/{total}",
+    "noStopsYet": "មិនទាន់មានចំណតនៅឡើយទេ។",
+    "navigate": "នាំផ្លូវ",
+    "done": "✅ រួចរាល់",
+    "skip": "រំលង",
+    "doneLabel": "រួចរាល់",
+    "skippedLabel": "បានរំលង",
+    "undo": "មិនធ្វើវិញ",
+    "achievementUnlocked": "🏆 សមិទ្ធិផលបានដោះសោ៖ {keys}"
   }
 }

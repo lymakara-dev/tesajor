@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,8 +16,16 @@ import {
 } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
 
-export default function LoginPage() {
+/** Only allow same-origin relative paths — never redirect off-site or via protocol-relative "//" tricks. */
+function safeCallbackUrl(raw: string | null): string {
+  if (raw && raw.startsWith("/") && !raw.startsWith("//")) return raw;
+  return "/";
+}
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = safeCallbackUrl(searchParams.get("callbackUrl"));
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -38,7 +46,7 @@ export default function LoginPage() {
       setError("Invalid email or password.");
       return;
     }
-    router.push("/groups");
+    router.push(callbackUrl);
     router.refresh();
   }
 
@@ -78,7 +86,7 @@ export default function LoginPage() {
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => signIn("google", { callbackUrl: "/groups" })}
+            onClick={() => signIn("google", { callbackUrl })}
           >
             Continue with Google
           </Button>
@@ -91,5 +99,13 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }

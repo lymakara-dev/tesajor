@@ -11,6 +11,20 @@
     "add": "Add",
     "tagline": "ទេសចរណ៍ · travel & split together"
   },
+  "home": {
+    "greeting": "Hi, {name}",
+    "subtitle": "Here's where things stand across your groups.",
+    "youAreOwed": "You are owed",
+    "youOwe": "You owe",
+    "youSettledUp": "You're settled up",
+    "otherCurrenciesNote": "Groups in other currencies are shown separately below.",
+    "yourGroups": "Your groups",
+    "noGroupsYet": "You're not in any groups yet.",
+    "createGroup": "Create your first group",
+    "settledUp": "settled up",
+    "addPaymentMethodHint": "Add a payment method so friends can pay you back easily.",
+    "addPaymentMethodLink": "Add one"
+  },
   "balances": {
     "baseCurrency": "Base currency: {currency}",
     "youAreOwed": "You are owed",

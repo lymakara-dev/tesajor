@@ -15,6 +15,13 @@
       "when": 1784681708508,
       "tag": "0001_stormy_screwball",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784685253070,
+      "tag": "0002_nasty_frightful_four",
+      "breakpoints": true
     }
   ]
 }

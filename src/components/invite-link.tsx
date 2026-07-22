@@ -5,12 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export function InviteLink({ inviteCode }: { inviteCode: string }) {
+export function InviteLink({
+  inviteCode,
+  joinPath = "/groups/join",
+  title = "Invite friends",
+}: {
+  inviteCode: string;
+  joinPath?: string;
+  title?: string;
+}) {
   const [copied, setCopied] = useState(false);
   const url =
     typeof window !== "undefined"
-      ? `${window.location.origin}/groups/join/${inviteCode}`
-      : `/groups/join/${inviteCode}`;
+      ? `${window.location.origin}${joinPath}/${inviteCode}`
+      : `${joinPath}/${inviteCode}`;
 
   async function copy() {
     await navigator.clipboard.writeText(url);
@@ -21,7 +29,7 @@ export function InviteLink({ inviteCode }: { inviteCode: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Invite friends</CardTitle>
+        <CardTitle className="text-base">{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex gap-2">
         <Input readOnly value={url} />

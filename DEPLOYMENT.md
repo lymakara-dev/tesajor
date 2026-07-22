@@ -33,6 +33,7 @@ with an authorized redirect URI of
 | `AUTH_URL` | `https://<your-domain>` |
 | `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Omit to leave Google sign-in disabled |
 | `TELEGRAM_BOT_TOKEN` / `TELEGRAM_BOT_USERNAME` / `TELEGRAM_WEBHOOK_SECRET` | Omit to leave Telegram payment requests disabled — see README "Telegram setup" |
+| `NEXT_PUBLIC_GOOGLE_MAPS_KEY` | Omit to leave the trip-agenda map as a plain stop list — see README "Trip Agenda & Maps" |
 
 ## 4. Telegram (optional)
 

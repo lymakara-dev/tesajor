@@ -24,6 +24,8 @@ interface ExpenseFormProps {
   mode: "create" | "edit";
   expenseId?: string;
   initial?: ExpenseFormInitialValues;
+  /** Quick-start values (e.g. from a trip journal entry) — ignored once `initial` is set. */
+  prefill?: { title?: string; totalDollars?: string; payerMemberId?: string };
 }
 
 interface ItemRow {
@@ -54,12 +56,13 @@ export function ExpenseForm({
   mode,
   expenseId,
   initial,
+  prefill,
 }: ExpenseFormProps) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [title, setTitle] = useState(initial?.title ?? "");
+  const [title, setTitle] = useState(initial?.title ?? prefill?.title ?? "");
   const [date, setDate] = useState(
     initial ? initial.expenseDate.toISOString().slice(0, 10) : todayInputValue(),
   );
@@ -71,11 +74,13 @@ export function ExpenseForm({
     initial?.splitMethod ?? "equal",
   );
 
-  const [totalInput, setTotalInput] = useState(() =>
-    initial && initial.splitMethod !== "itemized"
-      ? centsToDollarsInput(initial.totalAmountCents)
-      : "",
-  );
+  const [totalInput, setTotalInput] = useState(() => {
+    if (initial && initial.splitMethod !== "itemized") {
+      return centsToDollarsInput(initial.totalAmountCents);
+    }
+    if (!initial && prefill?.totalDollars) return prefill.totalDollars;
+    return "";
+  });
 
   const [payers, setPayers] = useState<Record<string, { included: boolean; amount: string }>>(
     () => {
@@ -86,7 +91,11 @@ export function ExpenseForm({
           state[p.memberId] = { included: true, amount: centsToDollarsInput(p.paidAmountCents) };
         }
       } else {
-        state[currentMemberId] = { included: true, amount: "" };
+        const payerId =
+          prefill?.payerMemberId && members.some((m) => m.id === prefill.payerMemberId)
+            ? prefill.payerMemberId
+            : currentMemberId;
+        state[payerId] = { included: true, amount: prefill?.totalDollars ?? "" };
       }
       return state;
     },

@@ -5,9 +5,12 @@ import {
   timestamp,
   integer,
   boolean,
+  doublePrecision,
+  date,
   jsonb,
   uuid,
   primaryKey,
+  unique,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
@@ -267,3 +270,117 @@ export const paymentRequests = pgTable("payment_requests", {
   confirmedAt: timestamp("confirmed_at"),
   settlementId: uuid("settlement_id").references(() => settlements.id),
 });
+
+// --- Trip Agenda ---
+
+export const tripVisibilityEnum = pgEnum("trip_visibility", [
+  "private",
+  "link",
+  "public_template",
+]);
+
+export const tripRoleEnum = pgEnum("trip_role", ["owner", "editor", "viewer"]);
+
+export const agendaItemCategoryEnum = pgEnum("agenda_item_category", [
+  "food",
+  "sight",
+  "transport",
+  "hotel",
+  "activity",
+  "other",
+]);
+
+export const agendaItemStatusEnum = pgEnum("agenda_item_status", [
+  "todo",
+  "done",
+  "skipped",
+]);
+
+export const trips = pgTable("trips", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  // Nullable: a trip doesn't have to be linked to an expense-splitting group.
+  groupId: uuid("group_id").references(() => groups.id, { onDelete: "set null" }),
+  ownerId: uuid("owner_id")
+    .notNull()
+    .references(() => users.id),
+  title: text("title").notNull(),
+  description: text("description"),
+  coverUrl: text("cover_url"),
+  startDate: date("start_date", { mode: "date" }).notNull(),
+  endDate: date("end_date", { mode: "date" }).notNull(),
+  baseCurrency: text("base_currency").notNull().default("USD"),
+  visibility: tripVisibilityEnum("visibility").notNull().default("private"),
+  // Lets other users join as a collaborator (see trip_members) — distinct
+  // from `visibility`, which controls template cloning.
+  inviteCode: text("invite_code").notNull().unique(),
+  clonedFromTripId: uuid("cloned_from_trip_id"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const tripMembers = pgTable(
+  "trip_members",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tripId: uuid("trip_id")
+      .notNull()
+      .references(() => trips.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    role: tripRoleEnum("role").notNull().default("viewer"),
+    joinedAt: timestamp("joined_at").notNull().defaultNow(),
+  },
+  (t) => [unique().on(t.tripId, t.userId)],
+);
+
+export const agendaItems = pgTable("agenda_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tripId: uuid("trip_id")
+    .notNull()
+    .references(() => trips.id, { onDelete: "cascade" }),
+  dayNumber: integer("day_number").notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  title: text("title").notNull(),
+  category: agendaItemCategoryEnum("category").notNull().default("other"),
+  plannedStart: timestamp("planned_start"),
+  plannedEnd: timestamp("planned_end"),
+  plannedCostCents: integer("planned_cost_cents"),
+  currency: text("currency").notNull().default("USD"),
+  placeName: text("place_name"),
+  placeId: text("place_id"),
+  lat: doublePrecision("lat"),
+  lng: doublePrecision("lng"),
+  address: text("address"),
+  status: agendaItemStatusEnum("status").notNull().default("todo"),
+  completedAt: timestamp("completed_at"),
+  completedBy: uuid("completed_by").references(() => users.id),
+});
+
+export const itemNotes = pgTable("item_notes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  agendaItemId: uuid("agenda_item_id")
+    .notNull()
+    .references(() => agendaItems.id, { onDelete: "cascade" }),
+  authorId: uuid("author_id")
+    .notNull()
+    .references(() => users.id),
+  mood: integer("mood"), // 1-5
+  noteText: text("note_text"),
+  tags: text("tags").array(),
+  actualCostCents: integer("actual_cost_cents"),
+  photoUrls: text("photo_urls").array(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const achievements = pgTable(
+  "achievements",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    key: text("key").notNull(),
+    earnedAt: timestamp("earned_at").notNull().defaultNow(),
+  },
+  (t) => [unique().on(t.userId, t.key)],
+);

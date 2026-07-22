@@ -17,6 +17,9 @@ export async function SiteHeader() {
               <Link href="/groups" className="text-sm">
                 Groups
               </Link>
+              <Link href="/trips" className="text-sm">
+                Trips
+              </Link>
               <Link href="/account" className="text-sm">
                 Account
               </Link>

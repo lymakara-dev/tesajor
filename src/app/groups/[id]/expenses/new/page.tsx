@@ -7,10 +7,13 @@ import { ExpenseForm } from "@/components/expense-form/expense-form";
 
 export default async function NewExpensePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ title?: string; amount?: string; payerMemberId?: string }>;
 }) {
   const { id } = await params;
+  const query = await searchParams;
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
@@ -34,6 +37,11 @@ export default async function NewExpensePage({
         currentMemberId={currentMember.id}
         mode="create"
         members={members.map((m) => ({ id: m.id, displayName: m.displayName }))}
+        prefill={{
+          title: query.title,
+          totalDollars: query.amount,
+          payerMemberId: query.payerMemberId,
+        }}
       />
     </div>
   );

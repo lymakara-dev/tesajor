@@ -84,6 +84,30 @@ against Telegram's real servers, since that needs a registered bot. Try
 the flow above once you have real credentials, and expect to debug the
 occasional rough edge.
 
+## Trip Agenda &amp; Maps (optional)
+
+Trips work fully without any Google Maps key — you get day-by-day agenda
+items with manual place name/address, quest-style completion with XP and
+achievements, journaling, and template cloning. Three specific things
+change with `NEXT_PUBLIC_GOOGLE_MAPS_KEY` set:
+
+- **Without a key**: each day shows its stops as a plain numbered list
+  instead of an embedded map.
+- **With a key**: an interactive per-day map renders numbered pins and a
+  route polyline (Maps JavaScript API).
+- **Always available, no key needed**: "Navigate to next stop" (the
+  universal Google Maps directions URL) and "You are here" (browser
+  Geolocation API + haversine distance to find the nearest upcoming stop)
+  both work with zero Google dependency.
+
+Getting a key needs a Google Cloud project with **billing enabled** (Maps
+JavaScript API isn't available on the always-free tier, though usage
+typically stays inside the monthly credit for light use — confirm current
+pricing before relying on it). Restrict the key to your domain in the
+Cloud Console. The embedded-map code path was written against Google's
+documented API but not exercised against a real key while building this —
+sanity-check it once you have one.
+
 ## Scripts
 
 - `pnpm dev` / `pnpm build` / `pnpm start` — Next.js dev/build/start.
@@ -122,6 +146,15 @@ occasional rough edge.
   (`webhook.ts`), and per-debtor amount computation (`amounts.ts`), all
   unit-tested; `client.ts` wraps the Bot API. `src/app/api/telegram/
   webhook/` is the actual webhook route. See "Telegram setup" above.
+- `src/lib/quests/` — pure gamification logic: per-day/per-trip progress,
+  XP (always derived from completion/achievement counts, never trusted
+  from the client), and achievement-unlock rules; `src/lib/trips/` —
+  role permissions (owner/editor/viewer), template-clone date shifting,
+  and geo helpers (haversine distance, nearest-upcoming-stop, the
+  universal directions URL). All unit-tested.
+- `src/app/trips/` — trip CRUD, day-grouped agenda with quest-style
+  completion, journaling, template publish/clone, and collaborator
+  invites, mirroring the groups/expenses invite-link pattern.
 
 Money is always stored as integer cents — never floats — per the invariants
 in `CLAUDE.md`.

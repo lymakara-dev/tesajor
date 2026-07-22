@@ -114,5 +114,23 @@
     "someone": "អ្នកណាម្នាក់",
     "actualPrice": "តម្លៃពិត៖",
     "addToGroupExpenses": "បន្ថែមទៅចំណាយក្រុម"
+  },
+  "activity": {
+    "heading": "{groupName} — សកម្មភាព",
+    "subtitle": "រាល់ចំណាយ និងការទូទាត់ទាំងអស់ តាមលំដាប់។",
+    "history": "ប្រវត្តិ",
+    "noActivity": "មិនទាន់មានសកម្មភាពនៅឡើយទេ។",
+    "someone": "អ្នកណាម្នាក់",
+    "groupCreated": "បានបង្កើតក្រុម \"{name}\"។",
+    "memberJoined": "បានចូលរួមក្រុម។",
+    "expenseCreated": "បានបន្ថែមចំណាយ \"{title}\" ចំនួន {amount}។",
+    "expenseUpdated": "បានកែសម្រួលចំណាយ \"{title}\" ទៅជា {amount}។",
+    "expenseDeleted": "បានលុបចំណាយ \"{title}\"។",
+    "settlementRecorded": "បានកត់ត្រាការទូទាត់ចំនួន {amount}។"
+  },
+  "tripsList": {
+    "title": "ដំណើរកម្សាន្តរបស់អ្នក",
+    "subtitle": "រៀបចំដំណើរកម្សាន្តជាកម្មវិធីប្រចាំថ្ងៃនៃចំណតនានា។",
+    "empty": "មិនទាន់មានដំណើរកម្សាន្តនៅឡើយទេ។"
   }
 }

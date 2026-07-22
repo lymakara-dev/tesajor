@@ -114,5 +114,23 @@
     "someone": "Someone",
     "actualPrice": "Actual price:",
     "addToGroupExpenses": "Add to group expenses"
+  },
+  "activity": {
+    "heading": "{groupName} — Activity",
+    "subtitle": "Every expense and settlement, in order.",
+    "history": "History",
+    "noActivity": "No activity yet.",
+    "someone": "Someone",
+    "groupCreated": "Created the group \"{name}\".",
+    "memberJoined": "Joined the group.",
+    "expenseCreated": "Added expense \"{title}\" for {amount}.",
+    "expenseUpdated": "Updated expense \"{title}\" to {amount}.",
+    "expenseDeleted": "Deleted expense \"{title}\".",
+    "settlementRecorded": "Recorded a payment of {amount}."
+  },
+  "tripsList": {
+    "title": "Your trips",
+    "subtitle": "Plan a trip as a day-by-day agenda of stops.",
+    "empty": "No trips yet."
   }
 }

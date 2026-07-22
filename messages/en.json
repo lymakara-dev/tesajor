@@ -194,7 +194,7 @@
     "recordPayment": "Record payment"
   },
   "requestPayments": {
-    "requestViaTelegram": "Request payments via Telegram",
+    "requestViaTelegram": "Request via Telegram",
     "sending": "Sending...",
     "sentTo": "Sent to {names}.",
     "oneUnlinked": "{names} hasn't connected Telegram yet.",

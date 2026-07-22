@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
 import { LanguageToggle } from "@/components/language-toggle";
 import type { Locale } from "@/i18n/config";
+import { LogOut, UserPlus } from "lucide-react";
 
 export async function SiteHeader() {
   const session = await auth();
@@ -41,8 +42,9 @@ export async function SiteHeader() {
                     await signOut({ redirectTo: "/" });
                   }}
                 >
-                  <Button variant="ghost" size="sm" type="submit">
-                    {t("signOut")}
+                  <Button variant="ghost" size="sm" type="submit" className="gap-1.5">
+                    <LogOut className="size-4" strokeWidth={1.5} />
+                    <span className="hidden sm:inline">{t("signOut")}</span>
                   </Button>
                 </form>
               </>
@@ -53,7 +55,10 @@ export async function SiteHeader() {
                 </Link>
                 <LanguageToggle current={locale} />
                 <Link href="/register">
-                  <Button size="sm">{t("getStarted")}</Button>
+                  <Button size="sm" className="gap-1.5">
+                    <UserPlus className="size-4" strokeWidth={1.5} />
+                    {t("getStarted")}
+                  </Button>
                 </Link>
               </>
             )}

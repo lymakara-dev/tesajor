@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
+import { LogIn } from "lucide-react";
 
 /** Only allow same-origin relative paths — never redirect off-site or via protocol-relative "//" tricks. */
 function safeCallbackUrl(raw: string | null): string {
@@ -79,7 +80,8 @@ function LoginForm() {
               />
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full gap-1.5" disabled={loading}>
+              <LogIn className="size-4" strokeWidth={1.5} />
               {loading ? "Signing in..." : "Sign in"}
             </Button>
           </form>

@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
+import { UserPlus } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -88,7 +89,8 @@ export default function RegisterPage() {
               />
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full gap-1.5" disabled={loading}>
+              <UserPlus className="size-4" strokeWidth={1.5} />
               {loading ? "Creating account..." : "Create account"}
             </Button>
           </form>

@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SUPPORTED_CURRENCIES } from "@/lib/money/currency";
+import { Plus } from "lucide-react";
 
 export function CreateGroupForm() {
   const router = useRouter();
@@ -66,7 +67,8 @@ export function CreateGroupForm() {
               </SelectContent>
             </Select>
           </div>
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading} className="gap-1.5">
+            <Plus className="size-4" strokeWidth={1.5} />
             {loading ? "Creating..." : "Create group"}
           </Button>
         </form>

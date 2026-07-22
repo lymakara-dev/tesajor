@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
+import { UserPlus, LogIn } from "lucide-react";
 
 const features = [
   {
@@ -37,10 +38,14 @@ export function MarketingLanding() {
         </p>
         <div className="flex gap-3">
           <Link href="/register">
-            <Button size="lg">Get started — it&apos;s free</Button>
+            <Button size="lg" className="gap-1.5">
+              <UserPlus className="size-4" strokeWidth={1.5} />
+              Get started — it&apos;s free
+            </Button>
           </Link>
           <Link href="/login">
-            <Button size="lg" variant="outline">
+            <Button size="lg" variant="outline" className="gap-1.5">
+              <LogIn className="size-4" strokeWidth={1.5} />
               Sign in
             </Button>
           </Link>

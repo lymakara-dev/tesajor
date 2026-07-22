@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { Languages } from "lucide-react";
 import { setLocale } from "@/lib/actions/locale";
-import { locales, localeLabels, type Locale } from "@/i18n/config";
+import { locales, localeLabels, localeShortLabels, type Locale } from "@/i18n/config";
 import { Button } from "@/components/ui/button";
 
 export function LanguageToggle({ current }: { current: Locale }) {
@@ -21,8 +22,16 @@ export function LanguageToggle({ current }: { current: Locale }) {
   }
 
   return (
-    <Button variant="ghost" size="sm" onClick={toggle} disabled={pending}>
-      {localeLabels[locale]}
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={toggle}
+      disabled={pending}
+      className="gap-1.5"
+      aria-label={`${localeLabels.en} / ${localeLabels.km}: ${localeLabels[locale]}`}
+    >
+      <Languages className="size-4" strokeWidth={1.5} />
+      {localeShortLabels[locale]}
     </Button>
   );
 }

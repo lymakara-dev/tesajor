@@ -194,7 +194,7 @@
     "recordPayment": "កត់ត្រាការទូទាត់"
   },
   "requestPayments": {
-    "requestViaTelegram": "ស្នើសុំការទូទាត់តាមរយៈ Telegram",
+    "requestViaTelegram": "ស្នើតាមរយៈ Telegram",
     "sending": "កំពុងផ្ញើ...",
     "sentTo": "បានផ្ញើទៅ {names}។",
     "oneUnlinked": "{names} មិនទាន់ភ្ជាប់ Telegram នៅឡើយទេ។",

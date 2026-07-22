@@ -108,7 +108,8 @@ export function CreateTripForm({ groups }: { groups: { id: string; name: string 
             </div>
           )}
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" disabled={submitting} className="w-full">
+          <Button type="submit" disabled={submitting} className="w-full gap-1.5">
+            <Plus className="size-4" strokeWidth={1.5} />
             {submitting ? t("creating") : t("create")}
           </Button>
         </form>

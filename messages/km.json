@@ -85,6 +85,34 @@
     "doneLabel": "រួចរាល់",
     "skippedLabel": "បានរំលង",
     "undo": "មិនធ្វើវិញ",
-    "achievementUnlocked": "🏆 សមិទ្ធិផលបានដោះសោ៖ {keys}"
+    "achievementUnlocked": "🏆 សមិទ្ធិផលបានដោះសោ៖ {keys}",
+    "tripComplete": "ដំណើរកម្សាន្តបានបញ្ចប់! គ្រប់ចំណតទាំងអស់បានធ្វើរួច។"
+  },
+  "share": {
+    "sharing": "ការចែករំលែក",
+    "private": {
+      "label": "ឯកជន",
+      "hint": "មានតែសមាជិកដែលបានអញ្ជើញប៉ុណ្ណោះទើបអាចមើលដំណើរនេះបាន។"
+    },
+    "link": {
+      "label": "អ្នកណាដែលមានតំណ",
+      "hint": "អ្នកដទៃអាចមើល និងចម្លងវាធ្វើជាគំរូ។"
+    },
+    "public_template": {
+      "label": "គំរូសាធារណៈ",
+      "hint": "អាចរកឃើញ និងចម្លងបានដោយអ្នកគ្រប់គ្នា។"
+    }
+  },
+  "item": {
+    "backToTrip": "ត្រឡប់ទៅដំណើរកម្សាន្ត",
+    "dayCategory": "ថ្ងៃទី {day} · {category}",
+    "planned": "គ្រោងទុក",
+    "navigateTo": "នាំផ្លូវទៅ {place}",
+    "thisStop": "ចំណតនេះ",
+    "journalEntries": "កំណត់ហេតុ",
+    "noJournalEntries": "មិនទាន់មានកំណត់ហេតុនៅឡើយទេ។",
+    "someone": "អ្នកណាម្នាក់",
+    "actualPrice": "តម្លៃពិត៖",
+    "addToGroupExpenses": "បន្ថែមទៅចំណាយក្រុម"
   }
 }

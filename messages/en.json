@@ -85,6 +85,34 @@
     "doneLabel": "Done",
     "skippedLabel": "Skipped",
     "undo": "Undo",
-    "achievementUnlocked": "🏆 Achievement unlocked: {keys}"
+    "achievementUnlocked": "🏆 Achievement unlocked: {keys}",
+    "tripComplete": "Trip complete! Every stop is done."
+  },
+  "share": {
+    "sharing": "Sharing",
+    "private": {
+      "label": "Private",
+      "hint": "Only invited members can see this trip."
+    },
+    "link": {
+      "label": "Anyone with the link",
+      "hint": "Others can view and clone it as a template."
+    },
+    "public_template": {
+      "label": "Public template",
+      "hint": "Discoverable and clonable by anyone."
+    }
+  },
+  "item": {
+    "backToTrip": "Back to trip",
+    "dayCategory": "Day {day} · {category}",
+    "planned": "planned",
+    "navigateTo": "Navigate to {place}",
+    "thisStop": "this stop",
+    "journalEntries": "Journal entries",
+    "noJournalEntries": "No journal entries yet.",
+    "someone": "Someone",
+    "actualPrice": "Actual price:",
+    "addToGroupExpenses": "Add to group expenses"
   }
 }

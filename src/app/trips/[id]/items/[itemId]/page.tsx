@@ -1,16 +1,18 @@
 import { and, eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { agendaItems, groupMembers, itemNotes, trips, users } from "@/db/schema";
 import { getTripRole } from "@/lib/actions/trip-membership";
 import { canJournal } from "@/lib/trips/permissions";
-import { formatCents } from "@/lib/money/cents";
+import { Money } from "@/components/money";
 import { directionsUrl } from "@/lib/trips/geo";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { JournalForm } from "@/components/journal-form";
+import { ArrowLeft, Navigation } from "lucide-react";
 
 export default async function AgendaItemPage({
   params,
@@ -20,6 +22,7 @@ export default async function AgendaItemPage({
   const { id, itemId } = await params;
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+  const t = await getTranslations("item");
 
   const [trip] = await db.select().from(trips).where(eq(trips.id, id)).limit(1);
   if (!trip) notFound();
@@ -63,39 +66,45 @@ export default async function AgendaItemPage({
   return (
     <div className="mx-auto max-w-[480px] px-4 py-10 space-y-6">
       <div>
-        <Link href={`/trips/${id}`} className="text-sm text-muted-foreground hover:underline">
-          ← Back to trip
+        <Link href={`/trips/${id}`} className="flex items-center gap-1 text-sm text-muted-foreground hover:underline">
+          <ArrowLeft className="size-3.5" strokeWidth={1.5} />
+          {t("backToTrip")}
         </Link>
         <h1 className="mt-2 text-2xl font-semibold">{item.title}</h1>
-        <p className="text-muted-foreground capitalize">
-          Day {item.dayNumber} · {item.category}
-          {item.plannedCostCents != null &&
-            ` · planned ${formatCents(item.plannedCostCents, item.currency)}`}
+        <p className="flex items-center gap-1.5 text-muted-foreground capitalize">
+          {t("dayCategory", { day: item.dayNumber, category: item.category })}
+          {item.plannedCostCents != null && (
+            <>
+              {" · "}
+              {t("planned")} <Money cents={item.plannedCostCents} currency={item.currency} size="sm" />
+            </>
+          )}
         </p>
         {(item.address || item.placeName) && (
           <a
             href={directionsUrl(item)}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm underline"
+            className="mt-1 flex items-center gap-1 text-sm underline"
           >
-            Navigate to {item.placeName ?? "this stop"}
+            <Navigation className="size-3.5" strokeWidth={1.5} />
+            {t("navigateTo", { place: item.placeName ?? t("thisStop") })}
           </a>
         )}
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Journal entries</CardTitle>
+          <CardTitle className="text-base">{t("journalEntries")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {notes.length === 0 && (
-            <p className="text-sm text-muted-foreground">No journal entries yet.</p>
+            <p className="text-sm text-muted-foreground">{t("noJournalEntries")}</p>
           )}
           {notes.map((note) => (
-            <div key={note.id} className="space-y-1 border-b pb-3 last:border-b-0 last:pb-0">
+            <div key={note.id} className="space-y-1 border-b border-sandstone pb-3 last:border-b-0 last:pb-0">
               <p className="text-sm">
-                <span className="font-medium">{note.authorName ?? "Someone"}</span>{" "}
+                <span className="font-medium">{note.authorName ?? t("someone")}</span>{" "}
                 {note.mood && <span>{"😞😕😐🙂😄"[note.mood - 1]}</span>}
               </p>
               {note.noteText && <p className="text-sm text-muted-foreground">{note.noteText}</p>}
@@ -105,7 +114,8 @@ export default async function AgendaItemPage({
               {note.actualCostCents != null && (
                 <div className="flex items-center gap-3">
                   <p className="text-sm">
-                    Actual price: {formatCents(note.actualCostCents, item.currency)}
+                    {t("actualPrice")}{" "}
+                    <Money cents={note.actualCostCents} currency={item.currency} tone="neutral" />
                   </p>
                   {trip.groupId && (
                     <Link
@@ -119,7 +129,7 @@ export default async function AgendaItemPage({
                       }}
                     >
                       <Button size="sm" variant="outline">
-                        Add to group expenses
+                        {t("addToGroupExpenses")}
                       </Button>
                     </Link>
                   )}

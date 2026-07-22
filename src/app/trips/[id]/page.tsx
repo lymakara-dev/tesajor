@@ -18,6 +18,7 @@ import { CloneTripButton } from "@/components/clone-trip-button";
 import { YouAreHere } from "@/components/you-are-here";
 import { TripDayMap } from "@/components/trip-day-map";
 import { TripProgressCard } from "@/components/trip-progress-card";
+import { TripCompleteCelebration } from "@/components/trip-complete-celebration";
 import { MapPin } from "lucide-react";
 
 export default async function TripPage({
@@ -66,6 +67,8 @@ export default async function TripPage({
           <CloneTripButton tripId={id} />
         )}
       </div>
+
+      {tripProgress.total > 0 && tripProgress.percent === 100 && <TripCompleteCelebration />}
 
       <TripProgressCard
         completed={tripProgress.completed}

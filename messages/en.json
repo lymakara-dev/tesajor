@@ -112,7 +112,13 @@
     "skippedLabel": "Skipped",
     "undo": "Undo",
     "achievementUnlocked": "🏆 Achievement unlocked: {keys}",
-    "tripComplete": "Trip complete! Every stop is done."
+    "tripComplete": "Trip complete! Every stop is done.",
+    "countdownLabel": "Your trip starts in",
+    "happeningNow": "Your trip is happening now!",
+    "days": "Days",
+    "hours": "Hrs",
+    "minutes": "Min",
+    "seconds": "Sec"
   },
   "share": {
     "sharing": "Sharing",

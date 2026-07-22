@@ -19,6 +19,7 @@ import { YouAreHere } from "@/components/you-are-here";
 import { TripDayMap } from "@/components/trip-day-map";
 import { TripProgressCard } from "@/components/trip-progress-card";
 import { TripCompleteCelebration } from "@/components/trip-complete-celebration";
+import { TripCountdown } from "@/components/trip-countdown";
 import { MapPin } from "lucide-react";
 
 export default async function TripPage({
@@ -70,6 +71,8 @@ export default async function TripPage({
       </div>
 
       {tripProgress.total > 0 && tripProgress.percent === 100 && <TripCompleteCelebration />}
+
+      <TripCountdown startDate={trip.startDate} endDate={trip.endDate} />
 
       <TripProgressCard
         completed={tripProgress.completed}

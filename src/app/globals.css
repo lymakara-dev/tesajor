@@ -167,6 +167,20 @@
   }
 }
 
+/* Reduced-motion fallback for CSS-driven animate-in/out utilities (Sheet,
+   Dialog slide/fade/zoom) that JS-level useReducedMotion() checks don't
+   cover — content still appears, just without the motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Money amounts: bold + tabular figures everywhere a value renders. */
 .amount {
   font-variant-numeric: tabular-nums;

@@ -182,6 +182,10 @@
     "cloning": "Cloning...",
     "cloneTrip": "Clone trip"
   },
+  "join": {
+    "couldNotJoinGroup": "Couldn't join group",
+    "couldNotJoinTrip": "Couldn't join trip"
+  },
   "addAgendaItem": {
     "title": "Add a stop",
     "stopTitle": "Title",

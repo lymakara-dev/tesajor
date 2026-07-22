@@ -182,6 +182,10 @@
     "cloning": "កំពុងចម្លង...",
     "cloneTrip": "ចម្លងដំណើរកម្សាន្ត"
   },
+  "join": {
+    "couldNotJoinGroup": "មិនអាចចូលរួមក្រុមបានទេ",
+    "couldNotJoinTrip": "មិនអាចចូលរួមដំណើរកម្សាន្តបានទេ"
+  },
   "addAgendaItem": {
     "title": "បន្ថែមចំណត",
     "stopTitle": "ចំណងជើង",

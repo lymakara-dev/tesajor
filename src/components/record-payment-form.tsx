@@ -9,10 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { HandCoins } from "lucide-react";
-
-const selectClass =
-  "h-10 w-full rounded-lg border border-input bg-transparent px-3 text-base md:text-sm";
 
 interface Member {
   id: string;
@@ -82,35 +80,39 @@ export function RecordPaymentForm({
           <SheetTitle>{t("title")}</SheetTitle>
         </SheetHeader>
         <form onSubmit={onSubmit} className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="from">{t("from")}</Label>
-              <select id="from" name="from" required defaultValue="" className={selectClass}>
-                <option value="" disabled>
-                  {t("selectMember")}
-                </option>
-                {members.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.displayName}
-                  </option>
-                ))}
-              </select>
+              <Select name="from" required>
+                <SelectTrigger id="from">
+                  <SelectValue placeholder={t("selectMember")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {members.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      {m.displayName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="to">{t("to")}</Label>
-              <select id="to" name="to" required defaultValue="" className={selectClass}>
-                <option value="" disabled>
-                  {t("selectMember")}
-                </option>
-                {members.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.displayName}
-                  </option>
-                ))}
-              </select>
+              <Select name="to" required>
+                <SelectTrigger id="to">
+                  <SelectValue placeholder={t("selectMember")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {members.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      {m.displayName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="amount">{t("amount")}</Label>
               <Input

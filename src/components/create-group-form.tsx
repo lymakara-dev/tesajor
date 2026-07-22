@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SUPPORTED_CURRENCIES } from "@/lib/money/currency";
 
 export function CreateGroupForm() {
   const router = useRouter();
@@ -51,13 +53,18 @@ export function CreateGroupForm() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="baseCurrency">Currency</Label>
-            <Input
-              id="baseCurrency"
-              name="baseCurrency"
-              defaultValue="USD"
-              maxLength={3}
-              className="w-20"
-            />
+            <Select name="baseCurrency" defaultValue="USD">
+              <SelectTrigger id="baseCurrency" className="w-28">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SUPPORTED_CURRENCIES.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <Button type="submit" disabled={loading}>
             {loading ? "Creating..." : "Create group"}

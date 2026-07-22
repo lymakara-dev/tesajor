@@ -10,6 +10,7 @@ import { computeExpenseShares, payersSumMatches } from "@/lib/splits/calculate";
 import type { SplitMethod } from "@/lib/splits/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -337,12 +338,11 @@ export function ExpenseForm({
               maxLength={120}
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="date">{t("dateLabel")}</Label>
-              <Input
+              <DateInput
                 id="date"
-                type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 required
@@ -430,7 +430,7 @@ export function ExpenseForm({
                   }))
                 }
               />
-              <span className="flex-1 text-sm">{m.displayName}</span>
+              <span className="min-w-0 flex-1 truncate text-sm">{m.displayName}</span>
               <Input
                 data-testid={`payer-amount-${m.id}`}
                 type="number"
@@ -498,7 +498,7 @@ export function ExpenseForm({
             <div className="space-y-2">
               {members.map((m) => (
                 <div key={m.id} className="flex items-center gap-3" data-testid={`exact-row-${m.id}`}>
-                  <span className="flex-1 text-sm">{m.displayName}</span>
+                  <span className="min-w-0 flex-1 truncate text-sm">{m.displayName}</span>
                   <Input
                     data-testid={`exact-amount-${m.id}`}
                     type="number"
@@ -521,7 +521,7 @@ export function ExpenseForm({
             <div className="space-y-2">
               {members.map((m) => (
                 <div key={m.id} className="flex items-center gap-3" data-testid={`percent-row-${m.id}`}>
-                  <span className="flex-1 text-sm">{m.displayName}</span>
+                  <span className="min-w-0 flex-1 truncate text-sm">{m.displayName}</span>
                   <div className="flex items-center gap-1">
                     <Input
                       data-testid={`percent-amount-${m.id}`}
@@ -548,7 +548,7 @@ export function ExpenseForm({
             <div className="space-y-2">
               {members.map((m) => (
                 <div key={m.id} className="flex items-center gap-3" data-testid={`shares-row-${m.id}`}>
-                  <span className="flex-1 text-sm">{m.displayName}</span>
+                  <span className="min-w-0 flex-1 truncate text-sm">{m.displayName}</span>
                   <Input
                     data-testid={`shares-amount-${m.id}`}
                     type="number"

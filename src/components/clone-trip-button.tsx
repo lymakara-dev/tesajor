@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { cloneTrip } from "@/lib/actions/trips";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Copy } from "lucide-react";
@@ -45,7 +45,7 @@ export function CloneTripButton({ tripId }: { tripId: string }) {
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="space-y-2">
             <Label htmlFor="newStartDate">{t("startDate")}</Label>
-            <Input id="newStartDate" name="newStartDate" type="date" required />
+            <DateInput id="newStartDate" name="newStartDate" required />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" disabled={submitting} className="w-full">

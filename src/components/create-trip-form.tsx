@@ -6,12 +6,12 @@ import { useTranslations } from "next-intl";
 import { createTrip } from "@/lib/actions/trips";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SUPPORTED_CURRENCIES } from "@/lib/money/currency";
 import { Plus } from "lucide-react";
-
-const selectClass =
-  "h-10 w-full rounded-lg border border-input bg-transparent px-3 text-base md:text-sm";
 
 function todayInputValue(): string {
   return new Date().toISOString().slice(0, 10);
@@ -63,31 +63,47 @@ export function CreateTripForm({ groups }: { groups: { id: string; name: string 
             <Label htmlFor="trip-title">{t("tripTitle")}</Label>
             <Input id="trip-title" name="title" placeholder={t("tripTitlePlaceholder")} required maxLength={120} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="startDate">{t("startDate")}</Label>
-              <Input id="startDate" name="startDate" type="date" defaultValue={todayInputValue()} required />
+              <DateInput id="startDate" name="startDate" defaultValue={todayInputValue()} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="endDate">{t("endDate")}</Label>
-              <Input id="endDate" name="endDate" type="date" defaultValue={todayInputValue()} required />
+              <DateInput id="endDate" name="endDate" defaultValue={todayInputValue()} required />
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="baseCurrency">{t("currency")}</Label>
-            <Input id="baseCurrency" name="baseCurrency" defaultValue="USD" maxLength={3} className="w-20" />
+            <Select name="baseCurrency" defaultValue="USD">
+              <SelectTrigger id="baseCurrency" className="w-28">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SUPPORTED_CURRENCIES.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           {groups.length > 0 && (
             <div className="space-y-2">
               <Label htmlFor="groupId">{t("linkGroup")}</Label>
-              <select id="groupId" name="groupId" defaultValue="" className={selectClass}>
-                <option value="">{t("noGroup")}</option>
-                {groups.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.name}
-                  </option>
-                ))}
-              </select>
+              <Select name="groupId" defaultValue="">
+                <SelectTrigger id="groupId">
+                  <SelectValue placeholder={t("noGroup")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">{t("noGroup")}</SelectItem>
+                  {groups.map((g) => (
+                    <SelectItem key={g.id} value={g.id}>
+                      {g.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <p className="text-xs text-muted-foreground">{t("linkGroupHint")}</p>
             </div>
           )}

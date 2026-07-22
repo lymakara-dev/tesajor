@@ -9,11 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
 
 const CATEGORIES = ["food", "sight", "transport", "hotel", "activity", "other"] as const;
-const selectClass =
-  "h-10 w-full rounded-lg border border-input bg-transparent px-3 text-base capitalize md:text-sm";
 
 export function AddAgendaItemForm({
   tripId,
@@ -76,26 +75,36 @@ export function AddAgendaItemForm({
             <Label htmlFor="item-title">{t("stopTitle")}</Label>
             <Input id="item-title" name="title" placeholder={t("stopTitlePlaceholder")} required maxLength={160} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="dayNumber">{t("day")}</Label>
-              <select id="dayNumber" name="dayNumber" defaultValue={defaultDay} className={selectClass}>
-                {Array.from({ length: dayCount }, (_, i) => i + 1).map((day) => (
-                  <option key={day} value={day}>
-                    {t("dayOption", { day })}
-                  </option>
-                ))}
-              </select>
+              <Select name="dayNumber" defaultValue={String(defaultDay)}>
+                <SelectTrigger id="dayNumber">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: dayCount }, (_, i) => i + 1).map((day) => (
+                    <SelectItem key={day} value={String(day)}>
+                      {t("dayOption", { day })}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="category">{t("category")}</Label>
-              <select id="category" name="category" defaultValue="other" className={selectClass}>
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {t(`categories.${c}`)}
-                  </option>
-                ))}
-              </select>
+              <Select name="category" defaultValue="other">
+                <SelectTrigger id="category">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {t(`categories.${c}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="space-y-2">

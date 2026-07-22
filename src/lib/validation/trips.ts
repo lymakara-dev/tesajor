@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SUPPORTED_CURRENCIES } from "@/lib/money/currency";
 
 export const tripVisibilitySchema = z.enum(["private", "link", "public_template"]);
 
@@ -8,7 +9,7 @@ export const createTripSchema = z
     description: z.string().trim().max(2000).optional(),
     startDate: z.coerce.date(),
     endDate: z.coerce.date(),
-    baseCurrency: z.string().trim().length(3).default("USD"),
+    baseCurrency: z.enum(SUPPORTED_CURRENCIES).default("USD"),
     groupId: z.uuid().optional(),
   })
   .refine((data) => data.endDate >= data.startDate, {

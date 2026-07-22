@@ -8,7 +8,7 @@ import { dollarsToCents } from "@/lib/money/cents";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Plus } from "lucide-react";
 
 const CATEGORIES = ["food", "sight", "transport", "hotel", "activity", "other"] as const;
@@ -28,6 +28,7 @@ export function AddAgendaItemForm({
 }) {
   const router = useRouter();
   const t = useTranslations("addAgendaItem");
+  const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -56,18 +57,20 @@ export function AddAgendaItemForm({
       return;
     }
     (event.target as HTMLFormElement).reset();
+    setOpen(false);
     router.refresh();
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Plus className="size-4 text-mekong" strokeWidth={1.5} />
-          {t("title")}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger render={<Button variant="outline" className="w-full justify-center gap-2" />}>
+        <Plus className="size-4" strokeWidth={1.5} />
+        {t("title")}
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>{t("title")}</SheetTitle>
+        </SheetHeader>
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="space-y-2">
             <Label htmlFor="item-title">{t("stopTitle")}</Label>
@@ -108,11 +111,11 @@ export function AddAgendaItemForm({
             <Input id="address" name="address" placeholder={t("addressPlaceholder")} maxLength={300} />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting} className="w-full">
             {submitting ? t("adding") : t("addStop")}
           </Button>
         </form>
-      </CardContent>
-    </Card>
+      </SheetContent>
+    </Sheet>
   );
 }

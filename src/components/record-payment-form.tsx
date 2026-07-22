@@ -8,7 +8,7 @@ import { dollarsToCents } from "@/lib/money/cents";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { HandCoins } from "lucide-react";
 
 const selectClass =
@@ -28,6 +28,7 @@ export function RecordPaymentForm({
 }) {
   const router = useRouter();
   const t = useTranslations("recordPayment");
+  const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -66,18 +67,20 @@ export function RecordPaymentForm({
       return;
     }
     form.reset();
+    setOpen(false);
     router.refresh();
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <HandCoins className="size-4 text-mekong" strokeWidth={1.5} />
-          {t("title")}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger render={<Button variant="outline" className="gap-2" />}>
+        <HandCoins className="size-4" strokeWidth={1.5} />
+        {t("title")}
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>{t("title")}</SheetTitle>
+        </SheetHeader>
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
@@ -131,11 +134,11 @@ export function RecordPaymentForm({
             <Input id="note" name="note" maxLength={500} />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting} className="w-full">
             {submitting ? t("recording") : t("recordPayment")}
           </Button>
         </form>
-      </CardContent>
-    </Card>
+      </SheetContent>
+    </Sheet>
   );
 }

@@ -136,6 +136,20 @@
     "subtitle": "Plan a trip as a day-by-day agenda of stops.",
     "empty": "No trips yet."
   },
+  "createTrip": {
+    "trigger": "New trip",
+    "title": "New trip",
+    "tripTitle": "Title",
+    "tripTitlePlaceholder": "Japan 2026",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "currency": "Currency",
+    "linkGroup": "Link to a group (optional)",
+    "noGroup": "No group — just for me",
+    "linkGroupHint": "Lets you turn journaled prices into group expenses in one tap.",
+    "creating": "Creating...",
+    "create": "Create trip"
+  },
   "recordPayment": {
     "title": "Record a payment",
     "from": "From",

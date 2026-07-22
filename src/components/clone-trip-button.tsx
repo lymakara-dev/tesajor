@@ -7,7 +7,7 @@ import { cloneTrip } from "@/lib/actions/trips";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Copy } from "lucide-react";
 
 export function CloneTripButton({ tripId }: { tripId: string }) {
@@ -28,35 +28,31 @@ export function CloneTripButton({ tripId }: { tripId: string }) {
       setError(result.error);
       return;
     }
+    setOpen(false);
     router.push(`/trips/${result.data.tripId}`);
   }
 
-  if (!open) {
-    return (
-      <Button variant="outline" onClick={() => setOpen(true)}>
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger render={<Button variant="outline" className="gap-2" />}>
         <Copy className="size-4" strokeWidth={1.5} />
         {t("useThisTemplate")}
-      </Button>
-    );
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{t("title")}</CardTitle>
-      </CardHeader>
-      <CardContent>
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>{t("title")}</SheetTitle>
+        </SheetHeader>
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="space-y-2">
             <Label htmlFor="newStartDate">{t("startDate")}</Label>
             <Input id="newStartDate" name="newStartDate" type="date" required />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting} className="w-full">
             {submitting ? t("cloning") : t("cloneTrip")}
           </Button>
         </form>
-      </CardContent>
-    </Card>
+      </SheetContent>
+    </Sheet>
   );
 }

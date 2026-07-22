@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 // Brand colors are fixed regardless of light/dark theme, unlike the rest
 // of the app — a logo shouldn't re-tint itself when the user flips a
@@ -118,6 +119,27 @@ function Tile({
   );
 }
 
+function Lockup({
+  size,
+  animate,
+  className,
+}: {
+  size: number;
+  animate: boolean;
+  className?: string;
+}) {
+  const t = useTranslations("common");
+  return (
+    <div className={`flex items-center gap-3 ${className ?? ""}`}>
+      <Tile size={size} animate={animate} />
+      <div className="flex flex-col leading-tight">
+        <span className="font-sans text-lg font-bold text-foreground">Tesajor</span>
+        <span className="text-xs text-muted-foreground">{t("tagline")}</span>
+      </div>
+    </div>
+  );
+}
+
 export interface LogoProps {
   variant?: "tile" | "lockup" | "favicon" | "badge";
   size?: number;
@@ -157,17 +179,7 @@ export function Logo({ variant = "tile", size = 40, animate = false, className }
   }
 
   if (variant === "lockup") {
-    return (
-      <div className={`flex items-center gap-3 ${className ?? ""}`}>
-        <Tile size={size} animate={animate} />
-        <div className="flex flex-col leading-tight">
-          <span className="font-sans text-lg font-bold text-foreground">Tesajor</span>
-          <span className="text-xs text-muted-foreground">
-            ទេសចរណ៍ · travel &amp; split together
-          </span>
-        </div>
-      </div>
-    );
+    return <Lockup size={size} animate={animate} className={className} />;
   }
 
   return <Tile size={size} animate={animate} className={className} />;

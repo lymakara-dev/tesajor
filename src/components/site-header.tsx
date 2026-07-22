@@ -1,10 +1,15 @@
 import Link from "next/link";
+import { getTranslations, getLocale } from "next-intl/server";
 import { auth, signOut } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
+import { LanguageToggle } from "@/components/language-toggle";
+import type { Locale } from "@/i18n/config";
 
 export async function SiteHeader() {
   const session = await auth();
+  const t = await getTranslations("common");
+  const locale = (await getLocale()) as Locale;
 
   return (
     <>
@@ -15,18 +20,19 @@ export async function SiteHeader() {
           <Link href="/" className="flex items-center">
             <Logo variant="lockup" size={32} />
           </Link>
-          <nav className="flex items-center gap-3">
+          <nav className="flex items-center gap-2">
             {session?.user ? (
               <>
                 <Link href="/groups" className="text-sm font-medium">
-                  Groups
+                  {t("groups")}
                 </Link>
                 <Link href="/trips" className="text-sm font-medium">
-                  Trips
+                  {t("trips")}
                 </Link>
                 <Link href="/account" className="text-sm font-medium">
-                  Account
+                  {t("account")}
                 </Link>
+                <LanguageToggle current={locale} />
                 <form
                   action={async () => {
                     "use server";
@@ -34,17 +40,18 @@ export async function SiteHeader() {
                   }}
                 >
                   <Button variant="ghost" size="sm" type="submit">
-                    Sign out
+                    {t("signOut")}
                   </Button>
                 </form>
               </>
             ) : (
               <>
                 <Link href="/login" className="text-sm font-medium">
-                  Sign in
+                  {t("signIn")}
                 </Link>
+                <LanguageToggle current={locale} />
                 <Link href="/register">
-                  <Button size="sm">Get started</Button>
+                  <Button size="sm">{t("getStarted")}</Button>
                 </Link>
               </>
             )}

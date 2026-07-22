@@ -23,13 +23,15 @@ export async function SiteHeader() {
           <nav className="flex items-center gap-2">
             {session?.user ? (
               <>
-                <Link href="/groups" className="text-sm font-medium">
+                {/* Redundant on mobile once the bottom tab bar takes over
+                    primary navigation there; kept for desktop. */}
+                <Link href="/groups" className="hidden text-sm font-medium sm:inline">
                   {t("groups")}
                 </Link>
-                <Link href="/trips" className="text-sm font-medium">
+                <Link href="/trips" className="hidden text-sm font-medium sm:inline">
                   {t("trips")}
                 </Link>
-                <Link href="/account" className="text-sm font-medium">
+                <Link href="/account" className="hidden text-sm font-medium sm:inline">
                   {t("account")}
                 </Link>
                 <LanguageToggle current={locale} />

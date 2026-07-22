@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import { Kantumruy_Pro, Moul, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
+import { auth } from "@/lib/auth";
 import { SiteHeader } from "@/components/site-header";
+import { BottomTabBar } from "@/components/bottom-tab-bar";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { cn } from "@/lib/utils";
 import "./globals.css";
 
 const kantumruyPro = Kantumruy_Pro({
@@ -44,6 +47,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const locale = await getLocale();
+  const session = await auth();
+  const hasSession = Boolean(session?.user?.id);
 
   return (
     <html
@@ -55,7 +60,10 @@ export default async function RootLayout({
         <NextIntlClientProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <SiteHeader />
-            <main className="flex-1">{children}</main>
+            <main className={cn("flex-1", hasSession && "pb-20 sm:pb-0")}>
+              {children}
+            </main>
+            {hasSession && <BottomTabBar />}
             <Toaster />
           </ThemeProvider>
         </NextIntlClientProvider>

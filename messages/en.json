@@ -2,10 +2,13 @@
   "common": {
     "signIn": "Sign in",
     "getStarted": "Get started",
+    "home": "Home",
     "groups": "Groups",
     "trips": "Trips",
     "account": "Account",
     "signOut": "Sign out",
+    "navigation": "Navigation",
+    "add": "Add",
     "tagline": "ទេសចរណ៍ · travel & split together"
   },
   "balances": {

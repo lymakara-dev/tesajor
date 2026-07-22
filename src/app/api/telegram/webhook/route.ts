@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "crypto";
 import { and, eq, gt } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
@@ -5,10 +6,20 @@ import { groupMembers, paymentRequests, telegramAccounts, telegramLinkTokens } f
 import { answerCallbackQuery, sendTextMessage } from "@/lib/telegram/client";
 import { parseTelegramUpdate, type TelegramUpdate } from "@/lib/telegram/webhook";
 
+function secretMatches(expected: string, provided: string | null): boolean {
+  if (!provided) return false;
+  const expectedBuffer = Buffer.from(expected);
+  const providedBuffer = Buffer.from(provided);
+  return (
+    expectedBuffer.length === providedBuffer.length &&
+    timingSafeEqual(expectedBuffer, providedBuffer)
+  );
+}
+
 export async function POST(request: Request) {
   const expectedSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
   const providedSecret = request.headers.get("x-telegram-bot-api-secret-token");
-  if (!expectedSecret || providedSecret !== expectedSecret) {
+  if (!expectedSecret || !secretMatches(expectedSecret, providedSecret)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

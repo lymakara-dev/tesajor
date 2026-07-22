@@ -7,6 +7,7 @@ import { db } from "@/db";
 import { agendaItems, trips, tripMembers } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { getTripRole } from "@/lib/actions/trip-membership";
+import { requireUserIsMember } from "@/lib/actions/group-membership";
 import { canManageTrip } from "@/lib/trips/permissions";
 import { cloneTripStructure } from "@/lib/trips/clone";
 import { awardAchievements } from "@/lib/queries/trip-achievements";
@@ -34,6 +35,13 @@ export async function createTrip(
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid trip." };
   }
   const data = parsed.data;
+
+  if (data.groupId) {
+    const isMember = await requireUserIsMember(data.groupId, session.user.id);
+    if (!isMember) {
+      return { ok: false, error: "You are not a member of that group." };
+    }
+  }
 
   const existingTrips = await db
     .select({ id: trips.id })

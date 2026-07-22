@@ -45,6 +45,45 @@ via Drizzle ORM, Auth.js v5 (email/password + Google), Zod, Vitest.
    pnpm dev
    ```
 
+## Telegram setup (optional)
+
+Payment requests over Telegram are fully implemented but disabled by
+default — nothing breaks if you skip this section, the relevant buttons
+just show a "Telegram isn't configured" message instead of erroring.
+
+1. Message [@BotFather](https://t.me/BotFather) in Telegram, run `/newbot`,
+   and follow the prompts. You'll get a bot token
+   (`TELEGRAM_BOT_TOKEN`) and a username (`TELEGRAM_BOT_USERNAME`, without
+   the `@`).
+2. Set `TELEGRAM_WEBHOOK_SECRET` to a random string (e.g.
+   `openssl rand -hex 32`) — Telegram echoes this back on every webhook
+   call so we can verify requests actually came from Telegram.
+3. Register the webhook (needs a public HTTPS URL — use `ngrok` or similar
+   for local testing, since Telegram can't reach `localhost`):
+
+   ```bash
+   curl "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" \
+     -d "url=https://<your-domain>/api/telegram/webhook" \
+     -d "secret_token=<TELEGRAM_WEBHOOK_SECRET>"
+   ```
+
+4. Put all three variables in `.env` and restart the dev server.
+
+With that done: from `/account`, "Connect Telegram" opens a `t.me` deep
+link — tapping Start in Telegram lets the bot capture your `chat_id`
+(required for messaging you), independent of any login flow. From a
+group's Balances page, "Request payments via Telegram" sends each linked
+debtor a QR code + amount owed with an inline "I've paid" button; tapping
+it creates a pending claim the requester confirms in-app before it
+becomes a real settlement.
+
+This was built and unit-tested (HMAC verification, webhook intent parsing,
+per-debtor amount computation) and exercised end-to-end against a fake
+bot token/webhook secret to verify all the DB-writing logic — but never
+against Telegram's real servers, since that needs a registered bot. Try
+the flow above once you have real credentials, and expect to debug the
+occasional rough edge.
+
 ## Scripts
 
 - `pnpm dev` / `pnpm build` / `pnpm start` — Next.js dev/build/start.
@@ -74,10 +113,15 @@ via Drizzle ORM, Auth.js v5 (email/password + Google), Zod, Vitest.
 - `src/app/` — routes: `/`, `/login`, `/register`, `/groups`,
   `/groups/[id]` (+ `expenses/new`, `expenses/[expenseId]/edit`,
   `balances`, `activity`), `/groups/join/[code]`.
-- `src/app/api/uploads/` — local receipt-photo upload (saved under
+- `src/app/api/uploads/` — local receipt/QR-photo upload (saved under
   `public/uploads/`, not committed). Swap for cloud storage before
   production.
 - `src/app/api/groups/[id]/export/` — CSV export of a group's expenses.
+- `src/lib/telegram/` — pure logic for the Telegram integration: Login
+  Widget HMAC verification (`verify.ts`), webhook update parsing
+  (`webhook.ts`), and per-debtor amount computation (`amounts.ts`), all
+  unit-tested; `client.ts` wraps the Bot API. `src/app/api/telegram/
+  webhook/` is the actual webhook route. See "Telegram setup" above.
 
 Money is always stored as integer cents — never floats — per the invariants
 in `CLAUDE.md`.

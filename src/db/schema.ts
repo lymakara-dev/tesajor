@@ -4,6 +4,7 @@ import {
   text,
   timestamp,
   integer,
+  boolean,
   jsonb,
   uuid,
   primaryKey,
@@ -200,4 +201,69 @@ export const activityLog = pgTable("activity_log", {
   action: text("action").notNull(),
   payloadJson: jsonb("payload_json"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// --- Telegram integration ---
+
+export const paymentRequestStatusEnum = pgEnum("payment_request_status", [
+  "sent",
+  "delivered",
+  "failed",
+  "paid",
+]);
+
+export const telegramAccounts = pgTable("telegram_accounts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  telegramUserId: text("telegram_user_id").notNull().unique(),
+  chatId: text("chat_id"),
+  username: text("username"),
+  linkedAt: timestamp("linked_at").notNull().defaultNow(),
+});
+
+// One-time tokens for the t.me/<bot>?start=<token> deep-link linking flow;
+// short-lived, deleted once consumed by the webhook.
+export const telegramLinkTokens = pgTable("telegram_link_tokens", {
+  token: text("token").primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  expiresAt: timestamp("expires_at").notNull(),
+});
+
+export const paymentMethods = pgTable("payment_methods", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  label: text("label").notNull(),
+  qrImageUrl: text("qr_image_url"),
+  paymentLink: text("payment_link"),
+  isDefault: boolean("is_default").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const paymentRequests = pgTable("payment_requests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  groupId: uuid("group_id")
+    .notNull()
+    .references(() => groups.id, { onDelete: "cascade" }),
+  requesterMember: uuid("requester_member")
+    .notNull()
+    .references(() => groupMembers.id),
+  debtorMember: uuid("debtor_member")
+    .notNull()
+    .references(() => groupMembers.id),
+  amountCents: integer("amount_cents").notNull(),
+  paymentMethodId: uuid("payment_method_id").references(() => paymentMethods.id),
+  status: paymentRequestStatusEnum("status").notNull().default("sent"),
+  telegramMessageId: text("telegram_message_id"),
+  sentAt: timestamp("sent_at").notNull().defaultNow(),
+  paidAt: timestamp("paid_at"),
+  // Set once the requester confirms the debtor's "I've paid" claim and a
+  // real settlement is recorded — the claim alone never affects balances.
+  confirmedAt: timestamp("confirmed_at"),
+  settlementId: uuid("settlement_id").references(() => settlements.id),
 });

@@ -1,21 +1,17 @@
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import {
-  expensePayers,
-  expenseShares,
-  expenses,
-  groupMembers,
-  groups,
-  settlements,
-} from "@/db/schema";
+import { groupMembers, groups, paymentRequests } from "@/db/schema";
 import { recordSettlement } from "@/lib/actions/settlements";
-import { computeNetBalances, simplifyDebts } from "@/lib/balances/calculate";
+import { confirmPaymentRequest } from "@/lib/actions/payment-requests";
+import { simplifyDebts } from "@/lib/balances/calculate";
+import { getGroupNets } from "@/lib/queries/balances";
 import { formatCents } from "@/lib/money/cents";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RecordPaymentForm } from "@/components/record-payment-form";
+import { RequestPaymentsButton } from "@/components/request-payments-button";
 
 export default async function BalancesPage({
   params,
@@ -38,44 +34,23 @@ export default async function BalancesPage({
 
   const memberName = new Map(members.map((m) => [m.id, m.displayName]));
 
-  const groupExpenses = await db
-    .select({ id: expenses.id })
-    .from(expenses)
-    .where(and(eq(expenses.groupId, id), isNull(expenses.deletedAt)));
-  const expenseIds = groupExpenses.map((e) => e.id);
-
-  const payers = expenseIds.length
-    ? await db
-        .select({ memberId: expensePayers.memberId, paidAmountCents: expensePayers.paidAmountCents })
-        .from(expensePayers)
-        .where(inArray(expensePayers.expenseId, expenseIds))
-    : [];
-
-  const shares = expenseIds.length
-    ? await db
-        .select({ memberId: expenseShares.memberId, owedAmountCents: expenseShares.owedAmountCents })
-        .from(expenseShares)
-        .where(inArray(expenseShares.expenseId, expenseIds))
-    : [];
-
-  const groupSettlements = await db
-    .select({
-      fromMemberId: settlements.fromMember,
-      toMemberId: settlements.toMember,
-      amountCents: settlements.amountCents,
-    })
-    .from(settlements)
-    .where(eq(settlements.groupId, id));
-
-  const allNets = computeNetBalances(payers, shares, groupSettlements);
-  // Include every group member even if they have no activity yet (net 0).
-  const netByMember = new Map(allNets.map((n) => [n.memberId, n.netCents]));
-  const nets = members.map((m) => ({
-    memberId: m.id,
-    netCents: netByMember.get(m.id) ?? 0,
-  }));
-
+  const nets = await getGroupNets(id);
   const suggestions = simplifyDebts(nets);
+
+  const currentMember = members.find((m) => m.userId === session.user.id);
+
+  const pendingClaims = currentMember
+    ? await db
+        .select()
+        .from(paymentRequests)
+        .where(
+          and(
+            eq(paymentRequests.requesterMember, currentMember.id),
+            eq(paymentRequests.status, "paid"),
+            isNull(paymentRequests.confirmedAt),
+          ),
+        )
+    : [];
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 space-y-8">
@@ -154,6 +129,39 @@ export default async function BalancesPage({
           ))}
         </CardContent>
       </Card>
+
+      {pendingClaims.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Payment claims to confirm</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {pendingClaims.map((claim) => (
+              <div key={claim.id} className="flex items-center justify-between gap-3 text-sm">
+                <span>
+                  {memberName.get(claim.debtorMember)} says they paid you{" "}
+                  <span className="font-medium">
+                    {formatCents(claim.amountCents, group.baseCurrency)}
+                  </span>{" "}
+                  via Telegram
+                </span>
+                <form
+                  action={async () => {
+                    "use server";
+                    await confirmPaymentRequest(claim.id);
+                  }}
+                >
+                  <Button type="submit" size="sm" data-testid={`confirm-claim-${claim.id}`}>
+                    Confirm
+                  </Button>
+                </form>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {currentMember && <RequestPaymentsButton groupId={id} />}
 
       <RecordPaymentForm
         groupId={id}

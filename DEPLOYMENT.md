@@ -32,8 +32,20 @@ with an authorized redirect URI of
 | `AUTH_SECRET` | `openssl rand -base64 33` — must be set, unique per environment |
 | `AUTH_URL` | `https://<your-domain>` |
 | `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Omit to leave Google sign-in disabled |
+| `TELEGRAM_BOT_TOKEN` / `TELEGRAM_BOT_USERNAME` / `TELEGRAM_WEBHOOK_SECRET` | Omit to leave Telegram payment requests disabled — see README "Telegram setup" |
 
-## 4. Post-deploy checklist
+## 4. Telegram (optional)
+
+Once deployed, register the webhook against your production URL (this
+needs to happen once per deploy domain, not on every deploy):
+
+```bash
+curl "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" \
+  -d "url=https://<your-domain>/api/telegram/webhook" \
+  -d "secret_token=<TELEGRAM_WEBHOOK_SECRET>"
+```
+
+## 5. Post-deploy checklist
 
 - Visit `/terms` and `/privacy` and replace the `[PLACEHOLDER]` fields —
   they're a starting template, not reviewed legal text.
@@ -44,11 +56,15 @@ with an authorized redirect URI of
   function concurrently, so the effective limit is "per instance," not
   global — fine for basic abuse deterrence, but swap in a shared store
   (e.g. Upstash Redis) if you need a hard global limit.
-- Receipt uploads currently save to `public/uploads/` on the server's local
-  filesystem (`src/app/api/uploads/route.ts`). That does **not** persist on
+- Receipt photos and payment-method QR codes (both uploaded and
+  server-generated) currently save to `public/uploads/` on the server's
+  local filesystem (`src/app/api/uploads/route.ts`,
+  `src/lib/actions/payment-methods.ts`). That does **not** persist on
   Vercel's serverless filesystem between deploys/instances — swap this for
   object storage (e.g. Vercel Blob, S3, Cloudinary) before relying on
-  receipt photos in production.
+  either in production. Telegram payment requests specifically need the
+  QR image to be reachable at a public URL, so this matters more once
+  Telegram is enabled.
 - No Stripe/billing is wired up yet (by choice, to avoid adding a paid
   third-party dependency without sign-off) — the app currently has no
   Pro-tier gating.

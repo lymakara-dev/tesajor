@@ -46,5 +46,29 @@
     "receipt": "បង្កាន់ដៃ",
     "edit": "កែសម្រួល",
     "delete": "លុប"
+  },
+  "account": {
+    "title": "គណនី",
+    "profile": "ប្រវត្តិរូប",
+    "name": "ឈ្មោះ",
+    "email": "អ៊ីមែល",
+    "preferences": "ចំណូលចិត្ត",
+    "appearance": "រូបរាង",
+    "language": "ភាសា"
+  },
+  "paymentMethods": {
+    "title": "វិធីបង់ប្រាក់",
+    "uploadFailed": "បរាជ័យក្នុងការផ្ទុករូបភាព QR។",
+    "needQrOrLink": "ផ្ទុករូបភាព QR ឬបញ្ចូលតំណបង់ប្រាក់។",
+    "khqrDefaultLabel": "KHQR",
+    "default": "លំនាំដើម",
+    "delete": "លុប",
+    "label": "ស្លាក",
+    "labelPlaceholder": "KHQR, ABA, ACLEDA, Wing...",
+    "qrImage": "រូបភាព QR",
+    "orPaymentLink": "ឬតំណបង់ប្រាក់ (យើងនឹងបង្កើត QR ឱ្យ)",
+    "setAsDefault": "កំណត់ជាលំនាំដើម",
+    "adding": "កំពុងបន្ថែម...",
+    "addPaymentMethod": "បន្ថែមវិធីបង់ប្រាក់"
   }
 }

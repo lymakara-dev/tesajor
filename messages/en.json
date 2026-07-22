@@ -46,5 +46,29 @@
     "receipt": "Receipt",
     "edit": "Edit",
     "delete": "Delete"
+  },
+  "account": {
+    "title": "Account",
+    "profile": "Profile",
+    "name": "Name",
+    "email": "Email",
+    "preferences": "Preferences",
+    "appearance": "Appearance",
+    "language": "Language"
+  },
+  "paymentMethods": {
+    "title": "Payment methods",
+    "uploadFailed": "Failed to upload QR image.",
+    "needQrOrLink": "Upload a QR image or enter a payment link.",
+    "khqrDefaultLabel": "KHQR",
+    "default": "Default",
+    "delete": "Delete",
+    "label": "Label",
+    "labelPlaceholder": "KHQR, ABA, ACLEDA, Wing...",
+    "qrImage": "QR image",
+    "orPaymentLink": "Or a payment link (we'll generate a QR)",
+    "setAsDefault": "Set as default",
+    "adding": "Adding...",
+    "addPaymentMethod": "Add payment method"
   }
 }

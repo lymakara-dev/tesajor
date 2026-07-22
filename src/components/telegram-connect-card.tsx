@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createTelegramLinkToken, disconnectTelegram } from "@/lib/actions/telegram";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Send } from "lucide-react";
 
 interface Props {
   linked: boolean;
@@ -39,7 +40,10 @@ export function TelegramConnectCard({ linked, username, hasChatId }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Telegram</CardTitle>
+        <CardTitle className="flex items-center gap-1.5 text-base">
+          <Send className="size-4 text-mekong" strokeWidth={1.5} />
+          Telegram
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {linked ? (

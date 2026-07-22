@@ -24,5 +24,27 @@
     "paymentClaimsToConfirm": "Payment claims to confirm",
     "claimLine": "{name} says they paid you",
     "viaTelegram": "via Telegram"
+  },
+  "groupsList": {
+    "title": "Your groups",
+    "subtitle": "Create a group or open one you already belong to.",
+    "empty": "You're not in any groups yet.",
+    "baseCurrency": "Base currency: {currency}"
+  },
+  "groupDetail": {
+    "baseCurrency": "Base currency: {currency}",
+    "balances": "Balances",
+    "activity": "Activity",
+    "exportCsv": "Export CSV",
+    "inviteFriends": "Invite friends",
+    "members": "Members ({count})",
+    "placeholderMember": "placeholder · not claimed",
+    "expenses": "Expenses",
+    "addExpense": "Add expense",
+    "noExpenses": "No expenses yet.",
+    "paidBy": "Paid by {names}",
+    "receipt": "Receipt",
+    "edit": "Edit",
+    "delete": "Delete"
   }
 }

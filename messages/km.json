@@ -24,5 +24,27 @@
     "paymentClaimsToConfirm": "ការទាមទារទូទាត់ដែលត្រូវបញ្ជាក់",
     "claimLine": "{name} បានប្រាប់ថាបានបង់ឱ្យអ្នក",
     "viaTelegram": "តាមរយៈ Telegram"
+  },
+  "groupsList": {
+    "title": "ក្រុមរបស់អ្នក",
+    "subtitle": "បង្កើតក្រុមថ្មី ឬបើកក្រុមដែលអ្នកជាសមាជិករួចហើយ។",
+    "empty": "អ្នកមិនទាន់ចូលរួមក្រុមណាមួយនៅឡើយទេ។",
+    "baseCurrency": "រូបិយប័ណ្ណគោល៖ {currency}"
+  },
+  "groupDetail": {
+    "baseCurrency": "រូបិយប័ណ្ណគោល៖ {currency}",
+    "balances": "សមតុល្យ",
+    "activity": "សកម្មភាព",
+    "exportCsv": "នាំចេញ CSV",
+    "inviteFriends": "អញ្ជើញមិត្តភក្តិ",
+    "members": "សមាជិក ({count})",
+    "placeholderMember": "កន្លែងទុក · មិនទាន់ទាមទារ",
+    "expenses": "ចំណាយ",
+    "addExpense": "បន្ថែមចំណាយ",
+    "noExpenses": "មិនទាន់មានចំណាយនៅឡើយទេ។",
+    "paidBy": "បង់ដោយ {names}",
+    "receipt": "បង្កាន់ដៃ",
+    "edit": "កែសម្រួល",
+    "delete": "លុប"
   }
 }

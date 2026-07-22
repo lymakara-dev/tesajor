@@ -20,6 +20,7 @@ export interface MoneyProps {
   layout?: "stacked" | "inline";
   size?: "sm" | "base" | "lg" | "xl";
   className?: string;
+  "data-testid"?: string;
 }
 
 const SIZE_CLASS: Record<NonNullable<MoneyProps["size"]>, string> = {
@@ -36,13 +37,14 @@ export function Money({
   layout = "inline",
   size = "base",
   className,
+  "data-testid": testId,
 }: MoneyProps) {
   const { primary, secondary } = formatMoney(cents, currency);
   const toneClass = TONE_CLASS[tone];
 
   if (layout === "stacked") {
     return (
-      <span className={cn("inline-flex flex-col", className)}>
+      <span className={cn("inline-flex flex-col", className)} data-testid={testId}>
         <span className={cn("amount", SIZE_CLASS[size], toneClass)}>{primary}</span>
         {secondary && (
           <span className="amount text-xs font-normal text-muted-foreground">
@@ -54,7 +56,7 @@ export function Money({
   }
 
   return (
-    <span className={cn("amount", SIZE_CLASS[size], toneClass, className)}>
+    <span className={cn("amount", SIZE_CLASS[size], toneClass, className)} data-testid={testId}>
       {primary}
       {secondary && (
         <span className="amount ml-1 text-xs font-normal text-muted-foreground">

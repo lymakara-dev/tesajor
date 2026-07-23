@@ -10,7 +10,7 @@ export async function MarketingLanding() {
   const features = t.raw("features") as { title: string; body: string }[];
 
   return (
-    <div className="flex flex-col">
+    <div className="rumduol-pattern flex flex-col">
       <section className="mx-auto flex max-w-[480px] flex-col items-start gap-4 px-4 py-24">
         <Logo variant="lockup" size={48} animate />
         <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">

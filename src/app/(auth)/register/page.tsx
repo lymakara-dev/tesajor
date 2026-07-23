@@ -59,7 +59,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-[80vh] flex-col items-center justify-center px-4">
+    <div className="rumduol-pattern flex min-h-[80vh] flex-col items-center justify-center px-4">
       <Link href="/" className="mb-6">
         <Logo variant="tile" size={56} />
       </Link>

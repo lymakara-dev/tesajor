@@ -3,6 +3,13 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
+  // All specs register users from the same localhost IP, which shares one
+  // rate-limit bucket (5 registrations / 15 min — see checkRateLimit in
+  // src/lib/actions/auth.ts) across the whole run. Parallel workers made
+  // that bucket fill up across files and fail unrelated tests with a
+  // register timeout, not an app bug — force one worker so runs are
+  // deterministic.
+  workers: 1,
   retries: 0,
   reporter: "list",
   // Next.js dev mode compiles each route on first hit, which can be slow

@@ -60,7 +60,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider>
           <AuthSessionProvider session={session}>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
               <SiteHeader />
               <main className={cn("flex-1", hasSession && "pb-20 sm:pb-0")}>
                 {children}

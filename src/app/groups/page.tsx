@@ -35,7 +35,7 @@ export default async function GroupsPage() {
 
       <CreateGroupForm />
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {memberships.length === 0 && (
           <p className="text-sm text-muted-foreground">{t("empty")}</p>
         )}

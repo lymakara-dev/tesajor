@@ -41,7 +41,7 @@ export function CreateGroupForm() {
         <CardTitle className="text-base">New group</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-3">
+        <form onSubmit={onSubmit} className="space-y-3">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -52,25 +52,27 @@ export function CreateGroupForm() {
               maxLength={80}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="baseCurrency">Currency</Label>
-            <Select name="baseCurrency" defaultValue="USD">
-              <SelectTrigger id="baseCurrency" className="w-28">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {SUPPORTED_CURRENCIES.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="baseCurrency">Currency</Label>
+              <Select name="baseCurrency" defaultValue="USD">
+                <SelectTrigger id="baseCurrency" className="w-28">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SUPPORTED_CURRENCIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button type="submit" disabled={loading} className="flex-1 sm:flex-none">
+              <Plus className="size-4" strokeWidth={1.5} />
+              {loading ? "Creating..." : "Create group"}
+            </Button>
           </div>
-          <Button type="submit" disabled={loading}>
-            <Plus className="size-4" strokeWidth={1.5} />
-            {loading ? "Creating..." : "Create group"}
-          </Button>
         </form>
         {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
       </CardContent>

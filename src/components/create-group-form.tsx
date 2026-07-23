@@ -42,17 +42,18 @@ export function CreateGroupForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-3">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              name="name"
-              placeholder="Friday Dinner Crew"
-              required
-              maxLength={80}
-            />
-          </div>
-          <div className="flex flex-wrap items-end gap-3">
+          <div className="grid grid-cols-[1fr_auto] gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                name="name"
+                placeholder="Friday Dinner Crew"
+                required
+                maxLength={80}
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="baseCurrency">Currency</Label>
               <Select name="baseCurrency" defaultValue="USD">
@@ -68,11 +69,12 @@ export function CreateGroupForm() {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" disabled={loading} className="flex-1 sm:flex-none">
-              <Plus className="size-4" strokeWidth={1.5} />
-              {loading ? "Creating..." : "Create group"}
-            </Button>
           </div>
+
+          <Button type="submit" disabled={loading} className="w-full">
+            <Plus className="size-4" strokeWidth={1.5} />
+            {loading ? "Creating..." : "Create group"}
+          </Button>
         </form>
         {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
       </CardContent>

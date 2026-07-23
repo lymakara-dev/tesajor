@@ -73,6 +73,11 @@ export async function requestPaymentsViaTelegram(
   }
 
   const appUrl = process.env.AUTH_URL ?? "http://localhost:3000";
+  // qrImageUrl is either a same-origin "/uploads/..." path (needs the app
+  // origin prefixed) or, when Cloudinary is configured, an already-absolute
+  // https://res.cloudinary.com/... URL (must be used as-is).
+  const resolvePhotoUrl = (qrImageUrl: string) =>
+    qrImageUrl.startsWith("/") ? `${appUrl}${qrImageUrl}` : qrImageUrl;
   const memberById = new Map(members.map((m) => [m.id, m]));
 
   const sent: string[] = [];
@@ -125,7 +130,7 @@ export async function requestPaymentsViaTelegram(
 
       const result = await sendPaymentRequestPhoto({
         chatId: telegramAccount.chatId,
-        photoUrl: `${appUrl}${defaultMethod.qrImageUrl}`,
+        photoUrl: resolvePhotoUrl(defaultMethod.qrImageUrl),
         caption,
         paymentRequestId: row.id,
       });

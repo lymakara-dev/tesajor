@@ -3,6 +3,7 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { isCloudinaryConfigured, uploadToCloudinary } from "@/lib/cloudinary";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -76,6 +77,15 @@ export async function POST(request: Request) {
   const bytes = Buffer.from(await file.arrayBuffer());
   if (!matchesImageSignature(file.type, bytes)) {
     return NextResponse.json({ error: "File content doesn't match its declared image type." }, { status: 400 });
+  }
+
+  if (isCloudinaryConfigured) {
+    try {
+      const url = await uploadToCloudinary(bytes);
+      return NextResponse.json({ url });
+    } catch {
+      return NextResponse.json({ error: "Upload failed. Try again." }, { status: 502 });
+    }
   }
 
   const uploadsDir = path.join(process.cwd(), "public", "uploads");

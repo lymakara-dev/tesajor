@@ -108,6 +108,28 @@ Cloud Console. The embedded-map code path was written against Google's
 documented API but not exercised against a real key while building this —
 sanity-check it once you have one.
 
+## File uploads (Cloudinary, optional)
+
+Uploads (profile avatar, expense receipts, payment-method QR codes) are
+written to `./public/uploads` on the local disk by default — nothing to
+configure, works out of the box. Setting all three of
+`CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET`
+switches uploads to Cloudinary instead: uploads happen server-side via a
+signed request (the API secret never reaches the browser), and the
+returned `secure_url` is stored in place of the local `/uploads/...` path.
+
+1. Create a free Cloudinary account and grab the Cloud name, API key, and
+   API secret from its dashboard.
+2. Set the three env vars above. All three must be present — the app
+   falls back to local-disk storage otherwise.
+3. `next.config.ts` only allow-lists `next/image` to load from
+   `res.cloudinary.com/<your cloud name>/...`, derived from
+   `CLOUDINARY_CLOUD_NAME` at build/start time — restart the dev/prod
+   server after setting it for the first time.
+
+Existing file-type/size/magic-byte validation runs identically either
+way; only where the bytes end up after that changes.
+
 ## Scripts
 
 - `pnpm dev` / `pnpm build` / `pnpm start` — Next.js dev/build/start.

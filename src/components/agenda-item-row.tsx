@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { MATERIAL_STANDARD_EASE } from "@/lib/motion";
-import { Check, Navigation } from "lucide-react";
+import { Check, Navigation, X } from "lucide-react";
 import { completeAgendaItem, resetAgendaItem, skipAgendaItem } from "@/lib/actions/agenda-items";
 import { Money } from "@/components/money";
 import { ConfettiBurst } from "@/components/confetti-burst";
@@ -152,10 +152,25 @@ export function AgendaItemRow({
             )}
             {canComplete && item.status === "todo" && (
               <>
-                <Button size="xs" disabled={submitting} onClick={() => run(completeAgendaItem, true)} data-testid="complete-item">
+                <Button
+                  size="xs"
+                  disabled={submitting}
+                  onClick={() => run(completeAgendaItem, true)}
+                  data-testid="complete-item"
+                  className="rounded-full bg-paddy text-rice hover:bg-paddy/85"
+                >
+                  <Check className="size-3" strokeWidth={2.5} />
                   {t("done")}
                 </Button>
-                <Button size="xs" variant="ghost" disabled={submitting} onClick={() => run(skipAgendaItem, false)} data-testid="skip-item">
+                <Button
+                  size="xs"
+                  variant="outline"
+                  disabled={submitting}
+                  onClick={() => run(skipAgendaItem, false)}
+                  data-testid="skip-item"
+                  className="rounded-full"
+                >
+                  <X className="size-3" strokeWidth={2.5} />
                   {t("skip")}
                 </Button>
               </>

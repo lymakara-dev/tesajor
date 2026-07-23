@@ -31,10 +31,14 @@ export async function createTelegramLinkToken(): Promise<
     return { ok: false, error: "You must be signed in." };
   }
 
-  const botUsername = process.env.TELEGRAM_BOT_USERNAME;
-  if (!botUsername) {
+  const rawBotUsername = process.env.TELEGRAM_BOT_USERNAME;
+  if (!rawBotUsername) {
     return { ok: false, error: "Telegram isn't configured on this server yet." };
   }
+  // t.me deep links take the bare username — accept either convention in
+  // the env var (BotFather's own username display includes the "@") so a
+  // copy-paste from BotFather doesn't silently produce a broken link.
+  const botUsername = rawBotUsername.replace(/^@/, "");
 
   const token = randomUUID();
   await db.insert(telegramLinkTokens).values({

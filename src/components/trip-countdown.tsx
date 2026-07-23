@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Sparkles } from "lucide-react";
+import { MATERIAL_STANDARD_EASE } from "@/lib/motion";
 
 interface TimeLeft {
   days: number;
@@ -35,7 +36,7 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
             initial={prefersReducedMotion ? false : { y: -16, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={prefersReducedMotion ? undefined : { y: 16, opacity: 0 }}
-            transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: "easeOut" }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: MATERIAL_STANDARD_EASE }}
             className="amount absolute text-lg font-bold text-rice sm:text-xl"
           >
             {display}

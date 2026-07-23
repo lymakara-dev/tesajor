@@ -41,7 +41,7 @@ export default async function GroupsPage() {
         )}
         {memberships.map((m) => (
           <Link key={m.groupId} href={`/groups/${m.groupId}`}>
-            <Card className="transition-colors hover:bg-accent hover:shadow-sm">
+            <Card className="transition-[background-color,box-shadow] hover:bg-accent hover:elevation-3">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Users className="size-4 text-mekong" strokeWidth={1.5} />

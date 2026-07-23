@@ -32,10 +32,15 @@ const buttonVariants = cva(
         sm: "h-9 gap-1 rounded-[min(var(--radius-md),12px)] px-3 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3.5",
         lg: "h-11 gap-2 px-3 has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5",
         icon: "size-10",
+        // Visually compact icon buttons still need a ~48dp (M2's minimum
+        // touch target) hit area — expanded via an invisible pseudo-element
+        // rather than growing the button itself, the same technique
+        // Material's own dense components use.
+        // https://m2.material.io/design/usability/accessibility.html#layout-and-typography
         "icon-xs":
-          "size-7 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
+          "relative size-7 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg before:absolute before:inset-[-10px] before:content-[''] [&_svg:not([class*='size-'])]:size-3",
         "icon-sm":
-          "size-9 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
+          "relative size-9 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg before:absolute before:inset-[-6px] before:content-['']",
         "icon-lg": "size-11",
       },
     },

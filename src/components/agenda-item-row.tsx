@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { MATERIAL_STANDARD_EASE } from "@/lib/motion";
 import { Check, Navigation } from "lucide-react";
 import { completeAgendaItem, resetAgendaItem, skipAgendaItem } from "@/lib/actions/agenda-items";
 import { Money } from "@/components/money";
@@ -73,7 +74,7 @@ export function AgendaItemRow({
       )}
       data-testid={`agenda-item-${item.id}`}
       animate={sweep ? { backgroundColor: "rgba(31,138,93,0.15)" } : undefined}
-      transition={{ duration: prefersReducedMotion ? 0.15 : 0.6, ease: "easeOut" }}
+      transition={{ duration: prefersReducedMotion ? 0.15 : 0.6, ease: MATERIAL_STANDARD_EASE }}
     >
       <ConfettiBurst trigger={celebrateTick} />
       <div className="flex items-start gap-3">

@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { MATERIAL_STANDARD_EASE } from "@/lib/motion";
 
 /**
  * Trip-complete celebration + template-share moments only use the Moul
@@ -27,7 +28,7 @@ export function TripCompleteCelebration() {
     <motion.div
       initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+      transition={{ duration: 0.3, ease: MATERIAL_STANDARD_EASE }}
       className="rounded-xl bg-mekong px-6 py-8 text-center text-rice"
     >
       <p className="font-display text-3xl">ទេសចរណ៍</p>

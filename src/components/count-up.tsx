@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { animate, useMotionValue, useReducedMotion, useTransform } from "framer-motion";
 import { motion } from "framer-motion";
+import { MATERIAL_STANDARD_EASE } from "@/lib/motion";
 
 /**
  * Animates a numeric value counting up/down to `value` over ~300ms
@@ -31,7 +32,7 @@ export function CountUp({
     }
     const controls = animate(previous.current, value, {
       duration: 0.3,
-      ease: "easeOut",
+      ease: MATERIAL_STANDARD_EASE,
       onUpdate: (v) => motionValue.set(v),
     });
     previous.current = value;

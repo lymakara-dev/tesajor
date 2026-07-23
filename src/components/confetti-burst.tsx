@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { MATERIAL_STANDARD_EASE } from "@/lib/motion";
 
 const COLORS = ["#D42A34", "#D42A34", "#D42A34", "#F08A00", "#1F8A5D"];
 const PARTICLE_COUNT = 16;
@@ -60,7 +61,7 @@ export function ConfettiBurst({ trigger }: { trigger: number }) {
                 }}
                 initial={{ x: 0, y: 0, opacity: 1, rotate: 0 }}
                 animate={{ x, y, opacity: 0, rotate: p.rotate }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
+                transition={{ duration: 0.6, ease: MATERIAL_STANDARD_EASE }}
               />
             );
           })}

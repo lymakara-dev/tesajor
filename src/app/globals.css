@@ -210,3 +210,61 @@
   background-blend-mode: multiply;
   background-size: 8px 8px;
 }
+
+/* Material Design 2 elevation scale (https://m2.material.io/design/environment/elevation.html)
+   — the exact 3-shadow (umbra/penumbra/ambient) formulas for the dp
+   levels this app actually uses. Applied selectively per M2's own
+   component table (resting card = 1dp, raised/hover card = 3-4dp, menu
+   = 8dp, FAB = 6dp, bottom nav = 8dp, modal bottom sheet = 16dp,
+   dialog = 24dp) rather than blanket shadows everywhere — the app's
+   flat/bordered card aesthetic is intentional, elevation-1 just adds
+   the subtle depth cue M2 itself specifies for a resting card. Same
+   values in light and dark mode: the dark theme's surface (#12162b)
+   isn't true black, so a standard shadow still reads against it,
+   unlike M2's own dark-theme guidance (which assumes a black canvas
+   and uses surface-tint overlays instead of shadows). */
+@utility elevation-1 {
+  box-shadow:
+    0px 2px 1px -1px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+}
+@utility elevation-3 {
+  box-shadow:
+    0px 3px 3px -2px rgba(0, 0, 0, 0.2),
+    0px 3px 4px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 8px 0px rgba(0, 0, 0, 0.12);
+}
+@utility elevation-6 {
+  box-shadow:
+    0px 3px 5px -1px rgba(0, 0, 0, 0.2),
+    0px 6px 10px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+}
+@utility elevation-8 {
+  box-shadow:
+    0px 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0px 8px 10px 1px rgba(0, 0, 0, 0.14),
+    0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+/* Bottom navigation is fixed to the viewport's bottom edge — its
+   content sits "above" the page scrolling underneath it, so the M2
+   elevation-8 shadow is flipped to project upward instead of down. */
+@utility elevation-8-top {
+  box-shadow:
+    0px -5px 5px -3px rgba(0, 0, 0, 0.2),
+    0px -8px 10px 1px rgba(0, 0, 0, 0.14),
+    0px -3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+@utility elevation-16 {
+  box-shadow:
+    0px 8px 10px -5px rgba(0, 0, 0, 0.2),
+    0px 16px 24px 2px rgba(0, 0, 0, 0.14),
+    0px 6px 30px 5px rgba(0, 0, 0, 0.12);
+}
+@utility elevation-24 {
+  box-shadow:
+    0px 11px 15px -7px rgba(0, 0, 0, 0.2),
+    0px 24px 38px 3px rgba(0, 0, 0, 0.14),
+    0px 9px 46px 8px rgba(0, 0, 0, 0.12);
+}

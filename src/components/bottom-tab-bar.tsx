@@ -24,7 +24,7 @@ export function BottomTabBar() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-sandstone bg-background pb-[env(safe-area-inset-bottom)] sm:hidden"
+      className="elevation-8-top fixed inset-x-0 bottom-0 z-40 border-t border-sandstone bg-background pb-[env(safe-area-inset-bottom)] sm:hidden"
       aria-label={t("navigation")}
     >
       <div className="mx-auto flex max-w-[480px] items-center justify-between px-2">
@@ -35,7 +35,7 @@ export function BottomTabBar() {
         <Link
           href="/groups"
           aria-label={t("add")}
-          className="-mt-5 flex size-12 shrink-0 items-center justify-center rounded-full bg-saffron text-rice shadow-md transition-transform active:scale-95"
+          className="elevation-6 -mt-5 flex size-12 shrink-0 items-center justify-center rounded-full bg-saffron text-rice transition-transform active:scale-95"
         >
           <Plus className="size-6" strokeWidth={2} />
         </Link>

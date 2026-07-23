@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { MATERIAL_STANDARD_EASE } from "@/lib/motion";
 
 // Brand colors are fixed regardless of light/dark theme, unlike the rest
 // of the app — a logo shouldn't re-tint itself when the user flips a
@@ -58,7 +59,7 @@ function CurlMark({ path, strokeWidth, pinR, pinDotR, animate }: CurlMarkProps) 
         strokeLinejoin="round"
         initial={{ pathLength: 0 }}
         animate={{ pathLength: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        transition={{ duration: 0.5, ease: MATERIAL_STANDARD_EASE }}
       />
       <motion.circle
         cx={74}

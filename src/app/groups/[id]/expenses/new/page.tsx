@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { groupMembers, groups } from "@/db/schema";
+import { DEFAULT_USD_TO_KHR_RATE } from "@/lib/money/exchange-rate";
 import { ExpenseForm } from "@/components/expense-form/expense-form";
 
 export default async function NewExpensePage({
@@ -36,6 +37,7 @@ export default async function NewExpensePage({
       <ExpenseForm
         groupId={group.id}
         currency={group.baseCurrency}
+        usdKhrRate={group.usdKhrRate ?? DEFAULT_USD_TO_KHR_RATE}
         currentMemberId={currentMember.id}
         mode="create"
         members={members.map((m) => ({ id: m.id, displayName: m.displayName }))}

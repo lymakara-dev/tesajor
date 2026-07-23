@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ConvertibleAmountInput } from "@/components/convertible-amount-input";
 import { HandCoins } from "lucide-react";
 
 interface Member {
@@ -20,9 +21,13 @@ interface Member {
 export function RecordPaymentForm({
   groupId,
   members,
+  baseCurrency,
+  usdKhrRate,
 }: {
   groupId: string;
   members: Member[];
+  baseCurrency: string;
+  usdKhrRate: number;
 }) {
   const router = useRouter();
   const t = useTranslations("recordPayment");
@@ -71,7 +76,7 @@ export function RecordPaymentForm({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger render={<Button variant="outline" />}>
+      <SheetTrigger render={<Button variant="outline" data-testid="record-payment-trigger" />}>
         <HandCoins className="size-4" strokeWidth={1.5} />
         {t("title")}
       </SheetTrigger>
@@ -85,7 +90,9 @@ export function RecordPaymentForm({
               <Label htmlFor="from">{t("from")}</Label>
               <Select name="from" required>
                 <SelectTrigger id="from">
-                  <SelectValue placeholder={t("selectMember")} />
+                  <SelectValue placeholder={t("selectMember")}>
+                    {(value: string) => members.find((m) => m.id === value)?.displayName}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {members.map((m) => (
@@ -100,7 +107,9 @@ export function RecordPaymentForm({
               <Label htmlFor="to">{t("to")}</Label>
               <Select name="to" required>
                 <SelectTrigger id="to">
-                  <SelectValue placeholder={t("selectMember")} />
+                  <SelectValue placeholder={t("selectMember")}>
+                    {(value: string) => members.find((m) => m.id === value)?.displayName}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {members.map((m) => (
@@ -115,14 +124,12 @@ export function RecordPaymentForm({
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="amount">{t("amount")}</Label>
-              <Input
+              <ConvertibleAmountInput
                 id="amount"
                 name="amount"
-                type="number"
-                inputMode="decimal"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
+                data-testid="record-payment-amount"
+                baseCurrency={baseCurrency}
+                usdKhrRate={usdKhrRate}
                 required
               />
             </div>
@@ -136,7 +143,7 @@ export function RecordPaymentForm({
             <Input id="note" name="note" maxLength={500} />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" disabled={submitting} className="w-full">
+          <Button type="submit" disabled={submitting} className="w-full" data-testid="submit-record-payment">
             {submitting ? t("recording") : t("recordPayment")}
           </Button>
         </form>

@@ -6,17 +6,25 @@ import { useTranslations } from "next-intl";
 import { addItemNote } from "@/lib/actions/item-notes";
 import { dollarsToCents } from "@/lib/money/cents";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ConvertibleAmountInput } from "@/components/convertible-amount-input";
 import { NotebookPen } from "lucide-react";
 import { displayForAchievementKey } from "@/lib/trips/achievement-icons";
 
 const TAGS = ["environment", "scenery", "food", "price", "tip"] as const;
 const MOODS = ["😞", "😕", "😐", "🙂", "😄"];
 
-export function JournalForm({ agendaItemId }: { agendaItemId: string }) {
+export function JournalForm({
+  agendaItemId,
+  currency,
+  usdKhrRate,
+}: {
+  agendaItemId: string;
+  currency: string;
+  usdKhrRate: number;
+}) {
   const router = useRouter();
   const t = useTranslations("journal");
   const tAchievements = useTranslations("achievements");
@@ -25,6 +33,11 @@ export function JournalForm({ agendaItemId }: { agendaItemId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [unlocked, setUnlocked] = useState<string[]>([]);
+  // ConvertibleAmountInput manages its own currency-toggle state
+  // internally; form.reset() below only touches plain DOM inputs, so
+  // bump this to force the amount field to fully remount (and clear)
+  // after a successful submit, the same way the rest of the form does.
+  const [amountFieldResetKey, setAmountFieldResetKey] = useState(0);
 
   function toggleTag(tag: string) {
     setSelectedTags((prev) => {
@@ -61,6 +74,7 @@ export function JournalForm({ agendaItemId }: { agendaItemId: string }) {
     form.reset();
     setMood(null);
     setSelectedTags(new Set());
+    setAmountFieldResetKey((n) => n + 1);
     router.refresh();
   }
 
@@ -111,7 +125,13 @@ export function JournalForm({ agendaItemId }: { agendaItemId: string }) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="actualCost">{t("actualCost")}</Label>
-            <Input id="actualCost" name="actualCost" type="number" inputMode="decimal" step="0.01" min="0" placeholder="0.00" />
+            <ConvertibleAmountInput
+              key={amountFieldResetKey}
+              id="actualCost"
+              name="actualCost"
+              baseCurrency={currency}
+              usdKhrRate={usdKhrRate}
+            />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           {unlocked.length > 0 && (

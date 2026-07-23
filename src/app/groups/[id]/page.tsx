@@ -6,11 +6,14 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { expensePayers, expenses, groupMembers, groups } from "@/db/schema";
 import { deleteExpense } from "@/lib/actions/expenses";
+import { updateGroupExchangeRate } from "@/lib/actions/groups";
+import { DEFAULT_USD_TO_KHR_RATE } from "@/lib/money/exchange-rate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Money } from "@/components/money";
 import { InviteLink } from "@/components/invite-link";
+import { ExchangeRateSettings } from "@/components/exchange-rate-settings";
 import { Scale, Activity, Download, Receipt, Plus } from "lucide-react";
 
 export default async function GroupPage({
@@ -33,10 +36,11 @@ export default async function GroupPage({
     .from(groupMembers)
     .where(eq(groupMembers.groupId, id));
 
-  const isMember = members.some((m) => m.userId === session.user.id);
-  if (!isMember) {
+  const currentMembership = members.find((m) => m.userId === session.user.id);
+  if (!currentMembership) {
     redirect("/groups");
   }
+  const isOwner = currentMembership.role === "owner";
 
   const memberName = new Map(members.map((m) => [m.id, m.displayName]));
 
@@ -94,6 +98,16 @@ export default async function GroupPage({
       </div>
 
       <InviteLink inviteCode={group.inviteCode} title={t("inviteFriends")} />
+
+      {isOwner && (
+        <ExchangeRateSettings
+          currentRate={group.usdKhrRate ?? DEFAULT_USD_TO_KHR_RATE}
+          onSave={async (usdKhrRate) => {
+            "use server";
+            return updateGroupExchangeRate({ groupId: id, usdKhrRate });
+          }}
+        />
+      )}
 
       <Card>
         <CardHeader>

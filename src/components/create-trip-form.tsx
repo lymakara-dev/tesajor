@@ -93,7 +93,9 @@ export function CreateTripForm({ groups }: { groups: { id: string; name: string 
               <Label htmlFor="groupId">{t("linkGroup")}</Label>
               <Select name="groupId" defaultValue="">
                 <SelectTrigger id="groupId">
-                  <SelectValue placeholder={t("noGroup")} />
+                  <SelectValue placeholder={t("noGroup")}>
+                    {(value: string) => (value ? groups.find((g) => g.id === value)?.name : t("noGroup"))}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="">{t("noGroup")}</SelectItem>

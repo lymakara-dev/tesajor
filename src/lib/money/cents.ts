@@ -1,4 +1,4 @@
-import { USD_TO_KHR_RATE } from "./exchange-rate";
+import { DEFAULT_USD_TO_KHR_RATE } from "./exchange-rate";
 
 export function sumCents(amounts: number[]): number {
   return amounts.reduce((sum, a) => sum + a, 0);
@@ -53,7 +53,7 @@ function centsToKhrDisplay(amountCents: number, fromCurrency: string): string | 
   if (fromCurrency === "KHR") return null;
   if (fromCurrency !== "USD") return null; // only USD has a configured conversion rate
 
-  const riel = (amountCents / 100) * USD_TO_KHR_RATE;
+  const riel = (amountCents / 100) * DEFAULT_USD_TO_KHR_RATE;
   const roundedRiel = Math.round(riel / 100) * 100;
   return `៛${roundedRiel.toLocaleString("en-US")}`;
 }

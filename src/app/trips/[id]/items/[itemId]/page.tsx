@@ -9,6 +9,7 @@ import { getTripRole } from "@/lib/actions/trip-membership";
 import { canJournal } from "@/lib/trips/permissions";
 import { Money } from "@/components/money";
 import { directionsUrl } from "@/lib/trips/geo";
+import { DEFAULT_USD_TO_KHR_RATE } from "@/lib/money/exchange-rate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { JournalForm } from "@/components/journal-form";
@@ -145,7 +146,13 @@ export default async function AgendaItemPage({
         </CardContent>
       </Card>
 
-      {canJournal(role) && <JournalForm agendaItemId={item.id} />}
+      {canJournal(role) && (
+        <JournalForm
+          agendaItemId={item.id}
+          currency={item.currency}
+          usdKhrRate={trip.usdKhrRate ?? DEFAULT_USD_TO_KHR_RATE}
+        />
+      )}
     </div>
   );
 }

@@ -5,10 +5,12 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { agendaItems, trips, achievements } from "@/db/schema";
 import { getTripRole } from "@/lib/actions/trip-membership";
+import { updateTripExchangeRate } from "@/lib/actions/trips";
 import { canEditTrip, canManageTrip } from "@/lib/trips/permissions";
 import { computeDayProgress, computeTripProgress } from "@/lib/quests/progress";
 import { computeXp } from "@/lib/quests/xp";
 import { dayOffsetBetween } from "@/lib/trips/clone";
+import { DEFAULT_USD_TO_KHR_RATE } from "@/lib/money/exchange-rate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InviteLink } from "@/components/invite-link";
 import { AddAgendaItemForm } from "@/components/add-agenda-item-form";
@@ -20,6 +22,7 @@ import { TripDayMap } from "@/components/trip-day-map";
 import { TripProgressCard } from "@/components/trip-progress-card";
 import { TripCompleteCelebration } from "@/components/trip-complete-celebration";
 import { TripCountdown } from "@/components/trip-countdown";
+import { ExchangeRateSettings } from "@/components/exchange-rate-settings";
 import { MapPin } from "lucide-react";
 
 export default async function TripPage({
@@ -86,6 +89,13 @@ export default async function TripPage({
         <>
           <PublishTripControls tripId={id} visibility={trip.visibility} />
           <InviteLink inviteCode={trip.inviteCode} joinPath="/trips/join" title={t("inviteCollaborators")} />
+          <ExchangeRateSettings
+            currentRate={trip.usdKhrRate ?? DEFAULT_USD_TO_KHR_RATE}
+            onSave={async (usdKhrRate) => {
+              "use server";
+              return updateTripExchangeRate({ tripId: id, usdKhrRate });
+            }}
+          />
         </>
       )}
 
@@ -151,6 +161,7 @@ export default async function TripPage({
           dayCount={dayCount}
           defaultDay={1}
           currency={trip.baseCurrency}
+          usdKhrRate={trip.usdKhrRate ?? DEFAULT_USD_TO_KHR_RATE}
         />
       )}
     </div>

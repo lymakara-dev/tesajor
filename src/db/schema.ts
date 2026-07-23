@@ -87,6 +87,10 @@ export const groups = pgTable("groups", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   baseCurrency: text("base_currency").notNull().default("USD"),
+  // Riel per 1 USD. Null falls back to DEFAULT_USD_TO_KHR_RATE
+  // (src/lib/money/exchange-rate.ts) — lets a group override the app-wide
+  // default when converting an amount entered in the other currency.
+  usdKhrRate: integer("usd_khr_rate"),
   inviteCode: text("invite_code").notNull().unique(),
   createdBy: uuid("created_by")
     .notNull()
@@ -309,6 +313,9 @@ export const trips = pgTable("trips", {
   startDate: date("start_date", { mode: "date" }).notNull(),
   endDate: date("end_date", { mode: "date" }).notNull(),
   baseCurrency: text("base_currency").notNull().default("USD"),
+  // Riel per 1 USD. Null falls back to DEFAULT_USD_TO_KHR_RATE — see
+  // groups.usdKhrRate above.
+  usdKhrRate: integer("usd_khr_rate"),
   visibility: tripVisibilityEnum("visibility").notNull().default("private"),
   // Lets other users join as a collaborator (see trip_members) — distinct
   // from `visibility`, which controls template cloning.

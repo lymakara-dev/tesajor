@@ -16,6 +16,7 @@ import { recordSettlement } from "@/lib/actions/settlements";
 import { confirmPaymentRequest } from "@/lib/actions/payment-requests";
 import { simplifyDebts } from "@/lib/balances/calculate";
 import { getGroupNets } from "@/lib/queries/balances";
+import { DEFAULT_USD_TO_KHR_RATE } from "@/lib/money/exchange-rate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Money, type MoneyTone } from "@/components/money";
@@ -282,6 +283,8 @@ export default async function BalancesPage({
       <RecordPaymentForm
         groupId={id}
         members={members.map((m) => ({ id: m.id, displayName: m.displayName }))}
+        baseCurrency={group.baseCurrency}
+        usdKhrRate={group.usdKhrRate ?? DEFAULT_USD_TO_KHR_RATE}
       />
     </div>
   );

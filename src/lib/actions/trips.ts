@@ -16,6 +16,7 @@ import {
   createTripSchema,
   joinTripSchema,
   publishTripSchema,
+  updateTripExchangeRateSchema,
 } from "@/lib/validation/trips";
 
 export type ActionResult<T = undefined> =
@@ -242,4 +243,29 @@ export async function cloneTrip(
 
   revalidatePath("/trips");
   return { ok: true, data: { tripId: newTripId } };
+}
+
+export async function updateTripExchangeRate(input: unknown): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { ok: false, error: "You must be signed in." };
+  }
+
+  const parsed = updateTripExchangeRateSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid exchange rate." };
+  }
+
+  const role = await getTripRole(parsed.data.tripId, session.user.id);
+  if (!canManageTrip(role)) {
+    return { ok: false, error: "Only the trip owner can change the exchange rate." };
+  }
+
+  await db
+    .update(trips)
+    .set({ usdKhrRate: parsed.data.usdKhrRate })
+    .where(eq(trips.id, parsed.data.tripId));
+
+  revalidatePath(`/trips/${parsed.data.tripId}`);
+  return { ok: true, data: undefined };
 }

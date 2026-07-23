@@ -14,6 +14,7 @@ import {
 } from "@/db/schema";
 import { ExpenseForm } from "@/components/expense-form/expense-form";
 import type { ExpenseFormInitialValues } from "@/components/expense-form/types";
+import { DEFAULT_USD_TO_KHR_RATE } from "@/lib/money/exchange-rate";
 
 export default async function EditExpensePage({
   params,
@@ -129,6 +130,7 @@ export default async function EditExpensePage({
       <ExpenseForm
         groupId={group.id}
         currency={group.baseCurrency}
+        usdKhrRate={group.usdKhrRate ?? DEFAULT_USD_TO_KHR_RATE}
         currentMemberId={currentMember.id}
         mode="edit"
         expenseId={expense.id}

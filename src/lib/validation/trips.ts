@@ -32,3 +32,9 @@ export const cloneTripSchema = z.object({
   tripId: z.uuid(),
   newStartDate: z.coerce.date(),
 });
+
+export const updateTripExchangeRateSchema = z.object({
+  tripId: z.uuid(),
+  // Riel per 1 USD — see updateGroupExchangeRateSchema's comment.
+  usdKhrRate: z.coerce.number().int().positive().max(1_000_000),
+});

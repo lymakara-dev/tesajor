@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ConvertibleAmountInput } from "@/components/convertible-amount-input";
 import { Plus } from "lucide-react";
 
 const CATEGORIES = ["food", "sight", "transport", "hotel", "activity", "other"] as const;
@@ -19,11 +20,13 @@ export function AddAgendaItemForm({
   dayCount,
   defaultDay,
   currency,
+  usdKhrRate,
 }: {
   tripId: string;
   dayCount: number;
   defaultDay: number;
   currency: string;
+  usdKhrRate: number;
 }) {
   const router = useRouter();
   const t = useTranslations("addAgendaItem");
@@ -82,7 +85,9 @@ export function AddAgendaItemForm({
               <Label htmlFor="dayNumber">{t("day")}</Label>
               <Select name="dayNumber" defaultValue={String(defaultDay)}>
                 <SelectTrigger id="dayNumber">
-                  <SelectValue />
+                  <SelectValue>
+                    {(value: string) => t("dayOption", { day: Number(value) })}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {Array.from({ length: dayCount }, (_, i) => i + 1).map((day) => (
@@ -97,7 +102,7 @@ export function AddAgendaItemForm({
               <Label htmlFor="category">{t("category")}</Label>
               <Select name="category" defaultValue="other">
                 <SelectTrigger id="category">
-                  <SelectValue />
+                  <SelectValue>{(value: string) => t(`categories.${value}`)}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {CATEGORIES.map((c) => (
@@ -111,7 +116,12 @@ export function AddAgendaItemForm({
           </div>
           <div className="space-y-2">
             <Label htmlFor="plannedCost">{t("plannedCost", { currency })}</Label>
-            <Input id="plannedCost" name="plannedCost" type="number" inputMode="decimal" step="0.01" min="0" placeholder="0.00" />
+            <ConvertibleAmountInput
+              id="plannedCost"
+              name="plannedCost"
+              baseCurrency={currency}
+              usdKhrRate={usdKhrRate}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="placeName">{t("place")}</Label>

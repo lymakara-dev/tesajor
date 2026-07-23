@@ -1,12 +1,16 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { groups, groupMembers, activityLog, users } from "@/db/schema";
 import { auth } from "@/lib/auth";
-import { createGroupSchema, joinGroupSchema } from "@/lib/validation/groups";
+import {
+  createGroupSchema,
+  joinGroupSchema,
+  updateGroupExchangeRateSchema,
+} from "@/lib/validation/groups";
 
 export type ActionResult<T = undefined> =
   | { ok: true; data: T }
@@ -113,4 +117,35 @@ export async function joinGroupByInviteCode(
   });
 
   return { ok: true, data: { groupId: group.id } };
+}
+
+export async function updateGroupExchangeRate(input: unknown): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { ok: false, error: "You must be signed in." };
+  }
+
+  const parsed = updateGroupExchangeRateSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid exchange rate." };
+  }
+
+  const [membership] = await db
+    .select({ role: groupMembers.role })
+    .from(groupMembers)
+    .where(
+      and(eq(groupMembers.groupId, parsed.data.groupId), eq(groupMembers.userId, session.user.id)),
+    )
+    .limit(1);
+  if (membership?.role !== "owner") {
+    return { ok: false, error: "Only the group owner can change the exchange rate." };
+  }
+
+  await db
+    .update(groups)
+    .set({ usdKhrRate: parsed.data.usdKhrRate })
+    .where(eq(groups.id, parsed.data.groupId));
+
+  revalidatePath(`/groups/${parsed.data.groupId}`);
+  return { ok: true, data: undefined };
 }

@@ -392,5 +392,14 @@
     "transportExplorer": "Transport explorer",
     "fiveFoodJournals": "5 food journals",
     "unknown": "{key}"
+  },
+  "exchangeRate": {
+    "title": "Exchange rate",
+    "label": "Riel per $1 USD",
+    "hint": "Used to convert any amount entered in the other currency.",
+    "save": "Save",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "invalidRate": "Enter a whole number greater than 0."
   }
 }

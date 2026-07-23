@@ -17,12 +17,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Money } from "@/components/money";
+import { ConvertibleAmountInput } from "@/components/convertible-amount-input";
 import { Receipt, Users, SplitSquareHorizontal } from "lucide-react";
 import type { ExpenseFormInitialValues, ExpenseFormMember } from "./types";
 
 interface ExpenseFormProps {
   groupId: string;
   currency: string;
+  usdKhrRate: number;
   members: ExpenseFormMember[];
   currentMemberId: string;
   mode: "create" | "edit";
@@ -55,6 +57,7 @@ function newItemRow(): ItemRow {
 export function ExpenseForm({
   groupId,
   currency,
+  usdKhrRate,
   members,
   currentMemberId,
   mode,
@@ -362,15 +365,13 @@ export function ExpenseForm({
           {splitMethod !== "itemized" && (
             <div className="space-y-2">
               <Label htmlFor="total">{t("totalLabel", { currency })}</Label>
-              <Input
+              <ConvertibleAmountInput
                 id="total"
-                type="number"
-                inputMode="decimal"
-                step="0.01"
-                min="0"
+                data-testid="total"
+                baseCurrency={currency}
+                usdKhrRate={usdKhrRate}
                 value={totalInput}
-                onChange={(e) => setTotalInput(e.target.value)}
-                placeholder="0.00"
+                onChange={setTotalInput}
                 required
               />
             </div>
@@ -431,22 +432,19 @@ export function ExpenseForm({
                 }
               />
               <span className="min-w-0 flex-1 truncate text-sm">{m.displayName}</span>
-              <Input
+              <ConvertibleAmountInput
                 data-testid={`payer-amount-${m.id}`}
-                type="number"
-                inputMode="decimal"
-                step="0.01"
-                min="0"
-                className="w-28"
+                baseCurrency={currency}
+                usdKhrRate={usdKhrRate}
+                className="w-36 shrink-0"
                 disabled={!payers[m.id]?.included}
                 value={payers[m.id]?.amount ?? ""}
-                onChange={(e) =>
+                onChange={(amount) =>
                   setPayers((prev) => ({
                     ...prev,
-                    [m.id]: { included: true, amount: e.target.value },
+                    [m.id]: { included: true, amount },
                   }))
                 }
-                placeholder="0.00"
               />
             </div>
           ))}
@@ -499,18 +497,15 @@ export function ExpenseForm({
               {members.map((m) => (
                 <div key={m.id} className="flex items-center gap-3" data-testid={`exact-row-${m.id}`}>
                   <span className="min-w-0 flex-1 truncate text-sm">{m.displayName}</span>
-                  <Input
+                  <ConvertibleAmountInput
                     data-testid={`exact-amount-${m.id}`}
-                    type="number"
-                    inputMode="decimal"
-                    step="0.01"
-                    min="0"
-                    className="w-28"
+                    baseCurrency={currency}
+                    usdKhrRate={usdKhrRate}
+                    className="w-36 shrink-0"
                     value={exactAmounts[m.id] ?? ""}
-                    onChange={(e) =>
-                      setExactAmounts((prev) => ({ ...prev, [m.id]: e.target.value }))
+                    onChange={(amount) =>
+                      setExactAmounts((prev) => ({ ...prev, [m.id]: amount }))
                     }
-                    placeholder="0.00"
                   />
                 </div>
               ))}
@@ -583,16 +578,13 @@ export function ExpenseForm({
                       placeholder={t("itemNamePlaceholder")}
                       className="flex-1"
                     />
-                    <Input
+                    <ConvertibleAmountInput
                       data-testid={`item-price-${index}`}
-                      type="number"
-                      inputMode="decimal"
-                      step="0.01"
-                      min="0"
-                      className="w-24"
+                      baseCurrency={currency}
+                      usdKhrRate={usdKhrRate}
+                      className="w-36 shrink-0"
                       value={item.price}
-                      onChange={(e) => updateItem(item.clientId, { price: e.target.value })}
-                      placeholder="0.00"
+                      onChange={(price) => updateItem(item.clientId, { price })}
                     />
                     <Button
                       type="button"
@@ -628,18 +620,16 @@ export function ExpenseForm({
                 {t("addItem")}
               </Button>
               <div className="flex items-center gap-3">
-                <Label htmlFor="taxTip" className="w-28">
+                <Label htmlFor="taxTip" className="w-20 shrink-0">
                   {t("taxTip")}
                 </Label>
-                <Input
+                <ConvertibleAmountInput
                   id="taxTip"
-                  type="number"
-                  inputMode="decimal"
-                  step="0.01"
-                  min="0"
-                  className="w-28"
+                  baseCurrency={currency}
+                  usdKhrRate={usdKhrRate}
+                  className="w-36 shrink-0"
                   value={taxTip}
-                  onChange={(e) => setTaxTip(e.target.value)}
+                  onChange={setTaxTip}
                 />
               </div>
               <p className="text-sm text-muted-foreground">

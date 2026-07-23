@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 import { Moon, Sun, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -12,6 +13,7 @@ const OPTIONS = [
 ] as const;
 
 export function ThemeToggle() {
+  const t = useTranslations("theme");
   const { theme, setTheme } = useTheme();
   // Avoid a hydration mismatch: theme is only known client-side.
   const [mounted, setMounted] = useState(false);
@@ -27,10 +29,10 @@ export function ThemeToggle() {
           variant={mounted && theme === value ? "default" : "ghost"}
           onClick={() => setTheme(value)}
           aria-pressed={mounted && theme === value}
-          className="capitalize"
+          data-testid={`theme-${value}`}
         >
           <Icon className="size-4" strokeWidth={1.5} />
-          {value}
+          {t(value)}
         </Button>
       ))}
     </div>

@@ -119,7 +119,14 @@
     "days": "Days",
     "hours": "Hrs",
     "minutes": "Min",
-    "seconds": "Sec"
+    "seconds": "Sec",
+    "geolocationUnavailable": "Geolocation isn't available in this browser.",
+    "locating": "Locating...",
+    "youAreHereButton": "📍 You are here",
+    "noUpcomingStop": "No upcoming stops with a location to navigate to.",
+    "locationError": "Couldn't get your location — check your browser's location permission.",
+    "nearestUpcomingStop": "Nearest upcoming stop:",
+    "metersAway": "({distance}m away)"
   },
   "share": {
     "sharing": "Sharing",
@@ -217,6 +224,13 @@
     "notes": "Notes",
     "notesPlaceholder": "How was it?",
     "tags": "Tags",
+    "tagLabels": {
+      "environment": "Environment",
+      "scenery": "Scenery",
+      "food": "Food",
+      "price": "Price",
+      "tip": "Tip"
+    },
     "actualCost": "Actual price paid",
     "achievementUnlocked": "Achievement unlocked: {keys}",
     "saving": "Saving...",
@@ -234,6 +248,8 @@
     "couldNotJoinTrip": "Couldn't join trip"
   },
   "expenseForm": {
+    "addTitle": "Add expense",
+    "editTitle": "Edit expense",
     "detailsTitle": "Details",
     "titleLabel": "Title",
     "titlePlaceholder": "Dinner at Nomz",
@@ -290,5 +306,91 @@
     "addressPlaceholder": "Address",
     "adding": "Adding...",
     "addStop": "Add stop"
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "loginDescription": "Welcome back. Sign in to see your groups.",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "signingIn": "Signing in...",
+    "signIn": "Sign in",
+    "invalidCredentials": "Invalid email or password.",
+    "continueWithGoogle": "Continue with Google",
+    "noAccount": "No account?",
+    "register": "Register",
+    "registerTitle": "Create an account",
+    "registerDescription": "Start splitting bills with your friends.",
+    "nameLabel": "Name",
+    "creatingAccount": "Creating account...",
+    "createAccount": "Create account",
+    "accountCreatedSignIn": "Account created — please sign in.",
+    "alreadyHaveAccount": "Already have an account?"
+  },
+  "marketing": {
+    "headline": "Split bills without the headache.",
+    "subtitle": "Track who paid, who owes what, and settle up with the fewest payments possible — built for splitting the bill right at the table.",
+    "getStarted": "Get started — it's free",
+    "signIn": "Sign in",
+    "features": [
+      {
+        "title": "Five ways to split",
+        "body": "Equal, exact amounts, percentages, shares, or itemized — tag who ate what and split tax & tip proportionally."
+      },
+      {
+        "title": "Multiple payers, one bill",
+        "body": "Two people split the check? Add every payer and their amount — the math always reconciles to the cent."
+      },
+      {
+        "title": "Simplify debts",
+        "body": "One tap turns a tangle of IOUs into the minimum number of payments needed to settle the whole group."
+      },
+      {
+        "title": "Full activity trail",
+        "body": "Every expense and settlement is logged and editable, so nothing gets lost or double-counted."
+      }
+    ],
+    "copyright": "© {year} Tesajor",
+    "terms": "Terms",
+    "privacy": "Privacy"
+  },
+  "createGroupForm": {
+    "title": "New group",
+    "nameLabel": "Name",
+    "namePlaceholder": "Friday Dinner Crew",
+    "currencyLabel": "Currency",
+    "creating": "Creating...",
+    "submit": "Create group"
+  },
+  "inviteLink": {
+    "defaultTitle": "Invite friends",
+    "copy": "Copy",
+    "copied": "Copied"
+  },
+  "telegram": {
+    "title": "Telegram",
+    "connectedNoUsername": "Connected.",
+    "connectedWithUsername": "Connected as @{username}.",
+    "canReceive": "You can receive payment requests here.",
+    "finishConnecting": "Finish connecting to receive payment requests: tap Connect once more and press Start in Telegram.",
+    "disconnect": "Disconnect",
+    "connectPrompt": "Connect Telegram to receive payment requests with a QR code and a one-tap \"I've paid\" button.",
+    "opening": "Opening...",
+    "connect": "Connect Telegram"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "achievements": {
+    "firstTrip": "First trip",
+    "allStopsDone": "All stops done",
+    "fullDayDone": "Full day done",
+    "dayStreak3": "3-day streak",
+    "journaledEveryStop": "Journaled every stop",
+    "earlyBird": "Early bird",
+    "transportExplorer": "Transport explorer",
+    "fiveFoodJournals": "5 food journals",
+    "unknown": "{key}"
   }
 }

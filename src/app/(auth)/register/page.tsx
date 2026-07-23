@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { registerUser } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,7 @@ import { Logo } from "@/components/Logo";
 import { UserPlus } from "lucide-react";
 
 export default function RegisterPage() {
+  const t = useTranslations("auth");
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,7 +50,7 @@ export default function RegisterPage() {
 
     setLoading(false);
     if (signInResult?.error) {
-      setError("Account created — please sign in.");
+      setError(t("accountCreatedSignIn"));
       router.push("/login");
       return;
     }
@@ -63,23 +65,21 @@ export default function RegisterPage() {
       </Link>
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Create an account</CardTitle>
-          <CardDescription>
-            Start splitting bills with your friends.
-          </CardDescription>
+          <CardTitle>{t("registerTitle")}</CardTitle>
+          <CardDescription>{t("registerDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t("nameLabel")}</Label>
               <Input id="name" name="name" required maxLength={80} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("emailLabel")}</Label>
               <Input id="email" name="email" type="email" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("passwordLabel")}</Label>
               <Input
                 id="password"
                 name="password"
@@ -91,7 +91,7 @@ export default function RegisterPage() {
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
               <UserPlus className="size-4" strokeWidth={1.5} />
-              {loading ? "Creating account..." : "Create account"}
+              {loading ? t("creatingAccount") : t("createAccount")}
             </Button>
           </form>
           <Button
@@ -99,12 +99,12 @@ export default function RegisterPage() {
             className="w-full"
             onClick={() => signIn("google", { callbackUrl: "/groups" })}
           >
-            Continue with Google
+            {t("continueWithGoogle")}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
+            {t("alreadyHaveAccount")}{" "}
             <a href="/login" className="underline">
-              Sign in
+              {t("signIn")}
             </a>
           </p>
         </CardContent>

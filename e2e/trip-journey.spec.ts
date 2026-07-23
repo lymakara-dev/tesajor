@@ -62,7 +62,7 @@ test("create trip, run agenda quests, journal to expense, publish, clone, and en
   await test.step("owner signs up and creates a group to link the trip to", async () => {
     await registerUser(ownerPage, "Trip Owner", ownerEmail);
     await ownerPage.fill("#name", "Trip Squad");
-    await ownerPage.click('button:has-text("Create group")');
+    await ownerPage.getByTestId("submit-create-group").click();
     await ownerPage.waitForURL(/\/groups\/[0-9a-f-]+$/, { timeout: 30000 });
   });
 
@@ -71,12 +71,12 @@ test("create trip, run agenda quests, journal to expense, publish, clone, and en
 
   await test.step("owner creates a trip linked to that group, spanning 2 days", async () => {
     await ownerPage.goto("/trips");
-    await ownerPage.getByRole("button", { name: "New trip" }).click();
+    await ownerPage.getByTestId("create-trip-trigger").click();
     await ownerPage.fill("#trip-title", "Siem Reap Adventure");
     await ownerPage.fill("#startDate", "2026-08-01");
     await ownerPage.fill("#endDate", "2026-08-02");
     await selectOption(ownerPage, "#groupId", "Trip Squad");
-    await ownerPage.click('button:has-text("Create trip")');
+    await ownerPage.getByTestId("submit-create-trip").click();
     await ownerPage.waitForURL(/\/trips\/[0-9a-f-]+$/, { timeout: 30000 });
     tripUrl = ownerPage.url();
     tripId = tripUrl.split("/").pop()!;
@@ -84,13 +84,14 @@ test("create trip, run agenda quests, journal to expense, publish, clone, and en
 
   await test.step("owner adds 3 stops: 2 on day 1, 1 on day 2", async () => {
     async function addStop(title: string, day: number, plannedCost: string) {
-      await ownerPage.getByRole("button", { name: "Add a stop" }).click();
+      await ownerPage.getByTestId("add-agenda-item-trigger").click();
       await ownerPage.fill("#item-title", title);
       if (day !== 1) {
-        await selectOption(ownerPage, "#dayNumber", `Day ${day}`);
+        await ownerPage.locator("#dayNumber").click();
+        await ownerPage.getByTestId(`day-option-${day}`).click();
       }
       await ownerPage.fill("#plannedCost", plannedCost);
-      await ownerPage.click('button:has-text("Add stop")');
+      await ownerPage.getByTestId("submit-add-agenda-item").click();
       // The day's map falls back to a plain list of stop names when no
       // Google Maps key is configured, so match the actual agenda row link
       // (not the map fallback list item) to avoid ambiguity.
@@ -108,18 +109,17 @@ test("create trip, run agenda quests, journal to expense, publish, clone, and en
 
   await test.step("complete both day-1 stops: progress/XP update and a 'full day done' achievement unlocks", async () => {
     await rowFor(ownerPage, "Angkor Wat Sunrise").getByTestId("complete-item").click();
-    await expect(ownerPage.getByText("1/3 stops done")).toBeVisible();
+    await expect(ownerPage.getByTestId("stops-done")).toContainText("1/3");
 
     // Completing the second (and last) day-1 stop finishes day 1, which is
     // exactly what src/lib/quests/achievements.ts awards "full_day_done" for.
     await rowFor(ownerPage, "Pub Street Dinner").getByTestId("complete-item").click();
-    await expect(ownerPage.getByText("2/3 stops done")).toBeVisible();
+    await expect(ownerPage.getByTestId("stops-done")).toContainText("2/3");
     // 2 completions (10 XP each) + the "full day done" achievement (25 XP)
-    // that just unlocked = 45, per src/lib/quests/xp.ts.
-    await expect(ownerPage.getByText(/45 XP/)).toBeVisible();
-    await expect(rowFor(ownerPage, "Pub Street Dinner")).toContainText(
-      "Achievement unlocked: Full day done",
-    );
+    // that just unlocked = 45, per src/lib/quests/xp.ts. "XP" itself is an
+    // intentionally untranslated abbreviation (see messages/*.json).
+    await expect(ownerPage.getByTestId("xp-total")).toContainText("45");
+    await expect(rowFor(ownerPage, "Pub Street Dinner").getByTestId("achievement-unlocked")).toBeVisible();
   });
 
   await test.step("journal the completed stop with a mood, text, and an actual price", async () => {
@@ -127,15 +127,15 @@ test("create trip, run agenda quests, journal to expense, publish, clone, and en
     await ownerPage.waitForURL(/\/items\//, { timeout: 30000 });
     await ownerPage.getByRole("button", { name: "🙂" }).click();
     await ownerPage.fill("#noteText", "Gorgeous sunrise, worth the early wake-up.");
-    await ownerPage.getByRole("button", { name: /^price$/i }).click();
+    await ownerPage.getByTestId("tag-price").click();
     await ownerPage.fill("#actualCost", "12.50");
-    await ownerPage.click('button:has-text("Save journal entry")');
+    await ownerPage.getByTestId("submit-journal-entry").click();
     await expect(ownerPage.getByText("Gorgeous sunrise, worth the early wake-up.")).toBeVisible();
     await expect(ownerPage.getByText("$12.50")).toBeVisible();
   });
 
   await test.step("one tap converts the journaled price into a group expense", async () => {
-    await ownerPage.getByRole("button", { name: "Add to group expenses" }).click();
+    await ownerPage.getByTestId("add-to-group-expenses").click();
     await ownerPage.waitForURL(/\/groups\/.+\/expenses\/new/, { timeout: 30000 });
     await expect(ownerPage.locator("#title")).toHaveValue("Angkor Wat Sunrise");
     await expect(ownerPage.locator("#total")).toHaveValue("12.50");
@@ -147,11 +147,13 @@ test("create trip, run agenda quests, journal to expense, publish, clone, and en
 
   await test.step("owner publishes the trip as a public template", async () => {
     await ownerPage.goto(tripUrl);
-    // This radio is a controlled component driven by the server action +
+    // Selected by the radio's value attribute, not its (translated) label
+    // text. It's also a controlled component driven by the server action +
     // router.refresh() round trip, not a native checkbox toggle, so use a
     // plain click and let the assertion retry until the refresh lands.
-    await ownerPage.getByRole("radio", { name: /Public template/ }).click();
-    await expect(ownerPage.getByRole("radio", { name: /Public template/ })).toBeChecked();
+    const publicTemplateRadio = ownerPage.locator('input[type="radio"][value="public_template"]');
+    await publicTemplateRadio.click();
+    await expect(publicTemplateRadio).toBeChecked();
   });
 
   await test.step("a second account clones the published trip with a new start date", async () => {
@@ -160,9 +162,9 @@ test("create trip, run agenda quests, journal to expense, publish, clone, and en
     await registerUser(clonerPage, "Trip Cloner", clonerEmail);
 
     await clonerPage.goto(tripUrl);
-    await clonerPage.getByRole("button", { name: "Use this template" }).click();
+    await clonerPage.getByTestId("use-this-template").click();
     await clonerPage.fill("#newStartDate", "2026-09-10");
-    await clonerPage.click('button:has-text("Clone trip")');
+    await clonerPage.getByTestId("submit-clone-trip").click();
     // We start this step already on /trips/<tripId>, which itself matches
     // a bare /\/trips\/[0-9a-f-]+$/ pattern -- wait specifically for the
     // URL to move to a *different* trip id, not just any trip URL.
@@ -192,13 +194,13 @@ test("create trip, run agenda quests, journal to expense, publish, clone, and en
     await expect(clonerPage.getByRole("link", { name: "Pub Street Dinner" })).toBeVisible();
     await expect(clonerPage.getByRole("link", { name: "Tonle Sap Boat Tour" })).toBeVisible();
     // ...but completion state and journals did not.
-    await expect(clonerPage.getByText("0/3 stops done")).toBeVisible();
+    await expect(clonerPage.getByTestId("stops-done")).toContainText("0/3");
 
     await clonerPage.getByRole("link", { name: "Angkor Wat Sunrise" }).click();
     await clonerPage.waitForURL(/\/items\//, { timeout: 30000 });
-    await expect(clonerPage.getByText("No journal entries yet.")).toBeVisible();
+    await expect(clonerPage.getByTestId("no-journal-entries")).toBeVisible();
     // Clone isn't linked to a group, so there is nothing to journal-to-expense yet.
-    await expect(clonerPage.getByText("Add to group expenses")).toHaveCount(0);
+    await expect(clonerPage.getByTestId("add-to-group-expenses")).toHaveCount(0);
 
     const [clonedRow] = await sql`select group_id from trips where id = ${clonedTripId}`;
     expect(clonedRow.group_id).toBeNull();
@@ -220,7 +222,7 @@ test("create trip, run agenda quests, journal to expense, publish, clone, and en
     // Joining via invite link always grants "editor" (the app has no UI to
     // invite as "viewer" specifically) -- confirm the editor affordances
     // are present before we downgrade the role underneath this same page.
-    await expect(joinerPage.getByRole("button", { name: "Add a stop" })).toBeVisible();
+    await expect(joinerPage.getByTestId("add-agenda-item-trigger")).toBeVisible();
     const boatRow = rowFor(joinerPage, "Tonle Sap Boat Tour");
     await expect(boatRow.getByTestId("complete-item")).toBeVisible();
 
@@ -248,12 +250,12 @@ test("create trip, run agenda quests, journal to expense, publish, clone, and en
     // Reloading picks up the real (now viewer) role: the edit/complete
     // affordances disappear entirely, matching canEditTrip/canCompleteItems.
     await joinerPage.reload();
-    await expect(joinerPage.getByRole("button", { name: "Add a stop" })).toHaveCount(0);
+    await expect(joinerPage.getByTestId("add-agenda-item-trigger")).toHaveCount(0);
     await expect(rowFor(joinerPage, "Tonle Sap Boat Tour").getByTestId("complete-item")).toHaveCount(0);
     // Viewers can still journal -- canJournal(role) allows "viewer" too.
     await joinerPage.getByRole("link", { name: "Tonle Sap Boat Tour" }).click();
     await joinerPage.waitForURL(/\/items\//, { timeout: 30000 });
-    await expect(joinerPage.getByRole("button", { name: "Save journal entry" })).toBeVisible();
+    await expect(joinerPage.getByTestId("submit-journal-entry")).toBeVisible();
 
     await joinerContext.close();
   });

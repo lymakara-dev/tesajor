@@ -21,6 +21,7 @@ export function TripProgressCard({
   earnedKeys: string[];
 }) {
   const t = useTranslations("trip");
+  const tAchievements = useTranslations("achievements");
   const prefersReducedMotion = useReducedMotion();
   const earnedIcons = new Set(earnedKeys.map((k) => displayForAchievementKey(k).icon));
 
@@ -41,9 +42,9 @@ export function TripProgressCard({
               }
             />
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm text-muted-foreground" data-testid="stops-done">
             {t("stopsDone", { completed, total })} ·{" "}
-            <CountUp value={xpTotal} format={(n) => t("xp", { xp: n })} className="amount" />
+            <CountUp value={xpTotal} format={(n) => t("xp", { xp: n })} className="amount" data-testid="xp-total" />
           </p>
         </div>
 
@@ -52,7 +53,7 @@ export function TripProgressCard({
             <AchievementBadge
               key={badge.icon}
               icon={badge.icon}
-              label={badge.label}
+              label={tAchievements(badge.labelKey)}
               locked={badge.permanentlyLocked || !earnedIcons.has(badge.icon)}
               size={48}
             />

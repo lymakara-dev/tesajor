@@ -62,7 +62,9 @@ export function AddAgendaItemForm({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger render={<Button variant="outline" className="w-full justify-center" />}>
+      <SheetTrigger
+        render={<Button variant="outline" className="w-full justify-center" data-testid="add-agenda-item-trigger" />}
+      >
         <Plus className="size-4" strokeWidth={1.5} />
         {t("title")}
       </SheetTrigger>
@@ -84,7 +86,7 @@ export function AddAgendaItemForm({
                 </SelectTrigger>
                 <SelectContent>
                   {Array.from({ length: dayCount }, (_, i) => i + 1).map((day) => (
-                    <SelectItem key={day} value={String(day)}>
+                    <SelectItem key={day} value={String(day)} data-testid={`day-option-${day}`}>
                       {t("dayOption", { day })}
                     </SelectItem>
                   ))}
@@ -120,7 +122,7 @@ export function AddAgendaItemForm({
             <Input id="address" name="address" placeholder={t("addressPlaceholder")} maxLength={300} />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" disabled={submitting} className="w-full">
+          <Button type="submit" disabled={submitting} className="w-full" data-testid="submit-add-agenda-item">
             <Plus className="size-4" strokeWidth={1.5} />
             {submitting ? t("adding") : t("addStop")}
           </Button>

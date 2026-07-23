@@ -97,7 +97,9 @@ export default async function GroupPage({
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">{t("members", { count: members.length })}</CardTitle>
+          <CardTitle className="text-base" data-testid="member-count">
+            {t("members", { count: members.length })}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {members.map((member) => (

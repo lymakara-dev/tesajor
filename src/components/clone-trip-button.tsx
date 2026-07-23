@@ -34,7 +34,7 @@ export function CloneTripButton({ tripId }: { tripId: string }) {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger render={<Button variant="outline" />}>
+      <SheetTrigger render={<Button variant="outline" data-testid="use-this-template" />}>
         <Copy className="size-4" strokeWidth={1.5} />
         {t("useThisTemplate")}
       </SheetTrigger>
@@ -48,7 +48,7 @@ export function CloneTripButton({ tripId }: { tripId: string }) {
             <DateInput id="newStartDate" name="newStartDate" required />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" disabled={submitting} className="w-full">
+          <Button type="submit" disabled={submitting} className="w-full" data-testid="submit-clone-trip">
             {submitting ? t("cloning") : t("cloneTrip")}
           </Button>
         </form>

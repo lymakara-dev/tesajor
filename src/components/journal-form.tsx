@@ -19,6 +19,7 @@ const MOODS = ["😞", "😕", "😐", "🙂", "😄"];
 export function JournalForm({ agendaItemId }: { agendaItemId: string }) {
   const router = useRouter();
   const t = useTranslations("journal");
+  const tAchievements = useTranslations("achievements");
   const [mood, setMood] = useState<number | null>(null);
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
@@ -100,9 +101,10 @@ export function JournalForm({ agendaItemId }: { agendaItemId: string }) {
                   key={tag}
                   type="button"
                   onClick={() => toggleTag(tag)}
-                  className={`rounded-md border px-2.5 py-1 text-xs capitalize ${selectedTags.has(tag) ? "border-primary bg-accent" : ""}`}
+                  className={`rounded-md border px-2.5 py-1 text-xs ${selectedTags.has(tag) ? "border-primary bg-accent" : ""}`}
+                  data-testid={`tag-${tag}`}
                 >
-                  {tag}
+                  {t(`tagLabels.${tag}`)}
                 </button>
               ))}
             </div>
@@ -115,11 +117,11 @@ export function JournalForm({ agendaItemId }: { agendaItemId: string }) {
           {unlocked.length > 0 && (
             <p className="text-sm text-paddy">
               🏆 {t("achievementUnlocked", {
-                keys: unlocked.map((key) => displayForAchievementKey(key).label).join(", "),
+                keys: unlocked.map((key) => tAchievements(displayForAchievementKey(key).labelKey)).join(", "),
               })}
             </p>
           )}
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting} data-testid="submit-journal-entry">
             {submitting ? t("saving") : t("saveEntry")}
           </Button>
         </form>

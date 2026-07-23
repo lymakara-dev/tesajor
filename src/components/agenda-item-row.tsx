@@ -41,6 +41,7 @@ export function AgendaItemRow({
   isNext?: boolean;
 }) {
   const t = useTranslations("trip");
+  const tAchievements = useTranslations("achievements");
   const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
   const [submitting, setSubmitting] = useState(false);
@@ -174,9 +175,9 @@ export function AgendaItemRow({
           {error && <p className="mt-1.5 text-xs text-destructive">{error}</p>}
 
           {unlocked.length > 0 && (
-            <p className="mt-1.5 text-xs text-saffron">
+            <p className="mt-1.5 text-xs text-saffron" data-testid="achievement-unlocked">
               {t("achievementUnlocked", {
-                keys: unlocked.map((key) => displayForAchievementKey(key).label).join(", "),
+                keys: unlocked.map((key) => tAchievements(displayForAchievementKey(key).labelKey)).join(", "),
               })}
             </p>
           )}

@@ -4,6 +4,7 @@ import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +25,7 @@ function safeCallbackUrl(raw: string | null): string {
 }
 
 function LoginForm() {
+  const t = useTranslations("auth");
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = safeCallbackUrl(searchParams.get("callbackUrl"));
@@ -44,7 +46,7 @@ function LoginForm() {
 
     setLoading(false);
     if (result?.error) {
-      setError("Invalid email or password.");
+      setError(t("invalidCredentials"));
       return;
     }
     router.push(callbackUrl);
@@ -58,19 +60,17 @@ function LoginForm() {
       </Link>
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Sign in</CardTitle>
-          <CardDescription>
-            Welcome back. Sign in to see your groups.
-          </CardDescription>
+          <CardTitle>{t("loginTitle")}</CardTitle>
+          <CardDescription>{t("loginDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("emailLabel")}</Label>
               <Input id="email" name="email" type="email" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("passwordLabel")}</Label>
               <Input
                 id="password"
                 name="password"
@@ -82,7 +82,7 @@ function LoginForm() {
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
               <LogIn className="size-4" strokeWidth={1.5} />
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? t("signingIn") : t("signIn")}
             </Button>
           </form>
           <Button
@@ -90,12 +90,12 @@ function LoginForm() {
             className="w-full"
             onClick={() => signIn("google", { callbackUrl })}
           >
-            Continue with Google
+            {t("continueWithGoogle")}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            No account?{" "}
+            {t("noAccount")}{" "}
             <a href="/register" className="underline">
-              Register
+              {t("register")}
             </a>
           </p>
         </CardContent>

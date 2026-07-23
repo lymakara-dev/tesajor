@@ -157,6 +157,7 @@ export default async function BalancesPage({
               key={n.memberId}
               className="flex items-center gap-3 text-sm"
               data-testid={`net-${n.memberId}`}
+              data-tone={netTone(n.netCents)}
             >
               <MemberAvatar id={n.memberId} name={memberName.get(n.memberId) ?? "?"} size="sm" />
               <span className="min-w-0 flex-1">

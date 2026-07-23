@@ -62,10 +62,32 @@ test.describe("language and theme toggles", () => {
     await page.goto("/account");
     await expect(page.locator("html")).not.toHaveClass(/dark/);
 
-    await page.getByRole("button", { name: "dark" }).click();
+    // Selected by data-testid, not label text — the default locale is
+    // Khmer, so "dark"/"light" aren't the rendered button text.
+    await page.getByTestId("theme-dark").click();
     await expect(page.locator("html")).toHaveClass(/dark/);
 
-    await page.getByRole("button", { name: "light" }).click();
+    await page.getByTestId("theme-light").click();
     await expect(page.locator("html")).not.toHaveClass(/dark/);
+  });
+
+  test("language toggle updates copy on signed-out screens too", async ({
+    page,
+  }) => {
+    const screens = ["/", "/login", "/register"];
+
+    for (const path of screens) {
+      await page.goto(path);
+      const before = await page.locator("body").innerText();
+
+      await page.getByRole("button", { name: /english.*ខ្មែរ/i }).first().click();
+      await expect(async () => {
+        const current = await page.locator("body").innerText();
+        expect(current).not.toBe(before);
+      }).toPass({ timeout: 10_000 });
+
+      const after = await page.locator("body").innerText();
+      expect(after.replace(EMAIL_PATTERN, "")).not.toMatch(MISSING_KEY_PATTERN);
+    }
   });
 });

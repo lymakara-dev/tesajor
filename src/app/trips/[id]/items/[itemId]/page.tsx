@@ -23,6 +23,7 @@ export default async function AgendaItemPage({
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
   const t = await getTranslations("item");
+  const tJournal = await getTranslations("journal");
 
   const [trip] = await db.select().from(trips).where(eq(trips.id, id)).limit(1);
   if (!trip) notFound();
@@ -99,7 +100,9 @@ export default async function AgendaItemPage({
         </CardHeader>
         <CardContent className="space-y-4">
           {notes.length === 0 && (
-            <p className="text-sm text-muted-foreground">{t("noJournalEntries")}</p>
+            <p className="text-sm text-muted-foreground" data-testid="no-journal-entries">
+              {t("noJournalEntries")}
+            </p>
           )}
           {notes.map((note) => (
             <div key={note.id} className="space-y-1 border-b border-sandstone pb-3 last:border-b-0 last:pb-0">
@@ -109,7 +112,9 @@ export default async function AgendaItemPage({
               </p>
               {note.noteText && <p className="text-sm text-muted-foreground">{note.noteText}</p>}
               {note.tags && note.tags.length > 0 && (
-                <p className="text-xs text-muted-foreground capitalize">{note.tags.join(", ")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {note.tags.map((tag) => tJournal(`tagLabels.${tag}`)).join(", ")}
+                </p>
               )}
               {note.actualCostCents != null && (
                 <div className="flex items-center gap-3">
@@ -128,7 +133,7 @@ export default async function AgendaItemPage({
                         },
                       }}
                     >
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" data-testid="add-to-group-expenses">
                         {t("addToGroupExpenses")}
                       </Button>
                     </Link>

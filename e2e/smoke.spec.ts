@@ -32,7 +32,7 @@ test("sign up, create group, invite, itemized multi-payer expense, simplify, set
 
   await test.step("owner creates a group", async () => {
     await ownerPage.fill("#name", "Smoke Test Trip");
-    await ownerPage.click('button:has-text("Create group")');
+    await ownerPage.getByTestId("submit-create-group").click();
     await ownerPage.waitForURL(/\/groups\/[0-9a-f-]+$/, { timeout: 15000 });
   });
 
@@ -46,7 +46,7 @@ test("sign up, create group, invite, itemized multi-payer expense, simplify, set
     await registerUser(joinerPage, "Smoke Joiner", joinerEmail);
     await joinerPage.goto(inviteUrl);
     await joinerPage.waitForURL(groupUrl, { timeout: 15000 });
-    await expect(joinerPage.getByText("Members (2)")).toBeVisible();
+    await expect(joinerPage.getByTestId("member-count")).toContainText("2");
   });
 
   await test.step("owner adds a multi-payer itemized expense", async () => {
@@ -90,9 +90,9 @@ test("sign up, create group, invite, itemized multi-payer expense, simplify, set
     await ownerPage.goto(`${groupUrl}/balances`);
     const netRows = ownerPage.locator('[data-testid^="net-"]');
     await expect(netRows).toHaveCount(2);
-    const rowsText = await netRows.allTextContents();
-    expect(rowsText.some((t) => t.includes("is owed"))).toBe(true);
-    expect(rowsText.some((t) => t.includes("owes"))).toBe(true);
+    const tones = await netRows.evaluateAll((rows) => rows.map((r) => r.getAttribute("data-tone")));
+    expect(tones).toContain("owed");
+    expect(tones).toContain("owe");
   });
 
   await test.step("simplify: confirm the suggested settlement", async () => {
@@ -105,9 +105,9 @@ test("sign up, create group, invite, itemized multi-payer expense, simplify, set
   await test.step("settle: both members are now settled up", async () => {
     await ownerPage.goto(`${groupUrl}/balances`);
     const netRows = ownerPage.locator('[data-testid^="net-"]');
-    const rowsText = await netRows.allTextContents();
-    for (const text of rowsText) {
-      expect(text).toContain("settled up");
+    const tones = await netRows.evaluateAll((rows) => rows.map((r) => r.getAttribute("data-tone")));
+    for (const tone of tones) {
+      expect(tone).toBe("settled");
     }
   });
 

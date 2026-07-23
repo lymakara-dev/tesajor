@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { findNearestUpcomingStop, directionsUrl, type StopCandidate } from "@/lib/trips/geo";
 import { Button } from "@/components/ui/button";
 
@@ -12,6 +13,7 @@ export interface NearestStopStop extends StopCandidate {
 }
 
 export function YouAreHere({ stops }: { stops: NearestStopStop[] }) {
+  const t = useTranslations("trip");
   const [result, setResult] = useState<{ stop: NearestStopStop; distanceMeters: number } | null>(
     null,
   );
@@ -20,7 +22,7 @@ export function YouAreHere({ stops }: { stops: NearestStopStop[] }) {
 
   function locate() {
     if (!("geolocation" in navigator)) {
-      setError("Geolocation isn't available in this browser.");
+      setError(t("geolocationUnavailable"));
       return;
     }
     setLocating(true);
@@ -33,7 +35,7 @@ export function YouAreHere({ stops }: { stops: NearestStopStop[] }) {
           stops,
         );
         if (!nearest) {
-          setError("No upcoming stops with a location to navigate to.");
+          setError(t("noUpcomingStop"));
           setResult(null);
           return;
         }
@@ -42,7 +44,7 @@ export function YouAreHere({ stops }: { stops: NearestStopStop[] }) {
       },
       () => {
         setLocating(false);
-        setError("Couldn't get your location — check your browser's location permission.");
+        setError(t("locationError"));
       },
       { enableHighAccuracy: true, timeout: 10_000 },
     );
@@ -51,12 +53,12 @@ export function YouAreHere({ stops }: { stops: NearestStopStop[] }) {
   return (
     <div className="space-y-2">
       <Button type="button" variant="outline" size="sm" onClick={locate} disabled={locating}>
-        {locating ? "Locating..." : "📍 You are here"}
+        {locating ? t("locating") : t("youAreHereButton")}
       </Button>
       {error && <p className="text-sm text-destructive">{error}</p>}
       {result && (
         <p className="text-sm">
-          Nearest upcoming stop:{" "}
+          {t("nearestUpcomingStop")}{" "}
           <a
             href={directionsUrl(result.stop)}
             target="_blank"
@@ -65,7 +67,7 @@ export function YouAreHere({ stops }: { stops: NearestStopStop[] }) {
           >
             {result.stop.title}
           </a>{" "}
-          ({Math.round(result.distanceMeters)}m away)
+          {t("metersAway", { distance: Math.round(result.distanceMeters) })}
         </p>
       )}
     </div>

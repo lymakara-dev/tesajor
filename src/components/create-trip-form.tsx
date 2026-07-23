@@ -50,7 +50,7 @@ export function CreateTripForm({ groups }: { groups: { id: string; name: string 
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger render={<Button className="w-full justify-center" />}>
+      <SheetTrigger render={<Button className="w-full justify-center" data-testid="create-trip-trigger" />}>
         <Plus className="size-4" strokeWidth={1.5} />
         {t("trigger")}
       </SheetTrigger>
@@ -108,7 +108,7 @@ export function CreateTripForm({ groups }: { groups: { id: string; name: string 
             </div>
           )}
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" disabled={submitting} className="w-full">
+          <Button type="submit" disabled={submitting} className="w-full" data-testid="submit-create-trip">
             <Plus className="size-4" strokeWidth={1.5} />
             {submitting ? t("creating") : t("create")}
           </Button>

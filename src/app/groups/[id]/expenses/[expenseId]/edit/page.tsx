@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import {
@@ -22,6 +23,7 @@ export default async function EditExpensePage({
   const { id, expenseId } = await params;
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+  const t = await getTranslations("expenseForm");
 
   const [group] = await db.select().from(groups).where(eq(groups.id, id)).limit(1);
   if (!group) notFound();
@@ -123,7 +125,7 @@ export default async function EditExpensePage({
 
   return (
     <div className="mx-auto max-w-[480px] px-4 py-10">
-      <h1 className="mb-6 text-2xl font-semibold">Edit expense</h1>
+      <h1 className="mb-6 text-2xl font-semibold">{t("editTitle")}</h1>
       <ExpenseForm
         groupId={group.id}
         currency={group.baseCurrency}

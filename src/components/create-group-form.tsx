@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createGroup } from "@/lib/actions/groups";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ import { SUPPORTED_CURRENCIES } from "@/lib/money/currency";
 import { Plus } from "lucide-react";
 
 export function CreateGroupForm() {
+  const t = useTranslations("createGroupForm");
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -38,24 +40,24 @@ export function CreateGroupForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">New group</CardTitle>
+        <CardTitle className="text-base">{t("title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="grid grid-cols-[1fr_auto] gap-3">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t("nameLabel")}</Label>
               <Input
                 id="name"
                 name="name"
-                placeholder="Friday Dinner Crew"
+                placeholder={t("namePlaceholder")}
                 required
                 maxLength={80}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="baseCurrency">Currency</Label>
+              <Label htmlFor="baseCurrency">{t("currencyLabel")}</Label>
               <Select name="baseCurrency" defaultValue="USD">
                 <SelectTrigger id="baseCurrency" className="w-28">
                   <SelectValue />
@@ -71,9 +73,9 @@ export function CreateGroupForm() {
             </div>
           </div>
 
-          <Button type="submit" disabled={loading} className="w-full">
+          <Button type="submit" disabled={loading} className="w-full" data-testid="submit-create-group">
             <Plus className="size-4" strokeWidth={1.5} />
-            {loading ? "Creating..." : "Create group"}
+            {loading ? t("creating") : t("submit")}
           </Button>
         </form>
         {error && <p className="mt-2 text-sm text-destructive">{error}</p>}

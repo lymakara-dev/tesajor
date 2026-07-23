@@ -14,10 +14,12 @@ export function CountUp({
   value,
   format,
   className,
+  "data-testid": testId,
 }: {
   value: number;
   format: (n: number) => string;
   className?: string;
+  "data-testid"?: string;
 }) {
   const prefersReducedMotion = useReducedMotion();
   const motionValue = useMotionValue(value);
@@ -39,5 +41,9 @@ export function CountUp({
     return () => controls.stop();
   }, [value, prefersReducedMotion, motionValue]);
 
-  return <motion.span className={className}>{rounded}</motion.span>;
+  return (
+    <motion.span className={className} data-testid={testId}>
+      {rounded}
+    </motion.span>
+  );
 }

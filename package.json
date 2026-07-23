@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "NODE_OPTIONS=\"--no-network-family-autoselection --dns-result-order=ipv4first\" next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_OPTIONS=\"--no-network-family-autoselection --dns-result-order=ipv4first\" next start",
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",

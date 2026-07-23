@@ -1,7 +1,27 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "next-themes";
 import { directionsUrl } from "@/lib/trips/geo";
+
+// Google's map tiles are light by default and don't follow the app's
+// light/dark toggle on their own — without an explicit dark style, the map
+// renders as a stark white rectangle against the rest of a dark-mode page.
+const DARK_MAP_STYLES: google.maps.MapTypeStyle[] = [
+  { elementType: "geometry", stylers: [{ color: "#212121" }] },
+  { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#212121" }] },
+  { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#757575" }] },
+  { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#181818" }] },
+  { featureType: "road", elementType: "geometry.fill", stylers: [{ color: "#2c2c2c" }] },
+  { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#8a8a8a" }] },
+  { featureType: "road.highway", elementType: "geometry.fill", stylers: [{ color: "#3d3d3d" }] },
+  { featureType: "transit", elementType: "geometry", stylers: [{ color: "#2f2f2f" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#000000" }] },
+  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#3d3d3d" }] },
+];
 
 export interface MapStop {
   id: string;
@@ -48,6 +68,8 @@ function loadGoogleMapsScript(): Promise<void> {
 export function TripDayMap({ stops }: { stops: MapStop[] }) {
   const mapDivRef = useRef<HTMLDivElement>(null);
   const [loadError, setLoadError] = useState(false);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   const pinned = stops.filter(
     (s): s is MapStop & { lat: number; lng: number } => s.lat != null && s.lng != null,
@@ -63,6 +85,8 @@ export function TripDayMap({ stops }: { stops: MapStop[] }) {
         const map = new google.maps.Map(mapDivRef.current, {
           center: pinned[0],
           zoom: 13,
+          backgroundColor: isDark ? "#212121" : "#f5f3ec",
+          styles: isDark ? DARK_MAP_STYLES : [],
         });
         const bounds = new google.maps.LatLngBounds();
         pinned.forEach((stop, index) => {
@@ -91,11 +115,11 @@ export function TripDayMap({ stops }: { stops: MapStop[] }) {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pinned.length]);
+  }, [pinned.length, isDark]);
 
   if (!MAPS_KEY) {
     return (
-      <div className="space-y-2 rounded-md border p-3">
+      <div className="space-y-2 rounded-md border bg-muted/40 p-3">
         <p className="text-xs text-muted-foreground">
           Map view needs a Google Maps API key (set NEXT_PUBLIC_GOOGLE_MAPS_KEY) — showing stops
           as a list instead.
@@ -132,5 +156,5 @@ export function TripDayMap({ stops }: { stops: MapStop[] }) {
     return <p className="text-sm text-muted-foreground">No stops with a location yet.</p>;
   }
 
-  return <div ref={mapDivRef} className="h-64 w-full rounded-md border" />;
+  return <div ref={mapDivRef} className="h-64 w-full rounded-md border bg-muted/40" />;
 }

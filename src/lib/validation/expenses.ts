@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { uploadPathSchema } from "@/lib/validation/upload-path";
 
 const payerSchema = z.object({
   memberId: z.uuid(),
@@ -12,9 +13,11 @@ const baseExpenseFields = {
   currency: z.string().trim().length(3),
   category: z.string().trim().max(60).optional(),
   note: z.string().trim().max(2000).optional(),
-  // A same-origin path from our upload route (e.g. "/uploads/xyz.jpg"),
-  // not necessarily an absolute URL.
-  receiptUrl: z.string().trim().min(1).max(2048).optional(),
+  // Same-origin path from our upload route only — rendered directly as an
+  // <a href> on the group page, so an unrestricted string here would let a
+  // "javascript:" value execute in any group member's session when they
+  // click the receipt link.
+  receiptUrl: uploadPathSchema.optional(),
   expenseDate: z.coerce.date(),
   payers: z.array(payerSchema).min(1),
 };

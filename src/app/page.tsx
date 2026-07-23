@@ -6,10 +6,11 @@ import { db } from "@/db";
 import { groupMembers, groups, paymentMethods, users } from "@/db/schema";
 import { getGroupNets } from "@/lib/queries/balances";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Money, type MoneyTone } from "@/components/money";
 import { MemberAvatar } from "@/components/member-avatar";
 import { MarketingLanding } from "@/components/marketing-landing";
-import { Scale, Users } from "lucide-react";
+import { Plus, Scale, Users } from "lucide-react";
 
 function netTone(netCents: number): MoneyTone {
   if (netCents > 0) return "owed";
@@ -56,14 +57,16 @@ export default async function Home() {
   const hasPaymentMethod = myPaymentMethods.length > 0;
 
   return (
-    <div className="mx-auto max-w-[480px] space-y-8 px-4 py-10">
+    <div className="mx-auto max-w-[480px] space-y-8 px-4 py-10 sm:py-14">
       <div>
-        <h1 className="text-2xl font-semibold">{t("greeting", { name: session.user.name ?? "" })}</h1>
+        <h1 className="text-2xl font-semibold sm:text-3xl">
+          {t("greeting", { name: session.user.name ?? "" })}
+        </h1>
         <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <Card>
-        <CardContent className="flex flex-col items-center gap-2 py-6 text-center">
+        <CardContent className="flex flex-col items-center gap-2 py-6 text-center sm:py-8">
           <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Scale className="size-4" strokeWidth={1.5} />
             {totalNetCents === 0
@@ -94,10 +97,13 @@ export default async function Home() {
         </CardHeader>
         <CardContent className="space-y-2">
           {groupRows.length === 0 && (
-            <div className="space-y-2 text-center">
+            <div className="space-y-3 py-2 text-center">
               <p className="text-sm text-muted-foreground">{t("noGroupsYet")}</p>
-              <Link href="/groups" className="text-sm font-medium text-mekong underline">
-                {t("createGroup")}
+              <Link href="/groups" className="block sm:inline-block">
+                <Button className="w-full sm:w-auto">
+                  <Plus className="size-4" strokeWidth={1.5} />
+                  {t("createGroup")}
+                </Button>
               </Link>
             </div>
           )}

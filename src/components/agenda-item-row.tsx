@@ -47,12 +47,14 @@ export function AgendaItemRow({
   const [unlocked, setUnlocked] = useState<string[]>([]);
   const [celebrateTick, setCelebrateTick] = useState(0);
   const [sweep, setSweep] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function run(action: typeof completeAgendaItem, celebrate: boolean) {
     setSubmitting(true);
     const result = await action({ itemId: item.id });
     setSubmitting(false);
     if (result.ok) {
+      setError(null);
       setUnlocked(result.data.unlockedAchievements);
       if (celebrate) {
         setSweep(true);
@@ -60,6 +62,8 @@ export function AgendaItemRow({
         setTimeout(() => setSweep(false), 600);
       }
       router.refresh();
+    } else {
+      setError(t("updateFailed"));
     }
   }
 
@@ -166,6 +170,8 @@ export function AgendaItemRow({
               </>
             )}
           </div>
+
+          {error && <p className="mt-1.5 text-xs text-destructive">{error}</p>}
 
           {unlocked.length > 0 && (
             <p className="mt-1.5 text-xs text-saffron">

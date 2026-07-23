@@ -111,6 +111,7 @@
     "doneLabel": "Done",
     "skippedLabel": "Skipped",
     "undo": "Undo",
+    "updateFailed": "Couldn't update this stop. Try again.",
     "achievementUnlocked": "🏆 Achievement unlocked: {keys}",
     "tripComplete": "Trip complete! Every stop is done.",
     "countdownLabel": "Your trip starts in",

@@ -67,7 +67,7 @@ export function CreateGroupForm() {
               </SelectContent>
             </Select>
           </div>
-          <Button type="submit" disabled={loading} className="gap-1.5">
+          <Button type="submit" disabled={loading}>
             <Plus className="size-4" strokeWidth={1.5} />
             {loading ? "Creating..." : "Create group"}
           </Button>

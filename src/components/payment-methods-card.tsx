@@ -102,7 +102,7 @@ export function PaymentMethodsCard({
         {methods.map((m) => (
           <div
             key={m.id}
-            className="relative flex items-center gap-3 overflow-hidden rounded-xl bg-krama p-3 text-rice"
+            className="relative flex items-center gap-3 overflow-hidden rounded-xl bg-krama p-4 text-rice"
           >
             <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-white p-1">
               {m.qrImageUrl ? (

@@ -27,7 +27,6 @@ export function LanguageToggle({ current }: { current: Locale }) {
       size="sm"
       onClick={toggle}
       disabled={pending}
-      className="gap-1.5"
       aria-label={`${localeLabels.en} / ${localeLabels.km}: ${localeLabels[locale]}`}
     >
       <Languages className="size-4" strokeWidth={1.5} />

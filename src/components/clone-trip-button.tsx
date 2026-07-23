@@ -34,7 +34,7 @@ export function CloneTripButton({ tripId }: { tripId: string }) {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger render={<Button variant="outline" className="gap-2" />}>
+      <SheetTrigger render={<Button variant="outline" />}>
         <Copy className="size-4" strokeWidth={1.5} />
         {t("useThisTemplate")}
       </SheetTrigger>

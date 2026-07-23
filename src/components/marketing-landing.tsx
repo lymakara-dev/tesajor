@@ -38,13 +38,13 @@ export function MarketingLanding() {
         </p>
         <div className="flex gap-3">
           <Link href="/register">
-            <Button size="lg" className="gap-1.5">
+            <Button size="lg">
               <UserPlus className="size-4" strokeWidth={1.5} />
               Get started — it&apos;s free
             </Button>
           </Link>
           <Link href="/login">
-            <Button size="lg" variant="outline" className="gap-1.5">
+            <Button size="lg" variant="outline">
               <LogIn className="size-4" strokeWidth={1.5} />
               Sign in
             </Button>

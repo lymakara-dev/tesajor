@@ -80,7 +80,7 @@ function LoginForm() {
               />
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full gap-1.5" disabled={loading}>
+            <Button type="submit" className="w-full" disabled={loading}>
               <LogIn className="size-4" strokeWidth={1.5} />
               {loading ? "Signing in..." : "Sign in"}
             </Button>

@@ -92,7 +92,7 @@ export default async function TripPage({
       {items.some((i) => i.status === "todo" && i.lat != null && i.lng != null) && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-1.5 text-base">
+            <CardTitle className="flex items-center gap-2 text-base">
               <MapPin className="size-4 text-mekong" strokeWidth={1.5} />
               {t("livePosition")}
             </CardTitle>

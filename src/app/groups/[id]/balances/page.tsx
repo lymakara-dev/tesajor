@@ -123,7 +123,7 @@ export default async function BalancesPage({
       )}
 
       {currentMember && myDefaultMethod && (
-        <div className="flex items-center gap-3 rounded-2xl bg-krama p-3.5 text-rice">
+        <div className="flex items-center gap-3 rounded-xl bg-krama p-4 text-rice">
           <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-rice p-1">
             {myDefaultMethod.qrImageUrl ? (
               <Image
@@ -247,7 +247,7 @@ export default async function BalancesPage({
       {pendingClaims.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-1.5 text-base">
+            <CardTitle className="flex items-center gap-2 text-base">
               <HandCoins className="size-4" strokeWidth={1.5} />
               {t("paymentClaimsToConfirm")}
             </CardTitle>

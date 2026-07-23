@@ -40,7 +40,7 @@ export function TelegramConnectCard({ linked, username, hasChatId }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-1.5 text-base">
+        <CardTitle className="flex items-center gap-2 text-base">
           <Send className="size-4 text-mekong" strokeWidth={1.5} />
           Telegram
         </CardTitle>

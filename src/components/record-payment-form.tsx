@@ -71,7 +71,7 @@ export function RecordPaymentForm({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger render={<Button variant="outline" className="gap-2" />}>
+      <SheetTrigger render={<Button variant="outline" />}>
         <HandCoins className="size-4" strokeWidth={1.5} />
         {t("title")}
       </SheetTrigger>

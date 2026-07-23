@@ -39,7 +39,7 @@ export default async function AccountPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-1.5 text-base">
+          <CardTitle className="flex items-center gap-2 text-base">
             <UserRound className="size-4 text-mekong" strokeWidth={1.5} />
             {t("profile")}
           </CardTitle>
@@ -55,7 +55,7 @@ export default async function AccountPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-1.5 text-base">
+          <CardTitle className="flex items-center gap-2 text-base">
             <Palette className="size-4 text-mekong" strokeWidth={1.5} />
             {t("preferences")}
           </CardTitle>

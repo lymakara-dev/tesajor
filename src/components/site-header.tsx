@@ -42,7 +42,7 @@ export async function SiteHeader() {
                     await signOut({ redirectTo: "/" });
                   }}
                 >
-                  <Button variant="ghost" size="sm" type="submit" className="gap-1.5">
+                  <Button variant="ghost" size="sm" type="submit">
                     <LogOut className="size-4" strokeWidth={1.5} />
                     <span className="hidden sm:inline">{t("signOut")}</span>
                   </Button>
@@ -55,7 +55,7 @@ export async function SiteHeader() {
                 </Link>
                 <LanguageToggle current={locale} />
                 <Link href="/register">
-                  <Button size="sm" className="gap-1.5">
+                  <Button size="sm">
                     <UserPlus className="size-4" strokeWidth={1.5} />
                     {t("getStarted")}
                   </Button>

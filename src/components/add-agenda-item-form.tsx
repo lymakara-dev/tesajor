@@ -62,7 +62,7 @@ export function AddAgendaItemForm({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger render={<Button variant="outline" className="w-full justify-center gap-2" />}>
+      <SheetTrigger render={<Button variant="outline" className="w-full justify-center" />}>
         <Plus className="size-4" strokeWidth={1.5} />
         {t("title")}
       </SheetTrigger>
@@ -120,7 +120,7 @@ export function AddAgendaItemForm({
             <Input id="address" name="address" placeholder={t("addressPlaceholder")} maxLength={300} />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" disabled={submitting} className="w-full gap-1.5">
+          <Button type="submit" disabled={submitting} className="w-full">
             <Plus className="size-4" strokeWidth={1.5} />
             {submitting ? t("adding") : t("addStop")}
           </Button>

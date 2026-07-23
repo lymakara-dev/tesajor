@@ -5,11 +5,22 @@ import { expensePayers, expenses, groupMembers, groups } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { centsToDollarsInput } from "@/lib/money/cents";
 
+// Neutralize formula injection: a cell whose first character is =, +, -, @,
+// or a tab/CR is interpreted as a formula by Excel/Sheets when the CSV is
+// opened. These fields carry user-controlled data (expense titles/notes,
+// member display names sourced from profile names), so a value like
+// "=cmd|'/c calc'!A1" must not reach the file as-is. Prefixing with a
+// single quote forces spreadsheet apps to treat it as literal text.
+function neutralizeFormula(value: string): string {
+  return /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+}
+
 function escapeCsvField(value: string): string {
-  if (/[",\n]/.test(value)) {
-    return `"${value.replace(/"/g, '""')}"`;
+  const safe = neutralizeFormula(value);
+  if (/[",\n]/.test(safe)) {
+    return `"${safe.replace(/"/g, '""')}"`;
   }
-  return value;
+  return safe;
 }
 
 function toCsvRow(fields: string[]): string {

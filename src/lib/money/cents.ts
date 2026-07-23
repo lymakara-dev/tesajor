@@ -22,10 +22,22 @@ export function formatCents(
   currency: string,
   locale = "en-US",
 ): string {
+  const unitAmount = cents / 100;
+  if (currency === "KHR") {
+    // Riel has no practical minor unit — round to the nearest 100 and
+    // show no decimals, matching the KHR conversion line below.
+    const roundedRiel = Math.round(unitAmount / 100) * 100;
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(roundedRiel);
+  }
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
-  }).format(cents / 100);
+  }).format(unitAmount);
 }
 
 export interface FormattedMoney {

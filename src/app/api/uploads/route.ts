@@ -13,7 +13,12 @@ const ALLOWED_TYPES: Record<string, string> = {
   "image/gif": "gif",
 };
 
-const MAX_BYTES = 5 * 1024 * 1024;
+// Vercel hard-caps serverless function request bodies at 4.5MB — not
+// configurable, and it 413s at the platform edge before this handler even
+// runs. Stay under that regardless of what storage backend is configured.
+// The client compresses images before upload (see compress-image-client.ts)
+// so real photos should land far below this; this is just the backstop.
+const MAX_BYTES = 4 * 1024 * 1024;
 const MAX_DIMENSION = 1920;
 
 // Shrinks large photos (phone camera receipts, etc.) before they hit
@@ -108,7 +113,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Only JPEG, PNG, WebP, or GIF images are allowed." }, { status: 400 });
   }
   if (file.size > MAX_BYTES) {
-    return NextResponse.json({ error: "Image must be under 5MB." }, { status: 400 });
+    return NextResponse.json({ error: "Image must be under 4MB." }, { status: 400 });
   }
 
   const bytes = Buffer.from(await file.arrayBuffer());

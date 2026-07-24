@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { addPaymentMethod, deletePaymentMethod } from "@/lib/actions/payment-methods";
+import { compressImageForUpload } from "@/lib/upload/compress-image-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,7 +47,7 @@ export function PaymentMethodsCard({
     setError(null);
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", await compressImageForUpload(file));
       const response = await fetch("/api/uploads", { method: "POST", body: formData });
       const body = await response.json();
       if (!response.ok) {

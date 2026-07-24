@@ -18,6 +18,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Money } from "@/components/money";
 import { ConvertibleAmountInput } from "@/components/convertible-amount-input";
+import { compressImageForUpload } from "@/lib/upload/compress-image-client";
 import { Receipt, Users, SplitSquareHorizontal } from "lucide-react";
 import type { ExpenseFormInitialValues, ExpenseFormMember } from "./types";
 
@@ -191,7 +192,7 @@ export function ExpenseForm({
     setError(null);
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", await compressImageForUpload(file));
       const response = await fetch("/api/uploads", { method: "POST", body: formData });
       const body = await response.json();
       if (!response.ok) {
@@ -401,6 +402,7 @@ export function ExpenseForm({
               id="receipt"
               type="file"
               accept="image/jpeg,image/png,image/webp,image/gif"
+              capture="environment"
               onChange={onReceiptSelected}
               disabled={uploadingReceipt}
             />

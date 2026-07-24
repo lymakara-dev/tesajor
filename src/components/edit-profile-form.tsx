@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { updateProfile } from "@/lib/actions/account";
+import { compressImageForUpload } from "@/lib/upload/compress-image-client";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,7 +39,7 @@ export function EditProfileForm({
     setError(null);
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", await compressImageForUpload(file));
       const response = await fetch("/api/uploads", { method: "POST", body: formData });
       const body = await response.json();
       if (!response.ok) {

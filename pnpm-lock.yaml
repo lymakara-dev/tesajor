@@ -65,6 +65,9 @@ importers:
       shadcn:
         specifier: ^4.13.1
         version: 4.13.1(typescript@5.9.3)
+      sharp:
+        specifier: ^0.35.3
+        version: 0.35.3(@types/node@20.19.43)
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -117,9 +120,6 @@ importers:
       eslint-config-next:
         specifier: ^15
         version: 15.5.20(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
-      sharp:
-        specifier: ^0.35.3
-        version: 0.35.3(@types/node@20.19.43)
       tailwindcss:
         specifier: ^4
         version: 4.3.3

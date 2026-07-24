@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
+import sharp from "sharp";
 import { auth } from "@/lib/auth";
 import { isCloudinaryConfigured, uploadToCloudinary } from "@/lib/cloudinary";
 
@@ -13,6 +14,42 @@ const ALLOWED_TYPES: Record<string, string> = {
 };
 
 const MAX_BYTES = 5 * 1024 * 1024;
+const MAX_DIMENSION = 1920;
+
+// Shrinks large photos (phone camera receipts, etc.) before they hit
+// storage. GIFs are passed through untouched — sharp would flatten an
+// animated GIF to its first frame, which isn't what a QR/receipt upload
+// wants. If sharp can't decode the buffer, fall back to the original bytes
+// rather than fail the whole upload over a compression step.
+async function compressImage(bytes: Buffer, mimeType: string): Promise<Buffer> {
+  if (mimeType === "image/gif") {
+    return bytes;
+  }
+
+  try {
+    const resized = sharp(bytes)
+      .rotate()
+      .resize({
+        width: MAX_DIMENSION,
+        height: MAX_DIMENSION,
+        fit: "inside",
+        withoutEnlargement: true,
+      });
+
+    switch (mimeType) {
+      case "image/jpeg":
+        return await resized.jpeg({ quality: 80, mozjpeg: true }).toBuffer();
+      case "image/png":
+        return await resized.png({ compressionLevel: 9 }).toBuffer();
+      case "image/webp":
+        return await resized.webp({ quality: 80 }).toBuffer();
+      default:
+        return bytes;
+    }
+  } catch {
+    return bytes;
+  }
+}
 
 // The browser-supplied Content-Type is attacker-controlled — verify the
 // actual file bytes match a real image signature before trusting the
@@ -79,9 +116,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "File content doesn't match its declared image type." }, { status: 400 });
   }
 
+  const compressed = await compressImage(bytes, file.type);
+
   if (isCloudinaryConfigured) {
     try {
-      const url = await uploadToCloudinary(bytes);
+      const url = await uploadToCloudinary(compressed);
       return NextResponse.json({ url });
     } catch {
       return NextResponse.json({ error: "Upload failed. Try again." }, { status: 502 });
@@ -92,7 +131,7 @@ export async function POST(request: Request) {
   await mkdir(uploadsDir, { recursive: true });
 
   const filename = `${randomUUID()}.${extension}`;
-  await writeFile(path.join(uploadsDir, filename), bytes);
+  await writeFile(path.join(uploadsDir, filename), compressed);
 
   return NextResponse.json({ url: `/uploads/${filename}` });
 }

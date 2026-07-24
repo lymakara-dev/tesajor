@@ -9,11 +9,12 @@ import { deleteExpense } from "@/lib/actions/expenses";
 import { updateGroupExchangeRate } from "@/lib/actions/groups";
 import { DEFAULT_USD_TO_KHR_RATE } from "@/lib/money/exchange-rate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Money } from "@/components/money";
 import { InviteLink } from "@/components/invite-link";
 import { ExchangeRateSettings } from "@/components/exchange-rate-settings";
+import { MemberAvatar } from "@/components/member-avatar";
+import { cn } from "@/lib/utils";
 import { Scale, Activity, Download, Receipt, Plus } from "lucide-react";
 
 export default async function GroupPage({
@@ -118,16 +119,26 @@ export default async function GroupPage({
         <CardContent className="space-y-3">
           {members.map((member) => (
             <div key={member.id} className="flex items-center gap-3">
-              <Avatar>
-                <AvatarFallback>
-                  {member.displayName.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-sm font-medium">{member.displayName}</p>
-                <p className="text-xs text-muted-foreground">
-                  {member.userId ? member.role : t("placeholderMember")}
-                </p>
+              <MemberAvatar id={member.id} name={member.displayName} />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{member.displayName}</p>
+                <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                  <span
+                    className={cn(
+                      "rounded-full px-2 py-0.5 text-[11px] font-medium",
+                      member.role === "owner"
+                        ? "bg-saffron/15 text-saffron"
+                        : "bg-muted text-muted-foreground",
+                    )}
+                  >
+                    {member.role === "owner" ? t("roleOwner") : t("roleMember")}
+                  </span>
+                  {!member.userId && (
+                    <span className="text-[11px] text-muted-foreground">
+                      {t("placeholderMember")}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           ))}

@@ -64,7 +64,7 @@ function LoginForm() {
           <CardDescription>{t("loginDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={onSubmit} method="post" className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">{t("emailLabel")}</Label>
               <Input id="email" name="email" type="email" required />

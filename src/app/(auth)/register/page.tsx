@@ -69,7 +69,7 @@ export default function RegisterPage() {
           <CardDescription>{t("registerDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={onSubmit} method="post" className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">{t("nameLabel")}</Label>
               <Input id="name" name="name" required maxLength={80} />

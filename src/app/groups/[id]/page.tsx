@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { expensePayers, expenses, groupMembers, groups } from "@/db/schema";
+import { expensePayers, expenses, groupMembers, groups, telegramAccounts } from "@/db/schema";
 import { deleteExpense } from "@/lib/actions/expenses";
 import { updateGroupExchangeRate } from "@/lib/actions/groups";
 import { DEFAULT_USD_TO_KHR_RATE } from "@/lib/money/exchange-rate";
@@ -15,7 +15,7 @@ import { InviteLink } from "@/components/invite-link";
 import { ExchangeRateSettings } from "@/components/exchange-rate-settings";
 import { MemberAvatar } from "@/components/member-avatar";
 import { cn } from "@/lib/utils";
-import { Scale, Activity, Download, Receipt, Plus } from "lucide-react";
+import { Scale, Activity, Download, Receipt, Plus, Send } from "lucide-react";
 
 export default async function GroupPage({
   params,
@@ -44,6 +44,18 @@ export default async function GroupPage({
   const isOwner = currentMembership.role === "owner";
 
   const memberName = new Map(members.map((m) => [m.id, m.displayName]));
+
+  const memberUserIds = members.flatMap((m) => (m.userId ? [m.userId] : []));
+  const telegramConnectedUserIds = new Set<string>();
+  if (memberUserIds.length > 0) {
+    const linkedAccounts = await db
+      .select({ userId: telegramAccounts.userId, chatId: telegramAccounts.chatId })
+      .from(telegramAccounts)
+      .where(inArray(telegramAccounts.userId, memberUserIds));
+    for (const account of linkedAccounts) {
+      if (account.chatId) telegramConnectedUserIds.add(account.userId);
+    }
+  }
 
   const expenseRows = await db
     .select()
@@ -136,6 +148,12 @@ export default async function GroupPage({
                   {!member.userId && (
                     <span className="text-[11px] text-muted-foreground">
                       {t("placeholderMember")}
+                    </span>
+                  )}
+                  {member.userId && telegramConnectedUserIds.has(member.userId) && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-mekong/15 px-2 py-0.5 text-[11px] font-medium text-mekong">
+                      <Send className="size-3" strokeWidth={1.5} />
+                      {t("telegramConnected")}
                     </span>
                   )}
                 </div>

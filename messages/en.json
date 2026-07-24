@@ -60,6 +60,7 @@
     "roleOwner": "Owner",
     "roleMember": "Member",
     "placeholderMember": "Unclaimed",
+    "telegramConnected": "Telegram",
     "expenses": "Expenses",
     "addExpense": "Add expense",
     "noExpenses": "No expenses yet.",

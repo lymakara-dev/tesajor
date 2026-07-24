@@ -9,6 +9,7 @@ import QRCode from "qrcode";
 import { db } from "@/db";
 import { paymentMethods } from "@/db/schema";
 import { auth } from "@/lib/auth";
+import { isCloudinaryConfigured, uploadToCloudinary } from "@/lib/cloudinary";
 import {
   addPaymentMethodSchema,
   deletePaymentMethodSchema,
@@ -18,11 +19,20 @@ export type ActionResult<T = undefined> =
   | { ok: true; data: T }
   | { ok: false; error: string };
 
+// Mirrors the fallback in src/app/api/uploads/route.ts: on serverless hosts
+// (e.g. Vercel) the deployed filesystem is read-only outside /tmp, so a
+// bare writeFile into public/uploads silently doesn't persist. Cloudinary
+// must be used whenever it's configured; local disk is a dev-only fallback.
 async function generateQrImage(paymentLink: string): Promise<string> {
+  const buffer = await QRCode.toBuffer(paymentLink, { type: "png", width: 400 });
+
+  if (isCloudinaryConfigured) {
+    return uploadToCloudinary(buffer);
+  }
+
   const uploadsDir = path.join(process.cwd(), "public", "uploads");
   await mkdir(uploadsDir, { recursive: true });
   const filename = `${randomUUID()}.png`;
-  const buffer = await QRCode.toBuffer(paymentLink, { type: "png", width: 400 });
   await writeFile(path.join(uploadsDir, filename), buffer);
   return `/uploads/${filename}`;
 }

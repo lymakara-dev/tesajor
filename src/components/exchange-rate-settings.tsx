@@ -57,9 +57,10 @@ export function ExchangeRateSettings({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={onSubmit} className="flex items-end gap-2">
-          <div className="flex-1 space-y-2">
-            <Label htmlFor="usdKhrRate">{t("label")}</Label>
+        <form onSubmit={onSubmit} className="space-y-2">
+          <Label htmlFor="usdKhrRate">{t("label")}</Label>
+
+          <div className="flex items-end gap-2">
             <Input
               id="usdKhrRate"
               type="number"
@@ -68,12 +69,22 @@ export function ExchangeRateSettings({
               min="1"
               value={value}
               onChange={(e) => setValue(e.target.value)}
+              className="flex-1"
             />
-            <p className="text-xs text-muted-foreground">{t("hint")}</p>
+
+            <Button
+              type="submit"
+              disabled={saving}
+              className="rounded-lg"
+              data-testid="save-exchange-rate"
+            >
+              {saving ? t("saving") : saved ? t("saved") : t("save")}
+            </Button>
           </div>
-          <Button type="submit" disabled={saving} className="rounded-full" data-testid="save-exchange-rate">
-            {saving ? t("saving") : saved ? t("saved") : t("save")}
-          </Button>
+
+          <p className="text-xs text-muted-foreground">
+            {t("hint")}
+          </p>
         </form>
         {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
       </CardContent>

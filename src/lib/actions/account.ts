@@ -23,11 +23,23 @@ export async function updateProfile(
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid profile." };
   }
 
-  const [updated] = await db
-    .update(users)
-    .set({ name: parsed.data.name, image: parsed.data.image ?? null })
-    .where(eq(users.id, session.user.id))
-    .returning({ name: users.name, image: users.image });
+  const updated = await db.transaction(async (tx) => {
+    const [row] = await tx
+      .update(users)
+      .set({ name: parsed.data.name, image: parsed.data.image ?? null })
+      .where(eq(users.id, session.user.id))
+      .returning({ name: users.name, image: users.image });
+
+    // group_members.display_name is a denormalized copy of users.name taken
+    // at join time — keep it in sync so group members always see the
+    // current name, not whatever it was when they joined.
+    await tx
+      .update(groupMembers)
+      .set({ displayName: parsed.data.name })
+      .where(eq(groupMembers.userId, session.user.id));
+
+    return row;
+  });
 
   return { ok: true, data: updated };
 }

@@ -570,13 +570,13 @@ export function ExpenseForm({
                   className="space-y-2 rounded-md border p-3"
                   data-testid={`item-row-${index}`}
                 >
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Input
                       data-testid={`item-name-${index}`}
                       value={item.name}
                       onChange={(e) => updateItem(item.clientId, { name: e.target.value })}
                       placeholder={t("itemNamePlaceholder")}
-                      className="flex-1"
+                      className="min-w-[140px] flex-1"
                     />
                     <ConvertibleAmountInput
                       data-testid={`item-price-${index}`}

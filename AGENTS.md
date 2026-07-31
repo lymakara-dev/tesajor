@@ -28,7 +28,9 @@ In order, as the task requires:
    (schema change, new server action, new UI text, new domain logic).
    **If a playbook exists for your task, follow it.**
 5. `docs/ROADMAP.md` / `docs/SCALING.md` — before proposing new scope or
-   infrastructure.
+   infrastructure. `docs/plans/README.md` is the live feature board —
+   check it before starting feature work, and flip statuses (board + plan
+   doc) in the same PR as the work.
 6. `docs/adr/` — before reversing an architectural choice; add a new ADR
    (copy `template.md`) rather than silently diverging.
 

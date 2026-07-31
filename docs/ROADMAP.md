@@ -2,7 +2,9 @@
 
 Honest status as of July 2026, then the prioritized backlog. The original
 phase plan lives in [`CLAUDE.md`](../CLAUDE.md); this document tracks what
-actually shipped and what's next.
+actually shipped and what's next. **Features that have a written design
+are tracked live on the [plans board](./plans/README.md)** — that's the
+place to check what's in flight.
 
 ## Where the project stands
 
@@ -64,6 +66,24 @@ PWA icons.
     story in `/privacy`.
 
 ### P3 — product growth
+
+*Designed and ready to build* (full design in
+[plans/trip-companion.md](./plans/trip-companion.md), status on the
+[board](./plans/README.md)):
+
+- **Trip Companion TC-1 — Explore**: nearby essentials (bathroom, parking,
+  food, market, fuel, ATM via OpenStreetMap) + trending places from
+  public templates, with one-tap add-to-agenda.
+- **Trip Companion TC-2 — Music**: province-aware playlist suggestions
+  streamed from the owner's Navidrome server (Subsonic API), mini-player.
+- **Trip Companion TC-3 — Routing**: real road routes on the day map +
+  follow-along mode (OpenRouteService/OSRM), Google-handoff kept for
+  turn-by-turn.
+- **Trip Companion TC-4 — Khmer voice**: pre-generated Khmer TTS clips —
+  spoken "welcome to [destination]" on arrival + agenda reminders (in-app
+  and as Telegram voice messages).
+
+*Ideas (no design yet):*
 
 12. **Receipt OCR** (snap → auto-extract items) — the flagship Pro
     feature; needs a background-job story first (see SCALING.md).

@@ -19,6 +19,8 @@ product/technical plan and build phases.
 - [docs/ONBOARDING.md](./docs/ONBOARDING.md) — new-developer day-1 guide.
 - [docs/ROADMAP.md](./docs/ROADMAP.md) — phase status + prioritized
   backlog.
+- [docs/plans/](./docs/plans/README.md) — feature plans board: per-feature
+  design docs with live implementation status.
 - [docs/SCALING.md](./docs/SCALING.md) — ops playbook: what breaks first
   and the planned fixes.
 - [docs/adr/](./docs/adr/) — architecture decision records.

@@ -4,6 +4,26 @@ A bill-splitting web app: track shared expenses, see who owes whom, and
 settle up with the fewest payments possible. See `CLAUDE.md` for the full
 product/technical plan and build phases.
 
+## Documentation
+
+- [AGENTS.md](./AGENTS.md) — operating manual for AI coding agents
+  (any tool: Claude Code, Codex, Cursor, Gemini, Copilot, …).
+- [docs/playbooks/](./docs/playbooks/) — step-by-step recipes for
+  recurring tasks (schema change, server action, domain logic, i18n).
+- [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) — system map, module
+  layout, data model, invariants.
+- [docs/REFERENCE.md](./docs/REFERENCE.md) — every server action, API
+  route, and DB table.
+- [CONTRIBUTING.md](./CONTRIBUTING.md) — branching, code standards,
+  testing policy, PR checklist.
+- [docs/ONBOARDING.md](./docs/ONBOARDING.md) — new-developer day-1 guide.
+- [docs/ROADMAP.md](./docs/ROADMAP.md) — phase status + prioritized
+  backlog.
+- [docs/SCALING.md](./docs/SCALING.md) — ops playbook: what breaks first
+  and the planned fixes.
+- [docs/adr/](./docs/adr/) — architecture decision records.
+- [DEPLOYMENT.md](./DEPLOYMENT.md) — Vercel + Neon deploy steps.
+
 ## Stack
 
 Next.js 15 (App Router) + TypeScript, Tailwind CSS + shadcn/ui, PostgreSQL

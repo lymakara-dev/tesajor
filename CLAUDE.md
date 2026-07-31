@@ -1,5 +1,12 @@
 # SplitEase — Bill-Splitting Web App: Build Plan & Claude Code Master Prompt
 
+> **Agent note (2026-07):** the app described below is built (see
+> `docs/ROADMAP.md` for current status). Day-to-day operating instructions
+> for AI agents — including Claude Code — now live in **`AGENTS.md`** and
+> `docs/playbooks/`; current architecture is in `docs/ARCHITECTURE.md`.
+> This file remains authoritative for the **domain rules** (split methods,
+> money invariants, Telegram/trip behavior) and as the original plan.
+
 A plan for a commercial, scalable website that solves the "who owes who" problem when friends eat out together: sometimes one person pays, sometimes two people split the payment, people order different food, and settling up gets messy. This document has two parts: (1) the product and technical plan, and (2) a master prompt you can paste into Claude Code to build it.
 
 ---

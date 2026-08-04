@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
+import { getDayRoutes, type DayRouteLeg } from "@/lib/actions/routing";
 import { directionsUrl } from "@/lib/trips/geo";
+import { FollowMode, type FollowStop } from "@/components/follow-mode";
 
 // Google's map tiles are light by default and don't follow the app's
 // light/dark toggle on their own — without an explicit dark style, the map
@@ -26,6 +29,7 @@ const DARK_MAP_STYLES: google.maps.MapTypeStyle[] = [
 export interface MapStop {
   id: string;
   title: string;
+  status: "todo" | "done" | "skipped";
   lat: number | null;
   lng: number | null;
   placeId: string | null;
@@ -59,21 +63,51 @@ function loadGoogleMapsScript(): Promise<void> {
 }
 
 /**
- * Per-day map with numbered pins and a route polyline. Degrades to a plain
- * list of stops (with "navigate" links that need no API key at all) when
- * NEXT_PUBLIC_GOOGLE_MAPS_KEY isn't set — this is the only path actually
- * exercised in development, since a real key wasn't available while
- * building this.
+ * Per-day map with numbered pins and the actual road route between stops
+ * (OpenRouteService via the getDayRoutes action; falls back to straight
+ * polylines when no OPENROUTESERVICE_API_KEY is configured or a leg can't
+ * be routed). Degrades to a plain list of stops when
+ * NEXT_PUBLIC_GOOGLE_MAPS_KEY isn't set — leg distance/time chips and
+ * Follow mode still work there, since they don't need Google at all.
  */
-export function TripDayMap({ stops }: { stops: MapStop[] }) {
+export function TripDayMap({
+  stops,
+  tripId,
+  dayNumber,
+}: {
+  stops: MapStop[];
+  tripId?: string;
+  dayNumber?: number;
+}) {
+  const t = useTranslations("routing");
   const mapDivRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const legPolylinesRef = useRef<google.maps.Polyline[]>([]);
+  const [mapGeneration, setMapGeneration] = useState(0);
   const [loadError, setLoadError] = useState(false);
+  const [legs, setLegs] = useState<DayRouteLeg[] | null>(null);
+  const [currentLeg, setCurrentLeg] = useState<number | null>(null);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
   const pinned = stops.filter(
     (s): s is MapStop & { lat: number; lng: number } => s.lat != null && s.lng != null,
   );
+
+  useEffect(() => {
+    if (!tripId || !dayNumber || pinned.length < 2) return;
+    let cancelled = false;
+    getDayRoutes({ tripId, dayNumber })
+      .then((result) => {
+        if (!cancelled && result.ok) setLegs(result.data.legs);
+      })
+      .catch(() => {
+        // Roads are decoration — the straight polyline stays.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [tripId, dayNumber, pinned.length]);
 
   useEffect(() => {
     if (!MAPS_KEY || pinned.length === 0 || !mapDivRef.current) return;
@@ -99,15 +133,10 @@ export function TripDayMap({ stops }: { stops: MapStop[] }) {
           bounds.extend({ lat: stop.lat, lng: stop.lng });
         });
         map.fitBounds(bounds);
-
-        if (pinned.length > 1) {
-          new google.maps.Polyline({
-            path: pinned.map((s) => ({ lat: s.lat, lng: s.lng })),
-            geodesic: true,
-            strokeOpacity: 0.7,
-            map,
-          });
-        }
+        mapRef.current = map;
+        legPolylinesRef.current = [];
+        // Signal the polyline effect that it must redraw onto this map.
+        setMapGeneration((g) => g + 1);
       })
       .catch(() => setLoadError(true));
 
@@ -117,33 +146,122 @@ export function TripDayMap({ stops }: { stops: MapStop[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pinned.length, isDark]);
 
+  // (Re)draw the route: one polyline per leg — road-snapped points when the
+  // leg routed, a straight segment otherwise — with the leg currently being
+  // traveled (Follow mode) highlighted.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || pinned.length < 2) return;
+
+    legPolylinesRef.current.forEach((p) => p.setMap(null));
+    legPolylinesRef.current = [];
+
+    const paths: google.maps.LatLngLiteral[][] = legs
+      ? legs.flatMap((leg) => {
+          const from = pinned.find((s) => s.id === leg.fromId);
+          const to = pinned.find((s) => s.id === leg.toId);
+          if (!from || !to) return [];
+          return [leg.route?.points ?? [from, to]];
+        })
+      : [pinned.map((s) => ({ lat: s.lat, lng: s.lng }))];
+
+    legPolylinesRef.current = paths.map(
+      (path, index) =>
+        new google.maps.Polyline({
+          path,
+          geodesic: true,
+          strokeOpacity: legs && index === currentLeg ? 1 : 0.7,
+          strokeWeight: legs && index === currentLeg ? 5 : 3,
+          map,
+        }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [legs, currentLeg, mapGeneration]);
+
+  const fmtDistance = (meters: number) =>
+    meters < 1000
+      ? t("distanceM", { distance: Math.round(meters / 10) * 10 })
+      : t("distanceKm", { distance: (meters / 1000).toFixed(1) });
+  const fmtDuration = (sec: number) => {
+    const minutes = Math.max(1, Math.round(sec / 60));
+    return minutes < 60
+      ? t("durationMin", { minutes })
+      : t("durationHM", { hours: Math.floor(minutes / 60), minutes: minutes % 60 });
+  };
+
+  const routedLegs = legs?.filter((l) => l.route !== null) ?? [];
+  const totals =
+    routedLegs.length > 0
+      ? routedLegs.reduce(
+          (acc, l) => ({
+            distance: acc.distance + l.route!.distanceMeters,
+            duration: acc.duration + l.route!.durationSec,
+          }),
+          { distance: 0, duration: 0 },
+        )
+      : null;
+
+  const legChips = legs && routedLegs.length > 0 && (
+    <div className="space-y-1">
+      <div className="flex flex-wrap gap-1.5">
+        {legs.map((leg, i) =>
+          leg.route ? (
+            <span
+              key={`${leg.fromId}-${leg.toId}`}
+              className="rounded-full border bg-muted/40 px-2 py-0.5 text-xs text-muted-foreground"
+            >
+              {i + 1}→{i + 2} · {fmtDistance(leg.route.distanceMeters)} ·{" "}
+              {fmtDuration(leg.route.durationSec)}
+            </span>
+          ) : null,
+        )}
+      </div>
+      {totals && (
+        <p className="text-xs text-muted-foreground">
+          {t("dayTotal", {
+            distance: fmtDistance(totals.distance),
+            duration: fmtDuration(totals.duration),
+          })}
+        </p>
+      )}
+    </div>
+  );
+
+  const follow = pinned.length > 0 && (
+    <FollowMode stops={stops as FollowStop[]} legs={legs} onCurrentLegChange={setCurrentLeg} />
+  );
+
   if (!MAPS_KEY) {
     return (
-      <div className="space-y-2 rounded-md border bg-muted/40 p-3">
-        <p className="text-xs text-muted-foreground">
-          Map view needs a Google Maps API key (set NEXT_PUBLIC_GOOGLE_MAPS_KEY) — showing stops
-          as a list instead.
-        </p>
-        <ol className="list-decimal space-y-1 pl-5 text-sm">
-          {stops.map((s) => (
-            <li key={s.id}>
-              {s.title}
-              {(s.address || s.placeName) && (
-                <>
-                  {" — "}
-                  <a
-                    href={directionsUrl(s)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
-                  >
-                    {s.address ?? s.placeName}
-                  </a>
-                </>
-              )}
-            </li>
-          ))}
-        </ol>
+      <div className="space-y-3">
+        <div className="space-y-2 rounded-md border bg-muted/40 p-3">
+          <p className="text-xs text-muted-foreground">
+            Map view needs a Google Maps API key (set NEXT_PUBLIC_GOOGLE_MAPS_KEY) — showing stops
+            as a list instead.
+          </p>
+          <ol className="list-decimal space-y-1 pl-5 text-sm">
+            {stops.map((s) => (
+              <li key={s.id}>
+                {s.title}
+                {(s.address || s.placeName) && (
+                  <>
+                    {" — "}
+                    <a
+                      href={directionsUrl(s)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                    >
+                      {s.address ?? s.placeName}
+                    </a>
+                  </>
+                )}
+              </li>
+            ))}
+          </ol>
+        </div>
+        {legChips}
+        {follow}
       </div>
     );
   }
@@ -156,5 +274,11 @@ export function TripDayMap({ stops }: { stops: MapStop[] }) {
     return <p className="text-sm text-muted-foreground">No stops with a location yet.</p>;
   }
 
-  return <div ref={mapDivRef} className="h-64 w-full rounded-md border bg-muted/40" />;
+  return (
+    <div className="space-y-3">
+      <div ref={mapDivRef} className="h-64 w-full rounded-md border bg-muted/40" />
+      {legChips}
+      {follow}
+    </div>
+  );
 }

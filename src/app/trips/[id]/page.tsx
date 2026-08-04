@@ -178,7 +178,9 @@ export default async function TripPage({
               {dayItems.length === 0 && (
                 <p className="text-sm text-muted-foreground">{t("noStopsYet")}</p>
               )}
-              {dayItems.length > 0 && <TripDayMap stops={dayItems} />}
+              {dayItems.length > 0 && (
+                <TripDayMap stops={dayItems} tripId={id} dayNumber={day} />
+              )}
               {dayItems.map((item) => (
                 <AgendaItemRow
                   key={item.id}

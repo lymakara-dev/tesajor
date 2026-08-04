@@ -22,7 +22,7 @@ so keeping track never requires archaeology.
 |---|---|---|---|
 | Trip Companion — Explore (essentials + trending) | TC-1 | ✅ Shipped | [trip-companion.md](./trip-companion.md) |
 | Trip Companion — Navidrome music | TC-2 | ✅ Shipped | [trip-companion.md](./trip-companion.md) |
-| Trip Companion — Road routing & follow mode | TC-3 | 📝 Planned | [trip-companion.md](./trip-companion.md) |
+| Trip Companion — Road routing & follow mode | TC-3 | ✅ Shipped | [trip-companion.md](./trip-companion.md) |
 | Trip Companion — Khmer voice welcome & reminders | TC-4 | 📝 Planned | [trip-companion.md](./trip-companion.md) |
 | CI hardening (E2E in CI, branch protection) | — | 💡 Idea | [ROADMAP](../ROADMAP.md) P0/P1 |
 | Stripe Pro tier | — | 💡 Idea | [ROADMAP](../ROADMAP.md) P2 |

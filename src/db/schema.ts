@@ -397,6 +397,28 @@ export const placeCache = pgTable(
   (t) => [unique().on(t.cell, t.category)],
 );
 
+// Cached road routes between agenda stops (Trip Companion TC-3).
+// Coordinates are rounded to ~10 m (src/lib/routing/ors.ts roundForCache)
+// so tiny pin nudges reuse the same row. Routes between fixed points are
+// effectively static — no TTL; rows are overwritten only when re-fetched.
+// `polyline` is a jsonb array of {lat, lng} points snapped to roads.
+export const routeCache = pgTable(
+  "route_cache",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    fromLat: doublePrecision("from_lat").notNull(),
+    fromLng: doublePrecision("from_lng").notNull(),
+    toLat: doublePrecision("to_lat").notNull(),
+    toLng: doublePrecision("to_lng").notNull(),
+    profile: text("profile").notNull(),
+    polyline: jsonb("polyline").notNull(),
+    distanceMeters: integer("distance_meters").notNull(),
+    durationSec: integer("duration_sec").notNull(),
+    fetchedAt: timestamp("fetched_at").notNull().defaultNow(),
+  },
+  (t) => [unique().on(t.fromLat, t.fromLng, t.toLat, t.toLng, t.profile)],
+);
+
 // A user's linked Navidrome (Subsonic-compatible) music server. Stores only
 // the Subsonic auth pair — random salt + token = md5(password + salt) — never
 // the password itself; revocable by changing the Navidrome password. See

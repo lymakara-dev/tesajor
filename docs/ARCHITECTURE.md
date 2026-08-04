@@ -44,10 +44,10 @@ server returns. Every server action parses its input with a Zod schema from
 src/
   app/          routes (RSC pages, layouts, API route handlers)
   components/   feature components + components/ui (shadcn primitives)
-  db/           schema.ts (Drizzle, 25 tables / 7 enums), index.ts, seed.ts
+  db/           schema.ts (Drizzle, 26 tables / 7 enums), index.ts, seed.ts
   i18n/         next-intl config (locales: en, km)
   lib/
-    actions/    16 server-action files — the ONLY mutation entry points
+    actions/    17 server-action files — the ONLY mutation entry points
     validation/ Zod schemas, one file per action domain
     queries/    read-side helpers (balances, trip achievements, trending places)
     money/      cents math, USD↔KHR conversion, currency formatting
@@ -58,6 +58,7 @@ src/
     geo/        Cambodian province detection (bundled OSM-derived polygons)
     places/     Overpass essentials search, cache cells, trending ranking
     music/      Subsonic (Navidrome) client + province→playlist suggestion
+    routing/    road routes (OpenRouteService) + Follow-mode geometry
     telegram/   HMAC verify, webhook parsing, per-debtor amounts, bot client
     upload/     client-side image compression
     auth.ts     Auth.js config · rate-limit.ts · cloudinary.ts
@@ -104,6 +105,11 @@ src/
   password — ADR-0008), `suggest.ts` (playlist-for-province: explicit
   mapping → km/en name match → null; dominant province of a day's stops).
   Audio streams directly from the user's server to their device.
+- **`routing/`** — `ors.ts` (provider-neutral `Route` shape, pure
+  OpenRouteService request/response handling, ~10 m cache-key rounding,
+  thin fetcher; optional `OPENROUTESERVICE_API_KEY`, unset → straight
+  polylines — ADR-0009), `follow.ts` (nearest-point-on-polyline, remaining
+  distance, ETA, 200 m off-route detection for Follow mode).
 - **`telegram/`** — `verify.ts` (Login Widget HMAC-SHA256 check with the bot
   token, stale `auth_date` rejection), `webhook.ts` (pure update→intent
   parsing), `amounts.ts` (per-debtor amounts from simplified balances),
@@ -111,12 +117,12 @@ src/
   button creates a *pending claim*; only the requester's in-app confirmation
   records a real settlement.
 
-Each of these has a co-located `*.test.ts` (20 files, 213 cases). This is
+Each of these has a co-located `*.test.ts` (22 files, 230 cases). This is
 deliberate: the pure modules are the product; the UI is replaceable.
 
 ## Data model
 
-All 25 tables live in `src/db/schema.ts`; migrations are generated SQL in
+All 26 tables live in `src/db/schema.ts`; migrations are generated SQL in
 `drizzle/`. Grouped by domain:
 
 | Domain | Tables |
@@ -128,6 +134,7 @@ All 25 tables live in `src/db/schema.ts`; migrations are generated SQL in
 | Trips | `trips`, `trip_members`, `agenda_items`, `item_notes`, `achievements` |
 | Places (Explore) | `place_cache` (cached Overpass results per grid cell + category, 7-day TTL at read time) |
 | Music | `music_accounts` (Subsonic salt+token, never passwords — ADR-0008), `province_playlists` (explicit province→playlist choices) |
+| Routing | `route_cache` (road legs keyed on ~10 m-rounded coords + profile, no TTL — ADR-0009) |
 
 Design points worth knowing before touching the schema:
 

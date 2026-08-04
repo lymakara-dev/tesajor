@@ -1,6 +1,6 @@
 # Feature Plan: Trip Companion
 
-> **Status**: TC-1/2 ✅ Shipped · TC-3/4 📝 Planned · tracked on the
+> **Status**: TC-1/2/3 ✅ Shipped · TC-4 📝 Planned · tracked on the
 > [board](./README.md) · last updated 2026-08-04
 
 Design for four connected features that turn the Trip Agenda from a
@@ -276,7 +276,7 @@ guard as payment requests.
 |---|---|---|---|---|
 | **TC-1 Explore** | ✅ Shipped | Province geo module, Overpass essentials + cache, trending from templates, Explore tab | `place_cache` table | Overpass (free, no key) |
 | **TC-2 Music** | ✅ Shipped | Navidrome linking, province→playlist mapping, suggestions, mini-player | `music_accounts`, `province_playlists` | Owner's Navidrome via HTTPS tunnel |
-| **TC-3 Routing** | 📝 Planned | `routing/` provider + cache, road polylines on day map, Follow mode | `route_cache` table, `OPENROUTESERVICE_API_KEY` (optional) | OpenRouteService free tier (or self-hosted OSRM) |
+| **TC-3 Routing** | ✅ Shipped | `routing/` provider + cache, road polylines on day map, Follow mode | `route_cache` table, `OPENROUTESERVICE_API_KEY` (optional) | OpenRouteService free tier (or self-hosted OSRM) |
 | **TC-4 Voice** | 📝 Planned | Khmer TTS clips (pre-generated), arrival welcome + spoken/Telegram reminders, voice settings | `voice_clips` table, `TTS_PROVIDER`/`TTS_API_KEY` (optional) | Azure/Google TTS free tier; existing Telegram bot |
 
 When a phase's status changes, update it here **and** on the
@@ -296,7 +296,8 @@ implementation starts: "Overpass over Google Places for essentials"
 (✅ [ADR-0007](../adr/0007-overpass-over-google-places.md)),
 "Subsonic salt+token storage (no passwords)"
 (✅ [ADR-0008](../adr/0008-subsonic-salt-token-storage.md)),
-"OpenRouteService with provider abstraction".
+"OpenRouteService with provider abstraction"
+(✅ [ADR-0009](../adr/0009-openrouteservice-provider-abstraction.md)).
 
 ## Open questions (decide before the relevant phase)
 
@@ -352,6 +353,18 @@ From TC-2 (shipped 2026-08-04):
 - **Playwright spec for the music flow** — link (against a Subsonic stub)
   → map a province → see the suggestion card; unit coverage exists (22
   cases) but no e2e yet.
+
+From TC-3 (shipped 2026-08-04):
+
+- **Live-position marker on the map** — Follow mode computes everything
+  below the map (next-stop card, off-route, current-leg highlight) but
+  doesn't yet draw the traveler's dot on the Google map itself.
+- **Untested against a real ORS key** — request/response handling is
+  unit-tested against the documented GeoJSON shape, but no live
+  `OPENROUTESERVICE_API_KEY` existed during development; verify with a
+  real key before relying on it on the road.
+- **Playwright spec for the routing flow** — needs a geolocation mock and
+  an ORS stub, same shape as the pending Explore/music specs.
 
 Already-known candidates: AudioMuse-AI mood playlists (TC-2), Media
 Session lock-screen controls (TC-2), self-hosted OSRM + moto profile

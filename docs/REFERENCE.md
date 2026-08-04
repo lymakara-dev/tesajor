@@ -31,6 +31,7 @@ Drizzle, and (for group data) writes an `activity_log` row. Most return an
 | `item-notes.ts` | `addItemNote` | Stop journals: mood 1–5, text, tags, photos, actual cost |
 | `places.ts` | `getNearbyPlaces` | Explore tab essentials: cache-first Overpass (OSM) nearby search per grid cell + category, distance-sorted; session-only (no group data touched), rate-limited 30/user/5 min |
 | `music.ts` | `linkMusicAccount`, `unlinkMusicAccount`, `getMyPlaylists`, `setProvincePlaylist`, `clearProvincePlaylist`, `getMusicSuggestion`, `getPlaylistQueue` | Navidrome/Subsonic linking (ping-verified; stores salt+token, never the password — ADR-0008), province→playlist mappings, trip-day playlist suggestion, ready-to-play stream queues; link attempts rate-limited 5/user/5 min |
+| `routing.ts` | `getDayRoutes` | Road routes between a day's stops: trip-access-checked, cache-first (`route_cache`, no TTL), ORS fetch per missed leg; `legs: null` when `OPENROUTESERVICE_API_KEY` unset (map keeps straight lines); rate-limited 30/user/5 min |
 | `locale.ts` | `setLocale` | Persist the en/km locale choice |
 
 ## API routes (`src/app/api/`)
@@ -104,6 +105,12 @@ noted. Cascade deletes follow ownership (group → its expenses, etc.).
 |---|---|---|
 | `music_accounts` | `user_id` (unique), `server_url`, `username`, `subsonic_salt`, `subsonic_token` | One linked Subsonic-compatible server per user; token = md5(password+salt), password never stored (ADR-0008); revoked by changing the Navidrome password |
 | `province_playlists` | `province_code` (ISO 3166-2:KH), `playlist_id`, `playlist_name`, unique (`user_id`, `province_code`) | Explicit province→playlist choices — first rule in `src/lib/music/suggest.ts`; `playlist_name` denormalized for display |
+
+### Routing (Trip Companion)
+
+| Table | Key columns | Notes |
+|---|---|---|
+| `route_cache` | `from_lat`/`from_lng`/`to_lat`/`to_lng` (rounded ~10 m), `profile`, `polyline` (jsonb `{lat,lng}[]`), `distance_meters`, `duration_sec`, unique (coords, `profile`) | Road legs between agenda stops (ADR-0009); no TTL — routes between fixed points are static, quota only spent per edited leg |
 
 ### Enums (7)
 

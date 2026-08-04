@@ -470,5 +470,22 @@
     "next": "បទបន្ទាប់",
     "previous": "បទមុន",
     "close": "បិទកម្មវិធីចាក់"
+  },
+  "routing": {
+    "distanceM": "{distance} ម",
+    "distanceKm": "{distance} គម",
+    "durationMin": "{minutes} នាទី",
+    "durationHM": "{hours} ម៉ោង {minutes} នាទី",
+    "dayTotal": "សរុបថ្ងៃនេះ៖ {distance} · {duration}",
+    "followStart": "តាមដានផ្លូវ",
+    "followStop": "ឈប់តាមដាន",
+    "nextStop": "ចំណតបន្ទាប់",
+    "remaining": "នៅសល់ {distance}",
+    "eta": "ប្រហែល {minutes} នាទី",
+    "offRoute": "អ្នកចេញពីផ្លូវលើសពី ២០០ ម — បើកការណែនាំផ្លូវដើម្បីត្រឡប់ទៅផ្លូវវិញ។",
+    "navigate": "នាំផ្លូវ",
+    "geoDenied": "ការចូលប្រើទីតាំងត្រូវបានបិទ — អនុញ្ញាតវាដើម្បីតាមដានផ្លូវ។",
+    "locating": "កំពុងស្វែងរកទីតាំងរបស់អ្នក...",
+    "dayComplete": "ចំណតទាំងអស់សម្រាប់ថ្ងៃនេះបានបញ្ចប់ហើយ។"
   }
 }

@@ -470,5 +470,22 @@
     "next": "Next song",
     "previous": "Previous song",
     "close": "Close player"
+  },
+  "routing": {
+    "distanceM": "{distance} m",
+    "distanceKm": "{distance} km",
+    "durationMin": "{minutes} min",
+    "durationHM": "{hours} h {minutes} min",
+    "dayTotal": "Day total: {distance} · {duration}",
+    "followStart": "Follow along",
+    "followStop": "Stop following",
+    "nextStop": "Next stop",
+    "remaining": "{distance} to go",
+    "eta": "about {minutes} min",
+    "offRoute": "You're more than 200 m off the route — open navigation to get back on track.",
+    "navigate": "Navigate",
+    "geoDenied": "Location access is off — allow it to follow along the route.",
+    "locating": "Finding your position...",
+    "dayComplete": "Every stop for this day is done."
   }
 }

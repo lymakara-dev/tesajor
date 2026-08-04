@@ -1,7 +1,7 @@
 # Feature Plan: Trip Companion
 
-> **Status**: TC-1 ✅ Shipped · TC-2/3/4 📝 Planned · tracked on the
-> [board](./README.md) · last updated 2026-07-31
+> **Status**: TC-1/2 ✅ Shipped · TC-3/4 📝 Planned · tracked on the
+> [board](./README.md) · last updated 2026-08-04
 
 Design for four connected features that turn the Trip Agenda from a
 planner into an on-the-road companion:
@@ -275,7 +275,7 @@ guard as payment requests.
 | Phase | Status | Contents | New env/schema | External dependency |
 |---|---|---|---|---|
 | **TC-1 Explore** | ✅ Shipped | Province geo module, Overpass essentials + cache, trending from templates, Explore tab | `place_cache` table | Overpass (free, no key) |
-| **TC-2 Music** | 📝 Planned | Navidrome linking, province→playlist mapping, suggestions, mini-player | `music_accounts`, `province_playlists` | Owner's Navidrome via HTTPS tunnel |
+| **TC-2 Music** | ✅ Shipped | Navidrome linking, province→playlist mapping, suggestions, mini-player | `music_accounts`, `province_playlists` | Owner's Navidrome via HTTPS tunnel |
 | **TC-3 Routing** | 📝 Planned | `routing/` provider + cache, road polylines on day map, Follow mode | `route_cache` table, `OPENROUTESERVICE_API_KEY` (optional) | OpenRouteService free tier (or self-hosted OSRM) |
 | **TC-4 Voice** | 📝 Planned | Khmer TTS clips (pre-generated), arrival welcome + spoken/Telegram reminders, voice settings | `voice_clips` table, `TTS_PROVIDER`/`TTS_API_KEY` (optional) | Azure/Google TTS free tier; existing Telegram bot |
 
@@ -294,15 +294,16 @@ action → UI with en/km strings) and ends with the standard verification
 plus a Playwright spec for its main flow. ADRs to write when
 implementation starts: "Overpass over Google Places for essentials"
 (✅ [ADR-0007](../adr/0007-overpass-over-google-places.md)),
-"Subsonic salt+token storage (no passwords)", "OpenRouteService with
-provider abstraction".
+"Subsonic salt+token storage (no passwords)"
+(✅ [ADR-0008](../adr/0008-subsonic-salt-token-storage.md)),
+"OpenRouteService with provider abstraction".
 
 ## Open questions (decide before the relevant phase)
 
-1. **TC-2**: is music per-user (everyone links their own server) or
-   app-provided (one shared Navidrome, guests get read-only streaming via
-   a shared low-privilege account)? Plan assumes per-user; a shared-server
-   mode is a small extension (env-provided default `music_account`).
+1. **TC-2**: ~~per-user or app-provided music server~~ — decided: per-user
+   (everyone links their own server via `/account`); a shared-server mode
+   remains a small extension (env-provided default `music_account`) if
+   wanted later.
 2. **TC-3**: motorbike routing matters in Cambodia — ORS/OSRM support a
    `driving-car` vs. cycling profile, but true moto routing may need a
    custom OSRM profile. MVP ships `driving-car` only.
@@ -338,6 +339,19 @@ From TC-1 (shipped 2026-07-31):
   all public-template stops and filters by province in the page; fine at
   current scale, but a `province_code` column on `agenda_items` (filled
   on write via `provinceForPoint`) would let the DB do it.
+
+From TC-2 (shipped 2026-08-04):
+
+- **Layout-level persistent mini-player** — the player currently lives
+  inside the trip page's music card (fixed bottom bar while that page is
+  open); moving it to the root layout behind a small client store would
+  keep playback across navigations.
+- **Live-position province override** — the suggestion uses the dominant
+  province of the day's planned stops; the plan's "in Follow mode, live
+  position wins" rule waits on TC-3's Follow-mode geolocation loop.
+- **Playwright spec for the music flow** — link (against a Subsonic stub)
+  → map a province → see the suggestion card; unit coverage exists (22
+  cases) but no e2e yet.
 
 Already-known candidates: AudioMuse-AI mood playlists (TC-2), Media
 Session lock-screen controls (TC-2), self-hosted OSRM + moto profile

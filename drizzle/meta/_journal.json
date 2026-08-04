@@ -36,6 +36,13 @@
       "when": 1785481029229,
       "tag": "0004_jazzy_zarek",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1785837497667,
+      "tag": "0005_lumpy_microchip",
+      "breakpoints": true
     }
   ]
 }

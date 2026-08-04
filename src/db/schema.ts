@@ -397,6 +397,41 @@ export const placeCache = pgTable(
   (t) => [unique().on(t.cell, t.category)],
 );
 
+// A user's linked Navidrome (Subsonic-compatible) music server. Stores only
+// the Subsonic auth pair — random salt + token = md5(password + salt) — never
+// the password itself; revocable by changing the Navidrome password. See
+// ADR-0008.
+export const musicAccounts = pgTable("music_accounts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+  serverUrl: text("server_url").notNull(),
+  username: text("username").notNull(),
+  subsonicSalt: text("subsonic_salt").notNull(),
+  subsonicToken: text("subsonic_token").notNull(),
+  linkedAt: timestamp("linked_at").notNull().defaultNow(),
+});
+
+// Explicit province → playlist choices; the first suggestion rule in
+// src/lib/music/suggest.ts. `province_code` is an ISO 3166-2:KH code from
+// src/lib/geo/provinces-data.ts. `playlist_name` is a denormalized display
+// copy so the mapping list renders without a music-server round trip.
+export const provincePlaylists = pgTable(
+  "province_playlists",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    provinceCode: text("province_code").notNull(),
+    playlistId: text("playlist_id").notNull(),
+    playlistName: text("playlist_name").notNull(),
+  },
+  (t) => [unique().on(t.userId, t.provinceCode)],
+);
+
 export const achievements = pgTable(
   "achievements",
   {

@@ -3,12 +3,14 @@ import { redirect } from "next/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { paymentMethods, telegramAccounts, users } from "@/db/schema";
+import { musicAccounts, paymentMethods, provincePlaylists, telegramAccounts, users } from "@/db/schema";
+import { PROVINCES } from "@/lib/geo/provinces-data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EditProfileForm } from "@/components/edit-profile-form";
 import { DeleteAccountForm } from "@/components/delete-account-form";
 import { TelegramConnectCard } from "@/components/telegram-connect-card";
 import { PaymentMethodsCard } from "@/components/payment-methods-card";
+import { MusicServerCard } from "@/components/music-server-card";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 import type { Locale } from "@/i18n/config";
@@ -32,6 +34,17 @@ export default async function AccountPage() {
     .select()
     .from(paymentMethods)
     .where(eq(paymentMethods.userId, session.user.id));
+
+  const [musicAccount] = await db
+    .select()
+    .from(musicAccounts)
+    .where(eq(musicAccounts.userId, session.user.id))
+    .limit(1);
+
+  const musicMappings = await db
+    .select()
+    .from(provincePlaylists)
+    .where(eq(provincePlaylists.userId, session.user.id));
 
   return (
     <div className="mx-auto max-w-[480px] space-y-6 px-4 py-10">
@@ -86,6 +99,22 @@ export default async function AccountPage() {
           qrImageUrl: m.qrImageUrl,
           paymentLink: m.paymentLink,
           isDefault: m.isDefault,
+        }))}
+      />
+
+      <MusicServerCard
+        linked={Boolean(musicAccount)}
+        serverUrl={musicAccount?.serverUrl ?? null}
+        username={musicAccount?.username ?? null}
+        provinces={PROVINCES.map((p) => ({
+          code: p.code,
+          nameEn: p.nameEn,
+          nameKm: p.nameKm,
+        })).sort((a, b) => a.nameEn.localeCompare(b.nameEn))}
+        mappings={musicMappings.map((m) => ({
+          provinceCode: m.provinceCode,
+          playlistId: m.playlistId,
+          playlistName: m.playlistName,
         }))}
       />
 

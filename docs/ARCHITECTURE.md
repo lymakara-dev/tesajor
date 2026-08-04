@@ -44,10 +44,10 @@ server returns. Every server action parses its input with a Zod schema from
 src/
   app/          routes (RSC pages, layouts, API route handlers)
   components/   feature components + components/ui (shadcn primitives)
-  db/           schema.ts (Drizzle, 23 tables / 7 enums), index.ts, seed.ts
+  db/           schema.ts (Drizzle, 25 tables / 7 enums), index.ts, seed.ts
   i18n/         next-intl config (locales: en, km)
   lib/
-    actions/    15 server-action files — the ONLY mutation entry points
+    actions/    16 server-action files — the ONLY mutation entry points
     validation/ Zod schemas, one file per action domain
     queries/    read-side helpers (balances, trip achievements, trending places)
     money/      cents math, USD↔KHR conversion, currency formatting
@@ -57,6 +57,7 @@ src/
     trips/      trip permissions, template cloning, geo helpers
     geo/        Cambodian province detection (bundled OSM-derived polygons)
     places/     Overpass essentials search, cache cells, trending ranking
+    music/      Subsonic (Navidrome) client + province→playlist suggestion
     telegram/   HMAC verify, webhook parsing, per-debtor amounts, bot client
     upload/     client-side image compression
     auth.ts     Auth.js config · rate-limit.ts · cloudinary.ts
@@ -98,6 +99,11 @@ src/
   (~0.02° grid keys for `place_cache`), `trending.ts` (distinct-trip count
   with recency decay over public-template agenda items; hides places below
   3 distinct trips). See ADR-0007.
+- **`music/`** — `subsonic.ts` (pure Subsonic URL/param construction and
+  response parsing, thin fetchers; auth pair is salt + md5 token, never a
+  password — ADR-0008), `suggest.ts` (playlist-for-province: explicit
+  mapping → km/en name match → null; dominant province of a day's stops).
+  Audio streams directly from the user's server to their device.
 - **`telegram/`** — `verify.ts` (Login Widget HMAC-SHA256 check with the bot
   token, stale `auth_date` rejection), `webhook.ts` (pure update→intent
   parsing), `amounts.ts` (per-debtor amounts from simplified balances),
@@ -105,12 +111,12 @@ src/
   button creates a *pending claim*; only the requester's in-app confirmation
   records a real settlement.
 
-Each of these has a co-located `*.test.ts` (18 files, 191 cases). This is
+Each of these has a co-located `*.test.ts` (20 files, 213 cases). This is
 deliberate: the pure modules are the product; the UI is replaceable.
 
 ## Data model
 
-All 23 tables live in `src/db/schema.ts`; migrations are generated SQL in
+All 25 tables live in `src/db/schema.ts`; migrations are generated SQL in
 `drizzle/`. Grouped by domain:
 
 | Domain | Tables |
@@ -121,6 +127,7 @@ All 23 tables live in `src/db/schema.ts`; migrations are generated SQL in
 | Telegram | `telegram_accounts`, `telegram_link_tokens`, `payment_methods`, `payment_requests` |
 | Trips | `trips`, `trip_members`, `agenda_items`, `item_notes`, `achievements` |
 | Places (Explore) | `place_cache` (cached Overpass results per grid cell + category, 7-day TTL at read time) |
+| Music | `music_accounts` (Subsonic salt+token, never passwords — ADR-0008), `province_playlists` (explicit province→playlist choices) |
 
 Design points worth knowing before touching the schema:
 

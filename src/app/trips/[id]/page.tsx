@@ -1,10 +1,12 @@
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { agendaItems, trips, achievements } from "@/db/schema";
+import { agendaItems, trips, achievements, musicAccounts } from "@/db/schema";
+import { provinceForPoint } from "@/lib/geo/provinces";
+import { dominantProvince } from "@/lib/music/suggest";
 import { getTripRole } from "@/lib/actions/trip-membership";
 import { updateTripExchangeRate } from "@/lib/actions/trips";
 import { canEditTrip, canManageTrip } from "@/lib/trips/permissions";
@@ -21,6 +23,7 @@ import { CloneTripButton } from "@/components/clone-trip-button";
 import { YouAreHere } from "@/components/you-are-here";
 import { TripDayMap } from "@/components/trip-day-map";
 import { TripProgressCard } from "@/components/trip-progress-card";
+import { TripMusicCard } from "@/components/trip-music-card";
 import { TripCompleteCelebration } from "@/components/trip-complete-celebration";
 import { TripCountdown } from "@/components/trip-countdown";
 import { ExchangeRateSettings } from "@/components/exchange-rate-settings";
@@ -49,6 +52,23 @@ export default async function TripPage({
 
   const dayCount = Math.max(1, dayOffsetBetween(trip.startDate, trip.endDate) + 1);
   const tripProgress = computeTripProgress(items);
+
+  // Music suggestion card: only when the viewer has a linked music server
+  // and the trip's stops resolve to a Cambodian province (pure, no fetch —
+  // the card itself talks to the music server lazily).
+  const [musicAccount] = await db
+    .select({ id: musicAccounts.id })
+    .from(musicAccounts)
+    .where(eq(musicAccounts.userId, session.user.id))
+    .limit(1);
+  const tripProvince = musicAccount
+    ? dominantProvince(
+        items
+          .filter((i) => i.lat != null && i.lng != null)
+          .map((i) => provinceForPoint(i.lat as number, i.lng as number)),
+      )
+    : null;
+  const locale = await getLocale();
 
   const userAchievements = await db
     .select({ key: achievements.key })
@@ -86,6 +106,13 @@ export default async function TripPage({
       {tripProgress.total > 0 && tripProgress.percent === 100 && <TripCompleteCelebration />}
 
       <TripCountdown startDate={trip.startDate} endDate={trip.endDate} />
+
+      {tripProvince && (
+        <TripMusicCard
+          provinceCode={tripProvince.code}
+          provinceName={locale === "km" ? tripProvince.nameKm : tripProvince.nameEn}
+        />
+      )}
 
       <TripProgressCard
         completed={tripProgress.completed}

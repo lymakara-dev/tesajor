@@ -44,8 +44,11 @@ PWA icons.
    bypass attempts, invariant enforcement), the Telegram webhook route,
    and the uploads route currently have zero direct tests. Start with
    `expenses.ts` and the webhook.
-5. **E2E in CI** — Playwright with a Postgres service container and a
-   seeded DB; currently local-only.
+5. ~~**E2E in CI**~~ — done 2026-08-04: `ci.yml` gained an `e2e` job with
+   a Postgres 16 service container, migrations, and the full Playwright
+   suite (specs self-register users and stub external services, so no
+   seed is needed); traces upload on failure. First run happens on the
+   next push — watch it before relying on the check.
 6. **Distributed rate limiting** — the in-memory limiter is per-process;
    move to Upstash Redis before multi-instance deployment
    (see [SCALING.md](./SCALING.md)).

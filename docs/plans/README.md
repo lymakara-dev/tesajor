@@ -24,7 +24,7 @@ so keeping track never requires archaeology.
 | Trip Companion — Navidrome music | TC-2 | ✅ Shipped | [trip-companion.md](./trip-companion.md) |
 | Trip Companion — Road routing & follow mode | TC-3 | ✅ Shipped | [trip-companion.md](./trip-companion.md) |
 | Trip Companion — Khmer voice welcome & reminders | TC-4 | ✅ Shipped | [trip-companion.md](./trip-companion.md) |
-| CI hardening (E2E in CI, branch protection) | — | 💡 Idea | [ROADMAP](../ROADMAP.md) P0/P1 |
+| CI hardening (E2E in CI ✅ · branch protection needs repo admin) | — | 🔨 In progress | [ROADMAP](../ROADMAP.md) P0/P1 |
 | Stripe Pro tier | — | 💡 Idea | [ROADMAP](../ROADMAP.md) P2 |
 | Receipt OCR | — | 💡 Idea | [ROADMAP](../ROADMAP.md) P3 |
 

@@ -218,9 +218,14 @@ export function FollowMode({
     setWatching(true);
     watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => setPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      () => {
-        setGeoError(true);
-        setWatching(false);
+      (error) => {
+        // Only denial ends the session. Transient dropouts (tunnel, urban
+        // canyon → POSITION_UNAVAILABLE/TIMEOUT) keep the watch alive and
+        // the card on the last fix.
+        if (error.code === error.PERMISSION_DENIED) {
+          setGeoError(true);
+          setWatching(false);
+        }
       },
       { enableHighAccuracy: true, maximumAge: 5_000 },
     );
@@ -253,7 +258,12 @@ export function FollowMode({
 
   return (
     <div className="space-y-2">
-      <Button variant={watching ? "default" : "outline"} size="sm" onClick={toggle}>
+      <Button
+        variant={watching ? "default" : "outline"}
+        size="sm"
+        data-testid="follow-toggle"
+        onClick={toggle}
+      >
         <LocateFixed className="size-4" strokeWidth={1.5} />
         {watching ? t("followStop") : t("followStart")}
       </Button>
@@ -261,13 +271,16 @@ export function FollowMode({
       {geoError && <p className="text-sm text-muted-foreground">{t("geoDenied")}</p>}
 
       {welcome && (
-        <div className="space-y-2 rounded-md border border-saffron bg-muted/40 p-3">
+        <div
+          className="space-y-2 rounded-md border border-saffron bg-muted/40 p-3"
+          data-testid="arrival-welcome"
+        >
           <p className="flex items-center gap-1.5 text-sm font-medium">
             <PartyPopper className="size-4 shrink-0 text-saffron" strokeWidth={1.5} />
             {tv("welcomeBanner", { place: welcome.title })}
           </p>
           {canComplete && !completed && (
-            <Button size="sm" disabled={completing} onClick={completeStop}>
+            <Button size="sm" data-testid="arrival-complete" disabled={completing} onClick={completeStop}>
               {tv("completeStop")}
             </Button>
           )}
@@ -284,7 +297,7 @@ export function FollowMode({
       )}
 
       {watching && nextStop && position && remaining !== null && (
-        <div className="space-y-2 rounded-md border bg-muted/40 p-3">
+        <div className="space-y-2 rounded-md border bg-muted/40 p-3" data-testid="follow-next-stop">
           <p className="text-xs font-bold text-saffron">{t("nextStop")}</p>
           <p className="text-sm font-medium">{nextStop.title}</p>
           <p className="text-sm text-muted-foreground">

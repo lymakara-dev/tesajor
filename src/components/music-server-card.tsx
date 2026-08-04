@@ -166,13 +166,13 @@ export function MusicServerCard({ linked, serverUrl, username, provinces, mappin
               />
               <p className="text-xs text-muted-foreground">{t("passwordNotStored")}</p>
             </div>
-            <Button size="sm" type="submit" disabled={submitting}>
+            <Button size="sm" type="submit" data-testid="link-music-server" disabled={submitting}>
               {submitting ? t("linking") : t("link")}
             </Button>
           </form>
         ) : (
           <>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground" data-testid="music-linked">
               {t("linkedAs", { username: username ?? "", server: serverUrl ?? "" })}
             </p>
             <Button variant="outline" size="sm" onClick={onUnlink} disabled={submitting}>

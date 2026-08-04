@@ -77,6 +77,7 @@ export function AddToAgendaButton({
         type="button"
         variant="outline"
         size="sm"
+        data-testid="add-place-to-agenda"
         onClick={add}
         disabled={state !== "idle"}
       >
@@ -184,6 +185,7 @@ export function ExploreEssentials({
               variant={category === c ? "default" : "outline"}
               size="sm"
               className="shrink-0"
+              data-testid={`explore-category-${c}`}
               onClick={() => search(c)}
               disabled={loading && category === c}
             >

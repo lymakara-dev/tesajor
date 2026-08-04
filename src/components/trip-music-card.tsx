@@ -103,13 +103,18 @@ export function TripMusicCard({ provinceCode, provinceName }: Props) {
           )}
           {state.kind === "suggested" && (
             <>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground" data-testid="music-suggestion">
                 {t("suggestion", {
                   province: provinceName,
                   playlist: state.suggestion.playlistName,
                 })}
               </p>
-              <Button size="sm" onClick={() => play(state.suggestion)} disabled={loadingQueue}>
+              <Button
+                size="sm"
+                data-testid="music-play"
+                onClick={() => play(state.suggestion)}
+                disabled={loadingQueue}
+              >
                 <Play className="size-4" strokeWidth={1.5} />
                 {loadingQueue ? t("loading") : t("playButton")}
               </Button>

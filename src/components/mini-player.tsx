@@ -45,7 +45,10 @@ export function MiniPlayer({ playlistName, songs, onClose }: Props) {
 
   return (
     <div className="fixed inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-40 px-4 sm:bottom-4">
-      <div className="elevation-8-top mx-auto flex max-w-[480px] items-center gap-3 rounded-xl border border-sandstone bg-background p-3">
+      <div
+        className="elevation-8-top mx-auto flex max-w-[480px] items-center gap-3 rounded-xl border border-sandstone bg-background p-3"
+        data-testid="mini-player"
+      >
         <audio ref={audioRef} src={song.streamUrl} onEnded={next} autoPlay />
         {song.coverArtUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- remote art from the user's own server, unknown domain

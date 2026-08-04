@@ -325,9 +325,10 @@ while working on one.*
 
 From TC-1 (shipped 2026-07-31):
 
-- **Playwright spec for the Explore flow** — TC-1 shipped with 36 unit
-  tests over the pure modules but no e2e spec yet (the flow needs a
-  geolocation mock + an Overpass stub to be deterministic).
+- ~~**Playwright spec for the Explore flow**~~ — done 2026-08-04:
+  `e2e/trip-companion.spec.ts` seeds `place_cache` directly (the action is
+  cache-first, so no Overpass call happens) and drives geolocation via
+  Playwright's emulation.
 - **Shared province borders** — `provinces-data.ts` simplifies each
   province independently (geoBoundaries KHM ADM1, Douglas-Peucker
   0.002°, ~145 KB), so adjacent borders have slivers; `provinceForPoint`
@@ -350,9 +351,10 @@ From TC-2 (shipped 2026-08-04):
 - **Live-position province override** — the suggestion uses the dominant
   province of the day's planned stops; the plan's "in Follow mode, live
   position wins" rule waits on TC-3's Follow-mode geolocation loop.
-- **Playwright spec for the music flow** — link (against a Subsonic stub)
-  → map a province → see the suggestion card; unit coverage exists (22
-  cases) but no e2e yet.
+- ~~**Playwright spec for the music flow**~~ — done 2026-08-04:
+  `e2e/trip-companion.spec.ts` runs a throwaway local Subsonic stub
+  (ping/getPlaylists/getPlaylist/stream) and covers link → name-match
+  suggestion → mini-player.
 
 From TC-3 (shipped 2026-08-04):
 
@@ -363,8 +365,13 @@ From TC-3 (shipped 2026-08-04):
   unit-tested against the documented GeoJSON shape, but no live
   `OPENROUTESERVICE_API_KEY` existed during development; verify with a
   real key before relying on it on the road.
-- **Playwright spec for the routing flow** — needs a geolocation mock and
-  an ORS stub, same shape as the pending Explore/music specs.
+- ~~**Playwright spec for the routing flow**~~ — done 2026-08-04:
+  `e2e/trip-companion.spec.ts` covers Follow mode's straight-line
+  fallback path (no ORS key) plus the arrival welcome dwell; writing it
+  surfaced and fixed a real bug — a transient `watchPosition` error
+  (GPS dropout) used to end the whole Follow session instead of only
+  permission denial. Road-polyline rendering against a live ORS key is
+  still unverified (see the live-key item below).
 
 From TC-4 (shipped 2026-08-04):
 

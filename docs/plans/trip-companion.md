@@ -333,10 +333,9 @@ From TC-1 (shipped 2026-07-31):
   0.002°, ~145 KB), so adjacent borders have slivers; `provinceForPoint`
   papers over them with a 2 km boundary snap. A topology-aware simplify
   (shared arcs, TopoJSON-style) would remove the snap heuristic.
-- **Overpass resilience** — single endpoint (`overpass-api.de`) today;
-  add a mirror fallback (e.g. `overpass.kumi.systems`) and/or request
-  coalescing so concurrent cache misses for the same cell+category make
-  one flight.
+- ~~**Overpass resilience**~~ — done 2026-08-04: `overpass.kumi.systems`
+  mirror fallback + in-process request coalescing (one flight per
+  identical concurrent query) in `src/lib/places/overpass.ts`.
 - **Trending province filter at query time** — trending currently ranks
   all public-template stops and filters by province in the page; fine at
   current scale, but a `province_code` column on `agenda_items` (filled
@@ -369,20 +368,22 @@ From TC-3 (shipped 2026-08-04):
 
 From TC-4 (shipped 2026-08-04):
 
-- **Telegram voice reminders when the app is closed** — the plan's
-  `sendVoice`-via-bot path needs the cron/job-runner prerequisite
-  (Vercel cron MVP, or the Inngest/QStash upgrade SCALING.md plans — the
-  same prerequisite as Telegram batch sends moving off-request). In-app
-  reminders shipped; this is the missing delivery channel.
+- ~~**Telegram voice reminders when the app is closed**~~ — done
+  2026-08-04: Vercel cron (`vercel.json`, every 5 min) hits
+  `/api/cron/voice-reminders` (CRON_SECRET-protected), which sends each
+  due stop's reminder clip via `sendAudio` (plain text without a TTS key)
+  to trip members with voice on + linked Telegram, at most once per
+  (stop, user) via `voice_reminder_sends`. The Inngest/QStash upgrade
+  SCALING.md plans remains the scale path.
 - **Native-speaker TTS bake-off** — both drivers are built and unit-tested
   against documented request/response shapes, but neither ran against a
   live key; set `TTS_PROVIDER`+`TTS_API_KEY` for each, generate the same
   phrase, and have a native speaker pick (open question 4).
 - **Khmer place names in welcomes** — use OSM `name:km` (available via
   TC-1's Overpass data) instead of the stop's typed title when present.
-- **"Fire once per stop per day" across sessions** — arrival fire-once
-  state is per page session; persisting fired stops (localStorage or DB)
-  would survive a page reload mid-visit.
+- ~~**"Fire once per stop per day" across sessions**~~ — done
+  2026-08-04: welcomed stop ids persist in localStorage under today's
+  date, so a reload mid-visit doesn't replay the welcome.
 
 Already-known candidates: AudioMuse-AI mood playlists (TC-2), Media
 Session lock-screen controls (TC-2), self-hosted OSRM + moto profile

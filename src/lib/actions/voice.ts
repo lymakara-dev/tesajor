@@ -13,8 +13,8 @@ import {
   type VoiceKind,
   type VoiceLocale,
 } from "@/lib/voice/phrases";
-import { getTtsConfig, synthesize } from "@/lib/voice/tts";
-import { storeVoiceClip } from "@/lib/voice/store";
+import { getTtsConfig } from "@/lib/voice/tts";
+import { ensureVoiceClip } from "@/lib/voice/clips";
 import { getVoiceClipsSchema, setVoicePreferencesSchema } from "@/lib/validation/voice";
 
 export type ActionResult<T = undefined> =
@@ -119,29 +119,21 @@ export async function getVoiceClips(
   const clips: Record<string, ItemVoiceClips> = {};
   for (const item of items) clips[item.id] = { welcomeUrl: null, reminderUrl: null };
 
+  const titles = new Map(items.map((i) => [i.id, i.title]));
   for (const spec of wanted) {
     let url = byKey.get(`${spec.itemId}:${spec.kind}:${spec.hash}`) ?? null;
 
     if (!url && ttsConfig && generated < MAX_GENERATIONS_PER_CALL) {
       if (!checkRateLimit(`voice-gen:${session.user.id}`, 60, 5 * 60 * 1000)) break;
-      try {
-        generated++;
-        const bytes = await synthesize(spec.text, locale, ttsConfig);
-        url = await storeVoiceClip(bytes);
-        await db
-          .insert(voiceClips)
-          .values({
-            agendaItemId: spec.itemId,
-            kind: spec.kind,
-            locale,
-            textHash: spec.hash,
-            audioUrl: url,
-          })
-          .onConflictDoNothing();
-      } catch {
-        // Silent mode for this clip — banner + chime still fire client-side.
-        url = null;
-      }
+      generated++;
+      // Shared cache-first generator (src/lib/voice/clips.ts); null on
+      // failure — banner + chime still fire client-side.
+      url = await ensureVoiceClip({
+        agendaItemId: spec.itemId,
+        title: titles.get(spec.itemId) ?? "",
+        kind: spec.kind,
+        locale,
+      });
     }
 
     if (url) {

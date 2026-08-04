@@ -43,6 +43,7 @@ Drizzle, and (for group data) writes an `activity_log` row. Most return an
 | `api/groups/[id]/export` | GET | Session + group membership | CSV export of the group's expenses |
 | `api/telegram/webhook` | POST | `X-Telegram-Bot-Api-Secret-Token` header must match `TELEGRAM_WEBHOOK_SECRET` | Handles `/start <link-token>` (captures `chat_id`, links account) and "I've paid" callback queries (marks request paid, pending confirmation) |
 | `api/uploads` | POST | Session | Image upload: type/size/magic-byte validation → Cloudinary (if configured) or `public/uploads/` |
+| `api/cron/voice-reminders` | GET | `Authorization: Bearer` must match `CRON_SECRET` | Vercel cron (every 5 min, `vercel.json`): Telegram voice/text reminders for stops starting within 15 min, send-once per (stop, user) via `voice_reminder_sends` |
 
 ## Database tables (`src/db/schema.ts`)
 
@@ -118,6 +119,7 @@ noted. Cascade deletes follow ownership (group → its expenses, etc.).
 | Table | Key columns | Notes |
 |---|---|---|
 | `voice_clips` | `agenda_item_id` (cascade), `kind` (welcome\|reminder), `locale` (en\|km), `text_hash`, `audio_url`, unique (item, kind, locale, hash) | Pre-generated TTS clips (ADR-0010); hash keys phrase content so renames back-and-forth reuse clips. Per-user prefs live on `users.voice_enabled` / `users.voice_locale` (default km) |
+| `voice_reminder_sends` | `agenda_item_id` (cascade), `user_id` (cascade), `sent_at`, unique (item, user) | Idempotency log for the reminder cron — each (stop, user) Telegram reminder sends at most once |
 
 ### Enums (7)
 

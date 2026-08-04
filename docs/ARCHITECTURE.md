@@ -44,7 +44,7 @@ server returns. Every server action parses its input with a Zod schema from
 src/
   app/          routes (RSC pages, layouts, API route handlers)
   components/   feature components + components/ui (shadcn primitives)
-  db/           schema.ts (Drizzle, 27 tables / 7 enums), index.ts, seed.ts
+  db/           schema.ts (Drizzle, 28 tables / 7 enums), index.ts, seed.ts
   i18n/         next-intl config (locales: en, km)
   lib/
     actions/    18 server-action files — the ONLY mutation entry points
@@ -124,12 +124,12 @@ src/
   button creates a *pending claim*; only the requester's in-app confirmation
   records a real settlement.
 
-Each of these has a co-located `*.test.ts` (25 files, 249 cases). This is
+Each of these has a co-located `*.test.ts` (26 files, 255 cases). This is
 deliberate: the pure modules are the product; the UI is replaceable.
 
 ## Data model
 
-All 27 tables live in `src/db/schema.ts`; migrations are generated SQL in
+All 28 tables live in `src/db/schema.ts`; migrations are generated SQL in
 `drizzle/`. Grouped by domain:
 
 | Domain | Tables |
@@ -142,7 +142,7 @@ All 27 tables live in `src/db/schema.ts`; migrations are generated SQL in
 | Places (Explore) | `place_cache` (cached Overpass results per grid cell + category, 7-day TTL at read time) |
 | Music | `music_accounts` (Subsonic salt+token, never passwords — ADR-0008), `province_playlists` (explicit province→playlist choices) |
 | Routing | `route_cache` (road legs keyed on ~10 m-rounded coords + profile, no TTL — ADR-0009) |
-| Voice | `voice_clips` (pre-generated TTS audio per stop/kind/locale/text-hash — ADR-0010) |
+| Voice | `voice_clips` (pre-generated TTS audio per stop/kind/locale/text-hash — ADR-0010), `voice_reminder_sends` (cron idempotency) |
 
 Design points worth knowing before touching the schema:
 

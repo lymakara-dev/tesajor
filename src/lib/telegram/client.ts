@@ -53,6 +53,16 @@ export async function sendTextMessage(chatId: string, text: string): Promise<voi
   await callTelegramApi("sendMessage", { chat_id: chatId, text });
 }
 
+/** Sends a voice-companion clip (MP3 by public URL) with a caption —
+ * `sendAudio` because Telegram's `sendVoice` only accepts OGG/Opus. */
+export async function sendAudioMessage(
+  chatId: string,
+  audioUrl: string,
+  caption: string,
+): Promise<void> {
+  await callTelegramApi("sendAudio", { chat_id: chatId, audio: audioUrl, caption });
+}
+
 export async function answerCallbackQuery(callbackQueryId: string, text: string): Promise<void> {
   await callTelegramApi("answerCallbackQuery", { callback_query_id: callbackQueryId, text });
 }

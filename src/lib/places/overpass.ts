@@ -24,7 +24,11 @@ export const DEFAULT_RADIUS_METERS = 2_000;
 /** Max elements requested per query — keeps responses and cache rows small. */
 const MAX_RESULTS = 40;
 
-const OVERPASS_ENDPOINT = "https://overpass-api.de/api/interpreter";
+/** Tried in order — the main public endpoint, then a community mirror. */
+const OVERPASS_ENDPOINTS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+];
 
 /** Overpass tag selectors per category (applied to nodes, ways, relations). */
 const CATEGORY_SELECTORS: Record<PlaceCategory, string[]> = {
@@ -137,17 +141,41 @@ export async function fetchNearbyPlaces(
   category: PlaceCategory,
   radiusMeters: number = DEFAULT_RADIUS_METERS,
 ): Promise<NearbyPlace[]> {
-  const response = await fetch(OVERPASS_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      // Overpass usage policy asks for an identifying User-Agent.
-      "User-Agent": "Tesajor/0.1 (trip companion; https://github.com/lymakara-dev)",
-    },
-    body: `data=${encodeURIComponent(buildOverpassQuery(lat, lng, category, radiusMeters))}`,
-  });
-  if (!response.ok) {
-    throw new Error(`Overpass request failed with status ${response.status}`);
-  }
-  return normalizeOverpassResponse(await response.json(), category);
+  const body = `data=${encodeURIComponent(buildOverpassQuery(lat, lng, category, radiusMeters))}`;
+
+  // Coalesce concurrent identical lookups (several users missing the same
+  // cache cell at once) into one flight per endpoint attempt.
+  const flightKey = `${lat},${lng},${category},${radiusMeters}`;
+  const inFlight = flights.get(flightKey);
+  if (inFlight) return inFlight;
+
+  const flight = (async () => {
+    let lastError: unknown = null;
+    for (const endpoint of OVERPASS_ENDPOINTS) {
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            // Overpass usage policy asks for an identifying User-Agent.
+            "User-Agent": "Tesajor/0.1 (trip companion; https://github.com/lymakara-dev)",
+          },
+          body,
+          signal: AbortSignal.timeout(15_000),
+        });
+        if (!response.ok) {
+          throw new Error(`Overpass request failed with status ${response.status}`);
+        }
+        return normalizeOverpassResponse(await response.json(), category);
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw lastError ?? new Error("All Overpass endpoints failed");
+  })().finally(() => flights.delete(flightKey));
+
+  flights.set(flightKey, flight);
+  return flight;
 }
+
+const flights = new Map<string, Promise<NearbyPlace[]>>();

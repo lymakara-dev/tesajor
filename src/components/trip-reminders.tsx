@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { getVoiceClips, type ItemVoiceClips } from "@/lib/actions/voice";
+import { isDueForReminder } from "@/lib/voice/reminders";
 
 interface ReminderItem {
   id: string;
@@ -12,7 +13,6 @@ interface ReminderItem {
   plannedStart: Date | null;
 }
 
-const REMINDER_LEAD_MS = 15 * 60 * 1000;
 const CHECK_INTERVAL_MS = 30 * 1000;
 
 /**
@@ -59,9 +59,7 @@ export function TripReminders({
     function check() {
       const now = Date.now();
       for (const item of scheduled) {
-        const startMs = item.plannedStart!.getTime();
-        const untilStart = startMs - now;
-        if (untilStart <= 0 || untilStart > REMINDER_LEAD_MS) continue;
+        if (!isDueForReminder(item.plannedStart!.getTime(), now)) continue;
         if (firedRef.current.has(item.id)) continue;
         firedRef.current.add(item.id);
 

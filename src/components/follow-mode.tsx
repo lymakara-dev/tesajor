@@ -49,6 +49,33 @@ function playFallback(text: string, locale: string) {
   navigator.vibrate?.([200, 100, 200]);
 }
 
+// "Fire once per stop per day" must survive a page reload mid-visit, so
+// welcomed stop ids are kept in localStorage under today's date.
+const WELCOMED_STORAGE_KEY = "tesajor-welcomed-stops";
+
+function loadWelcomedToday(): string[] {
+  try {
+    const raw = JSON.parse(localStorage.getItem(WELCOMED_STORAGE_KEY) ?? "null");
+    if (raw?.date === new Date().toDateString() && Array.isArray(raw.stopIds)) {
+      return raw.stopIds;
+    }
+  } catch {
+    // Corrupt/blocked storage — fall through to a fresh day.
+  }
+  return [];
+}
+
+function saveWelcomedToday(stopIds: string[]) {
+  try {
+    localStorage.setItem(
+      WELCOMED_STORAGE_KEY,
+      JSON.stringify({ date: new Date().toDateString(), stopIds }),
+    );
+  } catch {
+    // Session-only memory still prevents repeats until reload.
+  }
+}
+
 function chime() {
   try {
     const ctx = new AudioContext();
@@ -139,6 +166,7 @@ export function FollowMode({
     });
     arrivalRef.current = state;
     if (fired) {
+      saveWelcomedToday(state.firedStopIds);
       setWelcome({ id: nextStop.id, title: nextStop.title });
       setCompleted(false);
       if (voiceEnabled) {
@@ -186,6 +214,7 @@ export function FollowMode({
       return;
     }
     setGeoError(false);
+    arrivalRef.current = { ...INITIAL_ARRIVAL_STATE, firedStopIds: loadWelcomedToday() };
     setWatching(true);
     watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => setPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude }),

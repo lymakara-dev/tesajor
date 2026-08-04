@@ -443,6 +443,23 @@ export const voiceClips = pgTable(
   (t) => [unique().on(t.agendaItemId, t.kind, t.locale, t.textHash)],
 );
 
+// Idempotency log for Telegram voice reminders: the cron route sends each
+// (stop, user) reminder at most once, whatever the cron cadence.
+export const voiceReminderSends = pgTable(
+  "voice_reminder_sends",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    agendaItemId: uuid("agenda_item_id")
+      .notNull()
+      .references(() => agendaItems.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    sentAt: timestamp("sent_at").notNull().defaultNow(),
+  },
+  (t) => [unique().on(t.agendaItemId, t.userId)],
+);
+
 // A user's linked Navidrome (Subsonic-compatible) music server. Stores only
 // the Subsonic auth pair — random salt + token = md5(password + salt) — never
 // the password itself; revocable by changing the Navidrome password. See

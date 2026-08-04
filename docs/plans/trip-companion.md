@@ -344,10 +344,10 @@ From TC-1 (shipped 2026-07-31):
 
 From TC-2 (shipped 2026-08-04):
 
-- **Layout-level persistent mini-player** — the player currently lives
-  inside the trip page's music card (fixed bottom bar while that page is
-  open); moving it to the root layout behind a small client store would
-  keep playback across navigations.
+- ~~**Layout-level persistent mini-player**~~ — done 2026-08-04:
+  `MusicPlayerProvider` in the root layout owns the queue and renders the
+  mini-player; the root layout never remounts on route changes, so
+  playback survives navigation. Pages start music via `useMusicPlayer()`.
 - **Live-position province override** — the suggestion uses the dominant
   province of the day's planned stops; the plan's "in Follow mode, live
   position wins" rule waits on TC-3's Follow-mode geolocation loop.

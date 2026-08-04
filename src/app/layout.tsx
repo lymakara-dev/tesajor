@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { MusicPlayerProvider } from "@/components/music-player-provider";
 import { AuthSessionProvider } from "@/components/auth-session-provider";
 import { cn } from "@/lib/utils";
 import "./globals.css";
@@ -61,12 +62,14 @@ export default async function RootLayout({
         <NextIntlClientProvider>
           <AuthSessionProvider session={session}>
             <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-              <SiteHeader />
-              <main className={cn("flex-1", hasSession && "pb-20 sm:pb-0")}>
-                {children}
-              </main>
-              {hasSession && <BottomTabBar />}
-              <Toaster />
+              <MusicPlayerProvider>
+                <SiteHeader />
+                <main className={cn("flex-1", hasSession && "pb-20 sm:pb-0")}>
+                  {children}
+                </main>
+                {hasSession && <BottomTabBar />}
+                <Toaster />
+              </MusicPlayerProvider>
             </ThemeProvider>
           </AuthSessionProvider>
         </NextIntlClientProvider>

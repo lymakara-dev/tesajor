@@ -3,13 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import {
-  getMusicSuggestion,
-  getPlaylistQueue,
-  type QueueSong,
-} from "@/lib/actions/music";
+import { getMusicSuggestion, getPlaylistQueue } from "@/lib/actions/music";
 import type { PlaylistSuggestion } from "@/lib/music/suggest";
-import { MiniPlayer } from "@/components/mini-player";
+import { useMusicPlayer } from "@/components/music-player-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Music, Play } from "lucide-react";
@@ -35,7 +31,7 @@ export function TripMusicCard({ provinceCode, provinceName }: Props) {
     | { kind: "none" }
     | { kind: "suggested"; suggestion: PlaylistSuggestion }
   >({ kind: "loading" });
-  const [queue, setQueue] = useState<{ playlistName: string; songs: QueueSong[] } | null>(null);
+  const player = useMusicPlayer();
   const [loadingQueue, setLoadingQueue] = useState(false);
   const [queueError, setQueueError] = useState<string | null>(null);
 
@@ -70,7 +66,8 @@ export function TripMusicCard({ provinceCode, provinceName }: Props) {
       setQueueError(t("emptyPlaylist"));
       return;
     }
-    setQueue({ playlistName: suggestion.playlistName, songs: result.data.songs });
+    // Hand the queue to the layout-level player, which survives navigation.
+    player.play(suggestion.playlistName, result.data.songs);
   }
 
   if (state.kind === "loading") return null;
@@ -123,13 +120,6 @@ export function TripMusicCard({ provinceCode, provinceName }: Props) {
           )}
         </CardContent>
       </Card>
-      {queue && (
-        <MiniPlayer
-          playlistName={queue.playlistName}
-          songs={queue.songs}
-          onClose={() => setQueue(null)}
-        />
-      )}
     </>
   );
 }

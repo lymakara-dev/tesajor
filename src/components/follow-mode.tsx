@@ -1,17 +1,69 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { completeAgendaItem } from "@/lib/actions/agenda-items";
 import type { DayRouteLeg } from "@/lib/actions/routing";
+import type { ItemVoiceClips } from "@/lib/actions/voice";
 import {
   etaSeconds,
   isOffRoute,
   nearestPointOnPolyline,
   remainingRouteMeters,
 } from "@/lib/routing/follow";
+import {
+  INITIAL_ARRIVAL_STATE,
+  updateArrival,
+  type ArrivalState,
+} from "@/lib/voice/arrival";
 import { directionsUrl, haversineDistanceMeters, type LatLng } from "@/lib/trips/geo";
 import { Button } from "@/components/ui/button";
-import { LocateFixed, Navigation, TriangleAlert } from "lucide-react";
+import { LocateFixed, Navigation, PartyPopper, TriangleAlert } from "lucide-react";
+
+/** Welcome audio: pre-generated clip → on-device Khmer/English speech →
+ * chime + vibration. Never throws — arrival must always at least show the
+ * banner. */
+function playWelcome(clipUrl: string | null, text: string, locale: string) {
+  try {
+    if (clipUrl) {
+      void new Audio(clipUrl).play().catch(() => playFallback(text, locale));
+      return;
+    }
+    playFallback(text, locale);
+  } catch {
+    // Even the fallback failed — the banner alone is the welcome.
+  }
+}
+
+function playFallback(text: string, locale: string) {
+  const lang = locale === "km" ? "km-KH" : "en-US";
+  const voices = window.speechSynthesis?.getVoices() ?? [];
+  if (voices.some((v) => v.lang.startsWith(lang.slice(0, 2)))) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    window.speechSynthesis.speak(utterance);
+  } else {
+    chime();
+  }
+  navigator.vibrate?.([200, 100, 200]);
+}
+
+function chime() {
+  try {
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.6);
+  } catch {
+    // No audio context — vibration/banner still happened.
+  }
+}
 
 export interface FollowStop {
   id: string;
@@ -29,6 +81,12 @@ interface Props {
   legs: DayRouteLeg[] | null;
   /** Lets the day map highlight the leg being traveled (null = none). */
   onCurrentLegChange?: (index: number | null) => void;
+  /** Pre-generated welcome/reminder clips per agenda item (TC-4). */
+  voiceClips?: Record<string, ItemVoiceClips>;
+  voiceEnabled?: boolean;
+  voiceLocale?: string;
+  /** Show the quest-completion button on the arrival banner. */
+  canComplete?: boolean;
 }
 
 /**
@@ -38,12 +96,26 @@ interface Props {
  * scope (see the trip-companion plan) — the Navigate button is the way to
  * actually drive a leg. All geometry comes from src/lib/routing/follow.ts.
  */
-export function FollowMode({ stops, legs, onCurrentLegChange }: Props) {
+export function FollowMode({
+  stops,
+  legs,
+  onCurrentLegChange,
+  voiceClips,
+  voiceEnabled = false,
+  voiceLocale = "km",
+  canComplete = false,
+}: Props) {
   const t = useTranslations("routing");
+  const tv = useTranslations("voice");
+  const router = useRouter();
   const [watching, setWatching] = useState(false);
   const [position, setPosition] = useState<LatLng | null>(null);
   const [geoError, setGeoError] = useState(false);
   const watchIdRef = useRef<number | null>(null);
+  const arrivalRef = useRef<ArrivalState>(INITIAL_ARRIVAL_STATE);
+  const [welcome, setWelcome] = useState<{ id: string; title: string } | null>(null);
+  const [completing, setCompleting] = useState(false);
+  const [completed, setCompleted] = useState(false);
 
   const nextStop = stops.find(
     (s): s is FollowStop & { lat: number; lng: number } =>
@@ -55,6 +127,41 @@ export function FollowMode({ stops, legs, onCurrentLegChange }: Props) {
   useEffect(() => {
     onCurrentLegChange?.(watching && legIndex >= 0 ? legIndex : null);
   }, [watching, legIndex, onCurrentLegChange]);
+
+  // Arrival welcome: dwell inside the 100 m radius for 10 s → banner + one
+  // spoken welcome (pure state machine in src/lib/voice/arrival.ts).
+  useEffect(() => {
+    if (!watching || !position || !nextStop) return;
+    const { state, fired } = updateArrival(arrivalRef.current, {
+      stopId: nextStop.id,
+      distanceMeters: haversineDistanceMeters(position, nextStop),
+      nowMs: Date.now(),
+    });
+    arrivalRef.current = state;
+    if (fired) {
+      setWelcome({ id: nextStop.id, title: nextStop.title });
+      setCompleted(false);
+      if (voiceEnabled) {
+        playWelcome(
+          voiceClips?.[nextStop.id]?.welcomeUrl ?? null,
+          tv("phraseWelcome", { place: nextStop.title }),
+          voiceLocale,
+        );
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watching, position, nextStop?.id]);
+
+  async function completeStop() {
+    if (!welcome) return;
+    setCompleting(true);
+    const result = await completeAgendaItem({ itemId: welcome.id });
+    setCompleting(false);
+    if (result.ok) {
+      setCompleted(true);
+      router.refresh();
+    }
+  }
 
   useEffect(() => {
     return () => {
@@ -70,6 +177,8 @@ export function FollowMode({ stops, legs, onCurrentLegChange }: Props) {
       watchIdRef.current = null;
       setWatching(false);
       setPosition(null);
+      setWelcome(null);
+      arrivalRef.current = INITIAL_ARRIVAL_STATE;
       return;
     }
     if (!navigator.geolocation) {
@@ -121,6 +230,21 @@ export function FollowMode({ stops, legs, onCurrentLegChange }: Props) {
       </Button>
 
       {geoError && <p className="text-sm text-muted-foreground">{t("geoDenied")}</p>}
+
+      {welcome && (
+        <div className="space-y-2 rounded-md border border-saffron bg-muted/40 p-3">
+          <p className="flex items-center gap-1.5 text-sm font-medium">
+            <PartyPopper className="size-4 shrink-0 text-saffron" strokeWidth={1.5} />
+            {tv("welcomeBanner", { place: welcome.title })}
+          </p>
+          {canComplete && !completed && (
+            <Button size="sm" disabled={completing} onClick={completeStop}>
+              {tv("completeStop")}
+            </Button>
+          )}
+          {completed && <p className="text-sm text-muted-foreground">{tv("completed")}</p>}
+        </div>
+      )}
 
       {watching && !nextStop && (
         <p className="text-sm text-muted-foreground">{t("dayComplete")}</p>

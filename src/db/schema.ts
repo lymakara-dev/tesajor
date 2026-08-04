@@ -34,6 +34,9 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash"),
   image: text("avatar_url"),
   defaultCurrency: text("default_currency").notNull().default("USD"),
+  // Trip voice companion (TC-4): spoken arrival welcomes & reminders.
+  voiceEnabled: boolean("voice_enabled").notNull().default(true),
+  voiceLocale: text("voice_locale").notNull().default("km"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -417,6 +420,27 @@ export const routeCache = pgTable(
     fetchedAt: timestamp("fetched_at").notNull().defaultNow(),
   },
   (t) => [unique().on(t.fromLat, t.fromLng, t.toLat, t.toLng, t.profile)],
+);
+
+// Pre-generated TTS audio for trip stops (Trip Companion TC-4). Clips are
+// generated once per (stop, kind, locale, phrase text) and played from
+// cache at the trigger moment — rural connectivity at arrival time is
+// exactly when live TTS would fail (ADR-0010). `text_hash` keys the phrase
+// content, so renaming a stop back and forth never regenerates.
+export const voiceClips = pgTable(
+  "voice_clips",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    agendaItemId: uuid("agenda_item_id")
+      .notNull()
+      .references(() => agendaItems.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull(), // welcome | reminder
+    locale: text("locale").notNull(), // en | km
+    textHash: text("text_hash").notNull(),
+    audioUrl: text("audio_url").notNull(),
+    generatedAt: timestamp("generated_at").notNull().defaultNow(),
+  },
+  (t) => [unique().on(t.agendaItemId, t.kind, t.locale, t.textHash)],
 );
 
 // A user's linked Navidrome (Subsonic-compatible) music server. Stores only

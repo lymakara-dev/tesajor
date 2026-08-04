@@ -487,5 +487,20 @@
     "geoDenied": "ការចូលប្រើទីតាំងត្រូវបានបិទ — អនុញ្ញាតវាដើម្បីតាមដានផ្លូវ។",
     "locating": "កំពុងស្វែងរកទីតាំងរបស់អ្នក...",
     "dayComplete": "ចំណតទាំងអស់សម្រាប់ថ្ងៃនេះបានបញ្ចប់ហើយ។"
+  },
+  "voice": {
+    "phraseWelcome": "សូមស្វាគមន៍មកកាន់ {place}",
+    "phraseReminder": "១៥ នាទីទៀត ទៅ {place}",
+    "settingsTitle": "សំឡេងដំណើរកម្សាន្ត",
+    "settingsHint": "សំឡេងស្វាគមន៍នៅពេលអ្នកមកដល់ចំណត និងការរំលឹកមុនចំណតដែលបានកំណត់ពេល។",
+    "enabled": "សំឡេងដំណើរ",
+    "voiceLocale": "ភាសាសំឡេង",
+    "localeKm": "ខ្មែរ (Khmer)",
+    "localeEn": "English",
+    "saved": "បានរក្សាទុក",
+    "welcomeBanner": "សូមស្វាគមន៍មកកាន់ {place}!",
+    "completeStop": "ចុះឈ្មោះ ✓",
+    "completed": "បានចុះឈ្មោះ",
+    "reminderToast": "១៥ នាទីទៀត ទៅ {place}"
   }
 }

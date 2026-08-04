@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 import { getDayRoutes, type DayRouteLeg } from "@/lib/actions/routing";
+import { getVoiceClips, type ItemVoiceClips } from "@/lib/actions/voice";
 import { directionsUrl } from "@/lib/trips/geo";
 import { FollowMode, type FollowStop } from "@/components/follow-mode";
 
@@ -74,10 +75,14 @@ export function TripDayMap({
   stops,
   tripId,
   dayNumber,
+  canComplete = false,
+  voiceLocale = "km",
 }: {
   stops: MapStop[];
   tripId?: string;
   dayNumber?: number;
+  canComplete?: boolean;
+  voiceLocale?: string;
 }) {
   const t = useTranslations("routing");
   const mapDivRef = useRef<HTMLDivElement>(null);
@@ -87,6 +92,10 @@ export function TripDayMap({
   const [loadError, setLoadError] = useState(false);
   const [legs, setLegs] = useState<DayRouteLeg[] | null>(null);
   const [currentLeg, setCurrentLeg] = useState<number | null>(null);
+  const [voice, setVoice] = useState<{
+    enabled: boolean;
+    clips: Record<string, ItemVoiceClips>;
+  } | null>(null);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
@@ -103,6 +112,23 @@ export function TripDayMap({
       })
       .catch(() => {
         // Roads are decoration — the straight polyline stays.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [tripId, dayNumber, pinned.length]);
+
+  // Preload the day's welcome clips so the arrival moment needs no
+  // connectivity (they're generated server-side on first request).
+  useEffect(() => {
+    if (!tripId || !dayNumber || pinned.length === 0) return;
+    let cancelled = false;
+    getVoiceClips({ tripId, dayNumber })
+      .then((result) => {
+        if (!cancelled && result.ok) setVoice(result.data);
+      })
+      .catch(() => {
+        // Silent mode — the arrival banner still works without clips.
       });
     return () => {
       cancelled = true;
@@ -228,7 +254,15 @@ export function TripDayMap({
   );
 
   const follow = pinned.length > 0 && (
-    <FollowMode stops={stops as FollowStop[]} legs={legs} onCurrentLegChange={setCurrentLeg} />
+    <FollowMode
+      stops={stops as FollowStop[]}
+      legs={legs}
+      onCurrentLegChange={setCurrentLeg}
+      voiceClips={voice?.clips}
+      voiceEnabled={voice?.enabled ?? false}
+      voiceLocale={voiceLocale}
+      canComplete={canComplete}
+    />
   );
 
   if (!MAPS_KEY) {

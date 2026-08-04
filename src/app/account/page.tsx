@@ -11,6 +11,7 @@ import { DeleteAccountForm } from "@/components/delete-account-form";
 import { TelegramConnectCard } from "@/components/telegram-connect-card";
 import { PaymentMethodsCard } from "@/components/payment-methods-card";
 import { MusicServerCard } from "@/components/music-server-card";
+import { VoiceSettingsCard } from "@/components/voice-settings-card";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 import type { Locale } from "@/i18n/config";
@@ -100,6 +101,11 @@ export default async function AccountPage() {
           paymentLink: m.paymentLink,
           isDefault: m.isDefault,
         }))}
+      />
+
+      <VoiceSettingsCard
+        enabled={me?.voiceEnabled ?? true}
+        locale={me?.voiceLocale ?? "km"}
       />
 
       <MusicServerCard

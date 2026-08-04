@@ -44,10 +44,10 @@ server returns. Every server action parses its input with a Zod schema from
 src/
   app/          routes (RSC pages, layouts, API route handlers)
   components/   feature components + components/ui (shadcn primitives)
-  db/           schema.ts (Drizzle, 26 tables / 7 enums), index.ts, seed.ts
+  db/           schema.ts (Drizzle, 27 tables / 7 enums), index.ts, seed.ts
   i18n/         next-intl config (locales: en, km)
   lib/
-    actions/    17 server-action files — the ONLY mutation entry points
+    actions/    18 server-action files — the ONLY mutation entry points
     validation/ Zod schemas, one file per action domain
     queries/    read-side helpers (balances, trip achievements, trending places)
     money/      cents math, USD↔KHR conversion, currency formatting
@@ -59,6 +59,7 @@ src/
     places/     Overpass essentials search, cache cells, trending ranking
     music/      Subsonic (Navidrome) client + province→playlist suggestion
     routing/    road routes (OpenRouteService) + Follow-mode geometry
+    voice/      TTS phrases/providers + arrival debounce (Khmer companion)
     telegram/   HMAC verify, webhook parsing, per-debtor amounts, bot client
     upload/     client-side image compression
     auth.ts     Auth.js config · rate-limit.ts · cloudinary.ts
@@ -110,6 +111,12 @@ src/
   thin fetcher; optional `OPENROUTESERVICE_API_KEY`, unset → straight
   polylines — ADR-0009), `follow.ts` (nearest-point-on-polyline, remaining
   distance, ETA, 200 m off-route detection for Follow mode).
+- **`voice/`** — `phrases.ts` (welcome/reminder text from message-file
+  templates + content hash), `tts.ts` (Azure/Google Khmer TTS behind one
+  interface, env-selected, both optional — ADR-0010), `arrival.ts` (pure
+  100 m / 10 s dwell state machine feeding the arrival welcome). Clips are
+  pre-generated server-side and cached in `voice_clips`; the client
+  degrades clip → on-device speech → chime + banner.
 - **`telegram/`** — `verify.ts` (Login Widget HMAC-SHA256 check with the bot
   token, stale `auth_date` rejection), `webhook.ts` (pure update→intent
   parsing), `amounts.ts` (per-debtor amounts from simplified balances),
@@ -117,12 +124,12 @@ src/
   button creates a *pending claim*; only the requester's in-app confirmation
   records a real settlement.
 
-Each of these has a co-located `*.test.ts` (22 files, 230 cases). This is
+Each of these has a co-located `*.test.ts` (25 files, 249 cases). This is
 deliberate: the pure modules are the product; the UI is replaceable.
 
 ## Data model
 
-All 26 tables live in `src/db/schema.ts`; migrations are generated SQL in
+All 27 tables live in `src/db/schema.ts`; migrations are generated SQL in
 `drizzle/`. Grouped by domain:
 
 | Domain | Tables |
@@ -135,6 +142,7 @@ All 26 tables live in `src/db/schema.ts`; migrations are generated SQL in
 | Places (Explore) | `place_cache` (cached Overpass results per grid cell + category, 7-day TTL at read time) |
 | Music | `music_accounts` (Subsonic salt+token, never passwords — ADR-0008), `province_playlists` (explicit province→playlist choices) |
 | Routing | `route_cache` (road legs keyed on ~10 m-rounded coords + profile, no TTL — ADR-0009) |
+| Voice | `voice_clips` (pre-generated TTS audio per stop/kind/locale/text-hash — ADR-0010) |
 
 Design points worth knowing before touching the schema:
 

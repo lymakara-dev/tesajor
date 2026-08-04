@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { agendaItems, trips, achievements, musicAccounts } from "@/db/schema";
+import { agendaItems, trips, achievements, musicAccounts, users } from "@/db/schema";
 import { provinceForPoint } from "@/lib/geo/provinces";
 import { dominantProvince } from "@/lib/music/suggest";
 import { getTripRole } from "@/lib/actions/trip-membership";
@@ -24,6 +24,7 @@ import { YouAreHere } from "@/components/you-are-here";
 import { TripDayMap } from "@/components/trip-day-map";
 import { TripProgressCard } from "@/components/trip-progress-card";
 import { TripMusicCard } from "@/components/trip-music-card";
+import { TripReminders } from "@/components/trip-reminders";
 import { TripCompleteCelebration } from "@/components/trip-complete-celebration";
 import { TripCountdown } from "@/components/trip-countdown";
 import { ExchangeRateSettings } from "@/components/exchange-rate-settings";
@@ -70,6 +71,20 @@ export default async function TripPage({
     : null;
   const locale = await getLocale();
 
+  const [voicePrefs] = await db
+    .select({ voiceLocale: users.voiceLocale })
+    .from(users)
+    .where(eq(users.id, session.user.id))
+    .limit(1);
+
+  // In-app spoken reminders only matter for the day the trip is actually
+  // on right now.
+  const todayDay = dayOffsetBetween(trip.startDate, new Date()) + 1;
+  const todayItems =
+    todayDay >= 1 && todayDay <= dayCount
+      ? items.filter((i) => i.dayNumber === todayDay)
+      : [];
+
   const userAchievements = await db
     .select({ key: achievements.key })
     .from(achievements)
@@ -106,6 +121,19 @@ export default async function TripPage({
       {tripProgress.total > 0 && tripProgress.percent === 100 && <TripCompleteCelebration />}
 
       <TripCountdown startDate={trip.startDate} endDate={trip.endDate} />
+
+      {todayItems.length > 0 && (
+        <TripReminders
+          tripId={id}
+          dayNumber={todayDay}
+          items={todayItems.map((i) => ({
+            id: i.id,
+            title: i.title,
+            status: i.status,
+            plannedStart: i.plannedStart,
+          }))}
+        />
+      )}
 
       {tripProvince && (
         <TripMusicCard
@@ -179,7 +207,13 @@ export default async function TripPage({
                 <p className="text-sm text-muted-foreground">{t("noStopsYet")}</p>
               )}
               {dayItems.length > 0 && (
-                <TripDayMap stops={dayItems} tripId={id} dayNumber={day} />
+                <TripDayMap
+                  stops={dayItems}
+                  tripId={id}
+                  dayNumber={day}
+                  canComplete={canEditTrip(role)}
+                  voiceLocale={voicePrefs?.voiceLocale ?? "km"}
+                />
               )}
               {dayItems.map((item) => (
                 <AgendaItemRow

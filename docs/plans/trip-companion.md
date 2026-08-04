@@ -1,6 +1,6 @@
 # Feature Plan: Trip Companion
 
-> **Status**: TC-1/2/3 ✅ Shipped · TC-4 📝 Planned · tracked on the
+> **Status**: TC-1/2/3/4 ✅ Shipped · tracked on the
 > [board](./README.md) · last updated 2026-08-04
 
 Design for four connected features that turn the Trip Agenda from a
@@ -277,7 +277,7 @@ guard as payment requests.
 | **TC-1 Explore** | ✅ Shipped | Province geo module, Overpass essentials + cache, trending from templates, Explore tab | `place_cache` table | Overpass (free, no key) |
 | **TC-2 Music** | ✅ Shipped | Navidrome linking, province→playlist mapping, suggestions, mini-player | `music_accounts`, `province_playlists` | Owner's Navidrome via HTTPS tunnel |
 | **TC-3 Routing** | ✅ Shipped | `routing/` provider + cache, road polylines on day map, Follow mode | `route_cache` table, `OPENROUTESERVICE_API_KEY` (optional) | OpenRouteService free tier (or self-hosted OSRM) |
-| **TC-4 Voice** | 📝 Planned | Khmer TTS clips (pre-generated), arrival welcome + spoken/Telegram reminders, voice settings | `voice_clips` table, `TTS_PROVIDER`/`TTS_API_KEY` (optional) | Azure/Google TTS free tier; existing Telegram bot |
+| **TC-4 Voice** | ✅ Shipped | Khmer TTS clips (pre-generated), arrival welcome + spoken in-app reminders, voice settings (Telegram reminders → Improvements) | `voice_clips` table, `TTS_PROVIDER`/`TTS_API_KEY` (optional) | Azure/Google TTS free tier |
 
 When a phase's status changes, update it here **and** on the
 [board](./README.md) in the same PR.
@@ -311,11 +311,12 @@ implementation starts: "Overpass over Google Places for essentials"
 3. **TC-1**: ~~minimum sample size before "Trending" shows~~ — decided:
    ≥3 distinct public trips referencing a place (default in
    `src/lib/places/trending.ts`).
-4. **TC-4**: TTS provider bake-off — generate the same welcome phrase
-   with Azure `km-KH` neural and Google Cloud TTS Khmer (if available),
-   have a native speaker pick; confirm current pricing/free tiers. Also:
-   should the welcome use the stop's Khmer name when the place has one
-   (OSM `name:km` tag, available via TC-1's Overpass data)?
+4. **TC-4**: ~~TTS provider bake-off~~ — settled by configuration
+   ([ADR-0010](../adr/0010-pregenerated-voice-clips.md)): both Azure and
+   Google drivers ship behind `TTS_PROVIDER`/`TTS_API_KEY`; point the env
+   at either, generate the same phrase, and let a native speaker pick.
+   Still open (moved to Improvements): the stop's OSM `name:km` for the
+   welcome phrase.
 
 ## Improvements (post-ship follow-ups land here)
 
@@ -365,6 +366,23 @@ From TC-3 (shipped 2026-08-04):
   real key before relying on it on the road.
 - **Playwright spec for the routing flow** — needs a geolocation mock and
   an ORS stub, same shape as the pending Explore/music specs.
+
+From TC-4 (shipped 2026-08-04):
+
+- **Telegram voice reminders when the app is closed** — the plan's
+  `sendVoice`-via-bot path needs the cron/job-runner prerequisite
+  (Vercel cron MVP, or the Inngest/QStash upgrade SCALING.md plans — the
+  same prerequisite as Telegram batch sends moving off-request). In-app
+  reminders shipped; this is the missing delivery channel.
+- **Native-speaker TTS bake-off** — both drivers are built and unit-tested
+  against documented request/response shapes, but neither ran against a
+  live key; set `TTS_PROVIDER`+`TTS_API_KEY` for each, generate the same
+  phrase, and have a native speaker pick (open question 4).
+- **Khmer place names in welcomes** — use OSM `name:km` (available via
+  TC-1's Overpass data) instead of the stop's typed title when present.
+- **"Fire once per stop per day" across sessions** — arrival fire-once
+  state is per page session; persisting fired stops (localStorage or DB)
+  would survive a page reload mid-visit.
 
 Already-known candidates: AudioMuse-AI mood playlists (TC-2), Media
 Session lock-screen controls (TC-2), self-hosted OSRM + moto profile

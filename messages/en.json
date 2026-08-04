@@ -487,5 +487,20 @@
     "geoDenied": "Location access is off — allow it to follow along the route.",
     "locating": "Finding your position...",
     "dayComplete": "Every stop for this day is done."
+  },
+  "voice": {
+    "phraseWelcome": "Welcome to {place}",
+    "phraseReminder": "15 minutes until {place}",
+    "settingsTitle": "Trip voice",
+    "settingsHint": "Spoken welcome when you arrive at a stop, and a spoken reminder before scheduled stops.",
+    "enabled": "Voice companion",
+    "voiceLocale": "Voice language",
+    "localeKm": "ខ្មែរ (Khmer)",
+    "localeEn": "English",
+    "saved": "Saved",
+    "welcomeBanner": "Welcome to {place}!",
+    "completeStop": "Check in ✓",
+    "completed": "Checked in",
+    "reminderToast": "15 minutes until {place}"
   }
 }

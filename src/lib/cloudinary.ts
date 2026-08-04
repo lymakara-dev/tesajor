@@ -21,9 +21,19 @@ if (isCloudinaryConfigured) {
  * bytes) before this is called. Returns the CDN's https secure_url.
  */
 export function uploadToCloudinary(bytes: Buffer): Promise<string> {
+  return uploadStream(bytes, "image");
+}
+
+/** Same contract for server-generated audio (TTS voice clips) — Cloudinary
+ * files audio under resource_type "video". */
+export function uploadAudioToCloudinary(bytes: Buffer): Promise<string> {
+  return uploadStream(bytes, "video");
+}
+
+function uploadStream(bytes: Buffer, resourceType: "image" | "video"): Promise<string> {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { folder: "tesajor-uploads", resource_type: "image" },
+      { folder: "tesajor-uploads", resource_type: resourceType },
       (error, result) => {
         if (error || !result) {
           reject(error ?? new Error("Cloudinary upload returned no result."));

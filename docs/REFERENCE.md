@@ -32,6 +32,7 @@ Drizzle, and (for group data) writes an `activity_log` row. Most return an
 | `places.ts` | `getNearbyPlaces` | Explore tab essentials: cache-first Overpass (OSM) nearby search per grid cell + category, distance-sorted; session-only (no group data touched), rate-limited 30/user/5 min |
 | `music.ts` | `linkMusicAccount`, `unlinkMusicAccount`, `getMyPlaylists`, `setProvincePlaylist`, `clearProvincePlaylist`, `getMusicSuggestion`, `getPlaylistQueue` | Navidrome/Subsonic linking (ping-verified; stores salt+token, never the password — ADR-0008), province→playlist mappings, trip-day playlist suggestion, ready-to-play stream queues; link attempts rate-limited 5/user/5 min |
 | `routing.ts` | `getDayRoutes` | Road routes between a day's stops: trip-access-checked, cache-first (`route_cache`, no TTL), ORS fetch per missed leg; `legs: null` when `OPENROUTESERVICE_API_KEY` unset (map keeps straight lines); rate-limited 30/user/5 min |
+| `voice.ts` | `getVoiceClips`, `setVoicePreferences` | Trip voice companion: per-day clip preload with cache-first generation (`voice_clips` by text hash; skipped without `TTS_PROVIDER`/`TTS_API_KEY`; ≤20 clips/call, rate-limited 60/user/5 min) and per-user voice on/off + locale |
 | `locale.ts` | `setLocale` | Persist the en/km locale choice |
 
 ## API routes (`src/app/api/`)
@@ -111,6 +112,12 @@ noted. Cascade deletes follow ownership (group → its expenses, etc.).
 | Table | Key columns | Notes |
 |---|---|---|
 | `route_cache` | `from_lat`/`from_lng`/`to_lat`/`to_lng` (rounded ~10 m), `profile`, `polyline` (jsonb `{lat,lng}[]`), `distance_meters`, `duration_sec`, unique (coords, `profile`) | Road legs between agenda stops (ADR-0009); no TTL — routes between fixed points are static, quota only spent per edited leg |
+
+### Voice (Trip Companion)
+
+| Table | Key columns | Notes |
+|---|---|---|
+| `voice_clips` | `agenda_item_id` (cascade), `kind` (welcome\|reminder), `locale` (en\|km), `text_hash`, `audio_url`, unique (item, kind, locale, hash) | Pre-generated TTS clips (ADR-0010); hash keys phrase content so renames back-and-forth reuse clips. Per-user prefs live on `users.voice_enabled` / `users.voice_locale` (default km) |
 
 ### Enums (7)
 

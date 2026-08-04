@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
@@ -23,7 +24,8 @@ import { TripProgressCard } from "@/components/trip-progress-card";
 import { TripCompleteCelebration } from "@/components/trip-complete-celebration";
 import { TripCountdown } from "@/components/trip-countdown";
 import { ExchangeRateSettings } from "@/components/exchange-rate-settings";
-import { MapPin } from "lucide-react";
+import { Compass, MapPin } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
 
 export default async function TripPage({
   params,
@@ -72,6 +74,14 @@ export default async function TripPage({
           <CloneTripButton tripId={id} />
         )}
       </div>
+
+      <Link
+        href={`/trips/${id}/explore`}
+        className={buttonVariants({ variant: "outline", size: "sm" })}
+      >
+        <Compass className="size-4 text-mekong" strokeWidth={1.5} />
+        {t("exploreNearby")}
+      </Link>
 
       {tripProgress.total > 0 && tripProgress.percent === 100 && <TripCompleteCelebration />}
 

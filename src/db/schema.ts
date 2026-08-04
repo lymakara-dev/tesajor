@@ -379,6 +379,24 @@ export const itemNotes = pgTable("item_notes", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Cached Overpass (OpenStreetMap) results for the Explore tab's essentials
+// search. `cell` is a ~0.02° grid key (src/lib/places/cache-cell.ts) so every
+// position inside a cell shares one cached response per category. Rows are
+// derived public OSM data (no user data); a ~7-day TTL is enforced at read
+// time in the getNearbyPlaces action, and stale rows are overwritten in
+// place. Readable by any signed-in user.
+export const placeCache = pgTable(
+  "place_cache",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    cell: text("cell").notNull(),
+    category: text("category").notNull(),
+    resultsJson: jsonb("results_json").notNull(),
+    fetchedAt: timestamp("fetched_at").notNull().defaultNow(),
+  },
+  (t) => [unique().on(t.cell, t.category)],
+);
+
 export const achievements = pgTable(
   "achievements",
   {

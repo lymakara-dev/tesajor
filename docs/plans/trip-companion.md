@@ -1,6 +1,6 @@
 # Feature Plan: Trip Companion
 
-> **Status**: 📝 Planned (all phases) · tracked on the
+> **Status**: TC-1 ✅ Shipped · TC-2/3/4 📝 Planned · tracked on the
 > [board](./README.md) · last updated 2026-07-31
 
 Design for four connected features that turn the Trip Agenda from a
@@ -274,7 +274,7 @@ guard as payment requests.
 
 | Phase | Status | Contents | New env/schema | External dependency |
 |---|---|---|---|---|
-| **TC-1 Explore** | 📝 Planned | Province geo module, Overpass essentials + cache, trending from templates, Explore tab | `place_cache` table | Overpass (free, no key) |
+| **TC-1 Explore** | ✅ Shipped | Province geo module, Overpass essentials + cache, trending from templates, Explore tab | `place_cache` table | Overpass (free, no key) |
 | **TC-2 Music** | 📝 Planned | Navidrome linking, province→playlist mapping, suggestions, mini-player | `music_accounts`, `province_playlists` | Owner's Navidrome via HTTPS tunnel |
 | **TC-3 Routing** | 📝 Planned | `routing/` provider + cache, road polylines on day map, Follow mode | `route_cache` table, `OPENROUTESERVICE_API_KEY` (optional) | OpenRouteService free tier (or self-hosted OSRM) |
 | **TC-4 Voice** | 📝 Planned | Khmer TTS clips (pre-generated), arrival welcome + spoken/Telegram reminders, voice settings | `voice_clips` table, `TTS_PROVIDER`/`TTS_API_KEY` (optional) | Azure/Google TTS free tier; existing Telegram bot |
@@ -292,7 +292,8 @@ bot and a cron).
 Each phase follows the playbooks (schema → pure module + tests → server
 action → UI with en/km strings) and ends with the standard verification
 plus a Playwright spec for its main flow. ADRs to write when
-implementation starts: "Overpass over Google Places for essentials",
+implementation starts: "Overpass over Google Places for essentials"
+(✅ [ADR-0007](../adr/0007-overpass-over-google-places.md)),
 "Subsonic salt+token storage (no passwords)", "OpenRouteService with
 provider abstraction".
 
@@ -305,8 +306,9 @@ provider abstraction".
 2. **TC-3**: motorbike routing matters in Cambodia — ORS/OSRM support a
    `driving-car` vs. cycling profile, but true moto routing may need a
    custom OSRM profile. MVP ships `driving-car` only.
-3. **TC-1**: minimum sample size before "Trending" shows (suggest: ≥3
-   distinct public trips referencing a place).
+3. **TC-1**: ~~minimum sample size before "Trending" shows~~ — decided:
+   ≥3 distinct public trips referencing a place (default in
+   `src/lib/places/trending.ts`).
 4. **TC-4**: TTS provider bake-off — generate the same welcome phrase
    with Azure `km-KH` neural and Google Cloud TTS Khmer (if available),
    have a native speaker pick; confirm current pricing/free tiers. Also:
@@ -315,8 +317,27 @@ provider abstraction".
 
 ## Improvements (post-ship follow-ups land here)
 
-*Empty until a phase ships. Add items instead of opening a new plan doc;
-set the board row to 🔁 while working on one.*
+*Add items instead of opening a new plan doc; set the board row to 🔁
+while working on one.*
+
+From TC-1 (shipped 2026-07-31):
+
+- **Playwright spec for the Explore flow** — TC-1 shipped with 36 unit
+  tests over the pure modules but no e2e spec yet (the flow needs a
+  geolocation mock + an Overpass stub to be deterministic).
+- **Shared province borders** — `provinces-data.ts` simplifies each
+  province independently (geoBoundaries KHM ADM1, Douglas-Peucker
+  0.002°, ~145 KB), so adjacent borders have slivers; `provinceForPoint`
+  papers over them with a 2 km boundary snap. A topology-aware simplify
+  (shared arcs, TopoJSON-style) would remove the snap heuristic.
+- **Overpass resilience** — single endpoint (`overpass-api.de`) today;
+  add a mirror fallback (e.g. `overpass.kumi.systems`) and/or request
+  coalescing so concurrent cache misses for the same cell+category make
+  one flight.
+- **Trending province filter at query time** — trending currently ranks
+  all public-template stops and filters by province in the page; fine at
+  current scale, but a `province_code` column on `agenda_items` (filled
+  on write via `provinceForPoint`) would let the DB do it.
 
 Already-known candidates: AudioMuse-AI mood playlists (TC-2), Media
 Session lock-screen controls (TC-2), self-hosted OSRM + moto profile

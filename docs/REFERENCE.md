@@ -29,6 +29,7 @@ Drizzle, and (for group data) writes an `activity_log` row. Most return an
 | `trip-membership.ts` | `getTripRole` | Shared role lookup used by trip actions |
 | `agenda-items.ts` | `addAgendaItem`, `updateAgendaItem`, `reorderAgendaItems`, `completeAgendaItem`, `skipAgendaItem`, `resetAgendaItem` | Agenda CRUD + drag-and-drop ordering + quest completion (server-side XP/achievements) |
 | `item-notes.ts` | `addItemNote` | Stop journals: mood 1–5, text, tags, photos, actual cost |
+| `places.ts` | `getNearbyPlaces` | Explore tab essentials: cache-first Overpass (OSM) nearby search per grid cell + category, distance-sorted; session-only (no group data touched), rate-limited 30/user/5 min |
 | `locale.ts` | `setLocale` | Persist the en/km locale choice |
 
 ## API routes (`src/app/api/`)
@@ -89,6 +90,12 @@ noted. Cascade deletes follow ownership (group → its expenses, etc.).
 | `agenda_items` | `day_number`, `sort_order`, `category`, `planned_cost_cents`, `place_id`/`lat`/`lng`, `status` (`todo\|done\|skipped`), `completed_by` | Google place fields optional (manual stops allowed) |
 | `item_notes` | `mood` (1–5), `tags[]`, `actual_cost_cents`, `photo_urls[]` | A noted cost can be converted to a group expense in one tap |
 | `achievements` | `key`, unique (`user_id`, `key`) | Keys defined in `src/lib/quests/achievements.ts` |
+
+### Places (Explore)
+
+| Table | Key columns | Notes |
+|---|---|---|
+| `place_cache` | `cell`, `category`, `results_json` (jsonb), `fetched_at`, unique (`cell`, `category`) | Cached Overpass responses per ~0.02° grid cell (`src/lib/places/cache-cell.ts`); ~7-day TTL enforced at read time in `getNearbyPlaces`; public OSM data, no user data |
 
 ### Enums (7)
 

@@ -129,7 +129,38 @@
     "noUpcomingStop": "No upcoming stops with a location to navigate to.",
     "locationError": "Couldn't get your location — check your browser's location permission.",
     "nearestUpcomingStop": "Nearest upcoming stop:",
-    "metersAway": "({distance}m away)"
+    "metersAway": "({distance}m away)",
+    "exploreNearby": "Explore nearby"
+  },
+  "explore": {
+    "title": "Explore nearby",
+    "backToTrip": "Back to trip",
+    "essentialsTitle": "Trip essentials",
+    "categories": {
+      "toilets": "Toilets",
+      "parking": "Parking",
+      "food": "Food",
+      "market": "Market",
+      "fuel": "Fuel",
+      "atm": "ATM",
+      "pharmacy": "Pharmacy"
+    },
+    "searchHint": "Pick a category to see what's nearby.",
+    "usingNextStopLocation": "Showing results around your next stop — allow location access for results near you.",
+    "noLocation": "No location to search around — allow location access, or add a stop with a place to this trip.",
+    "searching": "Searching nearby...",
+    "empty": "Nothing found within 2 km.",
+    "unnamedPlace": "Unnamed place",
+    "distanceM": "{distance} m",
+    "distanceKm": "{distance} km",
+    "navigate": "Navigate",
+    "addToAgenda": "Add to agenda",
+    "adding": "Adding...",
+    "added": "Added",
+    "trendingTitle": "Popular with other travelers",
+    "trendingIn": "Popular in {province}",
+    "usedByTrips": "In {count} public trips",
+    "osmAttribution": "Data © OpenStreetMap contributors"
   },
   "share": {
     "sharing": "Sharing",
@@ -354,7 +385,8 @@
     ],
     "copyright": "© {year} Tesajor",
     "terms": "Terms",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "osmCredit": "Map data © OpenStreetMap contributors"
   },
   "createGroupForm": {
     "title": "New group",

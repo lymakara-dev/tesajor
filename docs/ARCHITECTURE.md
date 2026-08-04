@@ -44,17 +44,19 @@ server returns. Every server action parses its input with a Zod schema from
 src/
   app/          routes (RSC pages, layouts, API route handlers)
   components/   feature components + components/ui (shadcn primitives)
-  db/           schema.ts (Drizzle, 22 tables / 7 enums), index.ts, seed.ts
+  db/           schema.ts (Drizzle, 23 tables / 7 enums), index.ts, seed.ts
   i18n/         next-intl config (locales: en, km)
   lib/
-    actions/    14 server-action files — the ONLY mutation entry points
+    actions/    15 server-action files — the ONLY mutation entry points
     validation/ Zod schemas, one file per action domain
-    queries/    read-side helpers (balances, trip achievements)
+    queries/    read-side helpers (balances, trip achievements, trending places)
     money/      cents math, USD↔KHR conversion, currency formatting
     splits/     expense splitting: equal | exact | percent | shares | itemized
     balances/   net balances + greedy debt simplification
     quests/     trip gamification: XP, progress, achievement rules
     trips/      trip permissions, template cloning, geo helpers
+    geo/        Cambodian province detection (bundled OSM-derived polygons)
+    places/     Overpass essentials search, cache cells, trending ranking
     telegram/   HMAC verify, webhook parsing, per-debtor amounts, bot client
     upload/     client-side image compression
     auth.ts     Auth.js config · rate-limit.ts · cloudinary.ts
@@ -85,6 +87,17 @@ src/
   start date, strips journals, records `cloned_from_trip_id`), `geo.ts`
   (haversine distance, nearest-upcoming-stop, universal Google Maps
   directions URL — the latter two need no API key).
+- **`geo/`** — `provinces.ts`: `provinceForPoint(lat, lng)` over bundled,
+  simplified geoBoundaries KHM ADM1 polygons (`provinces-data.ts`,
+  OSM-derived, ODbL — "© OpenStreetMap contributors" credited in the app
+  footer). Ray-casting point-in-polygon with hole support (Phnom Penh is a
+  hole in Kandal) and a 2 km border-sliver snap; returns en + km province
+  names, null outside Cambodia.
+- **`places/`** — `overpass.ts` (pure Overpass QL builder + response
+  normalizer for the essentials categories, thin fetcher), `cache-cell.ts`
+  (~0.02° grid keys for `place_cache`), `trending.ts` (distinct-trip count
+  with recency decay over public-template agenda items; hides places below
+  3 distinct trips). See ADR-0007.
 - **`telegram/`** — `verify.ts` (Login Widget HMAC-SHA256 check with the bot
   token, stale `auth_date` rejection), `webhook.ts` (pure update→intent
   parsing), `amounts.ts` (per-debtor amounts from simplified balances),
@@ -92,12 +105,12 @@ src/
   button creates a *pending claim*; only the requester's in-app confirmation
   records a real settlement.
 
-Each of these has a co-located `*.test.ts` (14 files, 155 cases). This is
+Each of these has a co-located `*.test.ts` (18 files, 191 cases). This is
 deliberate: the pure modules are the product; the UI is replaceable.
 
 ## Data model
 
-All 22 tables live in `src/db/schema.ts`; migrations are generated SQL in
+All 23 tables live in `src/db/schema.ts`; migrations are generated SQL in
 `drizzle/`. Grouped by domain:
 
 | Domain | Tables |
@@ -107,6 +120,7 @@ All 22 tables live in `src/db/schema.ts`; migrations are generated SQL in
 | Settlement & audit | `settlements`, `activity_log` |
 | Telegram | `telegram_accounts`, `telegram_link_tokens`, `payment_methods`, `payment_requests` |
 | Trips | `trips`, `trip_members`, `agenda_items`, `item_notes`, `achievements` |
+| Places (Explore) | `place_cache` (cached Overpass results per grid cell + category, 7-day TTL at read time) |
 
 Design points worth knowing before touching the schema:
 

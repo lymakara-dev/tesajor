@@ -47,16 +47,20 @@ export async function MarketingLanding() {
       </section>
 
       <footer className="border-t">
-        <div className="mx-auto flex max-w-[480px] flex-wrap items-center justify-between gap-2 px-4 py-6 text-sm text-muted-foreground">
-          <span>{t("copyright", { year: new Date().getFullYear() })}</span>
-          <div className="flex gap-4">
-            <Link href="/terms" className="underline">
-              {t("terms")}
-            </Link>
-            <Link href="/privacy" className="underline">
-              {t("privacy")}
-            </Link>
+        <div className="mx-auto max-w-[480px] space-y-2 px-4 py-6 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span>{t("copyright", { year: new Date().getFullYear() })}</span>
+            <div className="flex gap-4">
+              <Link href="/terms" className="underline">
+                {t("terms")}
+              </Link>
+              <Link href="/privacy" className="underline">
+                {t("privacy")}
+              </Link>
+            </div>
           </div>
+          {/* Province boundaries + places data are OSM-derived (ODbL) — attribution required. */}
+          <p className="text-xs">{t("osmCredit")}</p>
         </div>
       </footer>
     </div>

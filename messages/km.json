@@ -129,7 +129,38 @@
     "noUpcomingStop": "គ្មានចំណតបន្ទាប់ដែលមានទីតាំងសម្រាប់នាំផ្លូវទេ។",
     "locationError": "មិនអាចទទួលបានទីតាំងរបស់អ្នកទេ — សូមពិនិត្យសិទ្ធិទីតាំងរបស់កម្មវិធីរុករក។",
     "nearestUpcomingStop": "ចំណតបន្ទាប់ដែលនៅជិតបំផុត៖",
-    "metersAway": "(ចម្ងាយ {distance}ម)"
+    "metersAway": "(ចម្ងាយ {distance}ម)",
+    "exploreNearby": "រុករកជុំវិញ"
+  },
+  "explore": {
+    "title": "រុករកជុំវិញ",
+    "backToTrip": "ត្រឡប់ទៅដំណើរកម្សាន្ត",
+    "essentialsTitle": "កន្លែងចាំបាច់ក្នុងដំណើរ",
+    "categories": {
+      "toilets": "បង្គន់",
+      "parking": "ចំណតរថយន្ត",
+      "food": "អាហារ",
+      "market": "ផ្សារ",
+      "fuel": "ស្ថានីយប្រេង",
+      "atm": "ATM",
+      "pharmacy": "ឱសថស្ថាន"
+    },
+    "searchHint": "ជ្រើសរើសប្រភេទ ដើម្បីមើលកន្លែងនៅជិត។",
+    "usingNextStopLocation": "កំពុងបង្ហាញលទ្ធផលជុំវិញចំណតបន្ទាប់របស់អ្នក — សូមអនុញ្ញាតសិទ្ធិទីតាំង ដើម្បីទទួលបានលទ្ធផលនៅជិតអ្នក។",
+    "noLocation": "គ្មានទីតាំងសម្រាប់ស្វែងរកទេ — សូមអនុញ្ញាតសិទ្ធិទីតាំង ឬបន្ថែមចំណតដែលមានទីកន្លែងទៅដំណើរកម្សាន្តនេះ។",
+    "searching": "កំពុងស្វែងរកនៅជិត...",
+    "empty": "រកមិនឃើញអ្វីក្នុងចម្ងាយ ២ គីឡូម៉ែត្រទេ។",
+    "unnamedPlace": "កន្លែងគ្មានឈ្មោះ",
+    "distanceM": "{distance} ម",
+    "distanceKm": "{distance} គ.ម",
+    "navigate": "នាំផ្លូវ",
+    "addToAgenda": "បន្ថែមជាចំណត",
+    "adding": "កំពុងបន្ថែម...",
+    "added": "បានបន្ថែម",
+    "trendingTitle": "ពេញនិយមក្នុងចំណោមអ្នកដំណើរផ្សេងទៀត",
+    "trendingIn": "ពេញនិយមនៅ{province}",
+    "usedByTrips": "មាននៅក្នុងដំណើរសាធារណៈចំនួន {count}",
+    "osmAttribution": "ទិន្នន័យ © OpenStreetMap contributors"
   },
   "share": {
     "sharing": "ការចែករំលែក",
@@ -354,7 +385,8 @@
     ],
     "copyright": "© {year} Tesajor",
     "terms": "លក្ខខណ្ឌ",
-    "privacy": "ឯកជនភាព"
+    "privacy": "ឯកជនភាព",
+    "osmCredit": "ទិន្នន័យផែនទី © OpenStreetMap contributors"
   },
   "createGroupForm": {
     "title": "ក្រុមថ្មី",

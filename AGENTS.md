@@ -96,10 +96,10 @@ you touch flows the specs in `e2e/` cover. Database scripts:
 ```
 src/app/         routes (RSC pages + API handlers: auth, csv export, telegram webhook, uploads)
 src/components/  feature components + components/ui (shadcn)
-src/db/          schema.ts (all 22 tables) · seed.ts
-src/lib/actions/     the ONLY write path (14 files)
+src/db/          schema.ts (all 23 tables) · seed.ts
+src/lib/actions/     the ONLY write path (15 files)
 src/lib/validation/  Zod schemas, one file per action domain
-src/lib/{money,splits,balances,quests,trips,telegram}/  pure domain logic + tests
+src/lib/{money,splits,balances,quests,trips,geo,places,telegram}/  pure domain logic + tests
 messages/        en.json + km.json translations
 drizzle/         generated SQL migrations (committed)
 e2e/             Playwright specs

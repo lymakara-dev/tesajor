@@ -20,7 +20,7 @@ so keeping track never requires archaeology.
 
 | Feature | Phase | Status | Plan |
 |---|---|---|---|
-| Trip Companion — Explore (essentials + trending) | TC-1 | 📝 Planned | [trip-companion.md](./trip-companion.md) |
+| Trip Companion — Explore (essentials + trending) | TC-1 | ✅ Shipped | [trip-companion.md](./trip-companion.md) |
 | Trip Companion — Navidrome music | TC-2 | 📝 Planned | [trip-companion.md](./trip-companion.md) |
 | Trip Companion — Road routing & follow mode | TC-3 | 📝 Planned | [trip-companion.md](./trip-companion.md) |
 | Trip Companion — Khmer voice welcome & reminders | TC-4 | 📝 Planned | [trip-companion.md](./trip-companion.md) |

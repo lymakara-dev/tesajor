@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { animate, useMotionValue, useReducedMotion, useTransform } from "framer-motion";
-import { motion } from "framer-motion";
-import { MATERIAL_STANDARD_EASE } from "@/lib/motion";
+import { useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "@/lib/motion";
+
+function easeOutCubic(t: number): number {
+  return 1 - Math.pow(1 - t, 3);
+}
 
 /**
  * Animates a numeric value counting up/down to `value` over ~300ms
- * whenever it changes. Falls back to an instant opacity swap under
+ * whenever it changes. Falls back to an instant swap under
  * prefers-reduced-motion.
  */
 export function CountUp({
@@ -22,28 +24,52 @@ export function CountUp({
   "data-testid"?: string;
 }) {
   const prefersReducedMotion = useReducedMotion();
-  const motionValue = useMotionValue(value);
-  const rounded = useTransform(motionValue, (v) => format(Math.round(v)));
-  const previous = useRef(value);
+  const [displayValue, setDisplayValue] = useState(value);
+  const prevValueRef = useRef(value);
 
   useEffect(() => {
     if (prefersReducedMotion) {
-      motionValue.set(value);
-      previous.current = value;
+      setDisplayValue(value);
+      prevValueRef.current = value;
       return;
     }
-    const controls = animate(previous.current, value, {
-      duration: 0.3,
-      ease: MATERIAL_STANDARD_EASE,
-      onUpdate: (v) => motionValue.set(v),
-    });
-    previous.current = value;
-    return () => controls.stop();
-  }, [value, prefersReducedMotion, motionValue]);
+
+    const startVal = prevValueRef.current;
+    const endVal = value;
+    if (startVal === endVal) {
+      setDisplayValue(value);
+      return;
+    }
+
+    const duration = 300; // ms
+    const startTime = performance.now();
+    let rafId: number;
+
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutCubic(progress);
+      const current = Math.round(startVal + (endVal - startVal) * easedProgress);
+
+      setDisplayValue(current);
+
+      if (progress < 1) {
+        rafId = requestAnimationFrame(tick);
+      } else {
+        prevValueRef.current = endVal;
+      }
+    };
+
+    rafId = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+    };
+  }, [value, prefersReducedMotion]);
 
   return (
-    <motion.span className={className} data-testid={testId}>
-      {rounded}
-    </motion.span>
+    <span className={className} data-testid={testId}>
+      {format(displayValue)}
+    </span>
   );
 }

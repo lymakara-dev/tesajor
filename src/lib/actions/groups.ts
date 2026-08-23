@@ -1,11 +1,11 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
-import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { groups, groupMembers, activityLog, users } from "@/db/schema";
 import { auth } from "@/lib/auth";
+import { generateInviteCode } from "@/lib/id";
 import {
   createGroupSchema,
   joinGroupSchema,
@@ -35,7 +35,7 @@ export async function createGroup(
     .where(eq(users.id, session.user.id))
     .limit(1);
 
-  const inviteCode = nanoid(10);
+  const inviteCode = generateInviteCode(10);
 
   const [group] = await db
     .insert(groups)

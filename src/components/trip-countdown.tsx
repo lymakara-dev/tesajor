@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Sparkles } from "lucide-react";
-import { MATERIAL_STANDARD_EASE } from "@/lib/motion";
+import { useReducedMotion } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
 interface TimeLeft {
   days: number;
@@ -30,18 +30,15 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center gap-1.5">
       <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg bg-mekong shadow-sm sm:h-14 sm:w-14">
-        <AnimatePresence mode="popLayout" initial={false}>
-          <motion.span
-            key={display}
-            initial={prefersReducedMotion ? false : { y: -16, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={prefersReducedMotion ? undefined : { y: 16, opacity: 0 }}
-            transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: MATERIAL_STANDARD_EASE }}
-            className="amount absolute text-lg font-bold text-rice sm:text-xl"
-          >
-            {display}
-          </motion.span>
-        </AnimatePresence>
+        <span
+          key={display}
+          className={cn(
+            "amount absolute text-lg font-bold text-rice sm:text-xl",
+            !prefersReducedMotion && "animate-in fade-in slide-in-from-top-4 duration-200 ease-out",
+          )}
+        >
+          {display}
+        </span>
       </div>
       <span className="text-xs font-medium text-muted-foreground">{label}</span>
     </div>

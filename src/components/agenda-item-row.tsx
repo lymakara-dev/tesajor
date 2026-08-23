@@ -3,9 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { MATERIAL_STANDARD_EASE } from "@/lib/motion";
+import { useReducedMotion } from "@/lib/motion";
 import { Check, Navigation, X } from "lucide-react";
 import { completeAgendaItem, resetAgendaItem, skipAgendaItem } from "@/lib/actions/agenda-items";
 import { Money } from "@/components/money";
@@ -72,37 +71,29 @@ export function AgendaItemRow({
   const hasPlace = Boolean(item.address || item.placeName);
 
   return (
-    <motion.div
+    <div
       className={cn(
-        "relative space-y-2 overflow-visible rounded-xl border p-3",
-        done ? "border-paddy/25 bg-paddy/10" : "border-sandstone",
+        "relative space-y-2 overflow-visible rounded-xl border p-3 transition-colors",
+        prefersReducedMotion ? "duration-150" : "duration-600 ease-[cubic-bezier(0.4,0,0.2,1)]",
+        sweep ? "bg-[rgba(31,138,93,0.15)]" : done ? "border-paddy/25 bg-paddy/10" : "border-sandstone",
       )}
       data-testid={`agenda-item-${item.id}`}
-      animate={sweep ? { backgroundColor: "rgba(31,138,93,0.15)" } : undefined}
-      transition={{ duration: prefersReducedMotion ? 0.15 : 0.6, ease: MATERIAL_STANDARD_EASE }}
     >
       <ConfettiBurst trigger={celebrateTick} />
       <div className="flex items-start gap-3">
-        <AnimatePresence initial={false} mode="wait">
-          <motion.span
-            key={item.status}
-            initial={{ scale: prefersReducedMotion ? 1 : 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={
-              prefersReducedMotion ? { duration: 0.15 } : { type: "spring", stiffness: 400, damping: 15 }
-            }
-            className={cn(
-              "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border-2",
-              done
-                ? "border-paddy bg-paddy text-rice"
-                : item.status === "skipped"
-                  ? "border-sandstone bg-sandstone text-muted-foreground"
-                  : "border-sandstone",
-            )}
-          >
-            {done && <Check className="size-3.5" strokeWidth={2.5} />}
-          </motion.span>
-        </AnimatePresence>
+        <span
+          key={item.status}
+          className={cn(
+            "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-transform duration-150",
+            done
+              ? "border-paddy bg-paddy text-rice animate-in zoom-in-50 fade-in duration-150"
+              : item.status === "skipped"
+                ? "border-sandstone bg-sandstone text-muted-foreground"
+                : "border-sandstone",
+          )}
+        >
+          {done && <Check className="size-3.5" strokeWidth={2.5} />}
+        </span>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-3">
@@ -198,6 +189,6 @@ export function AgendaItemRow({
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

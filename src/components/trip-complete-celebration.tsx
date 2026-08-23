@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { MATERIAL_STANDARD_EASE } from "@/lib/motion";
+import { useReducedMotion } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
 /**
  * Trip-complete celebration + template-share moments only use the Moul
@@ -25,15 +25,15 @@ export function TripCompleteCelebration() {
   const prefersReducedMotion = useReducedMotion();
 
   return (
-    <motion.div
-      initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: MATERIAL_STANDARD_EASE }}
-      className="rounded-xl bg-mekong px-6 py-8 text-center text-rice"
+    <div
+      className={cn(
+        "rounded-xl bg-mekong px-6 py-8 text-center text-rice",
+        !prefersReducedMotion && "animate-in fade-in slide-in-from-top-2 duration-300 ease-out",
+      )}
     >
       <p className="font-display text-3xl">ទេសចរណ៍</p>
       <div className="mx-auto mt-2 h-1 w-20 rounded-full bg-krama" />
       <p className="mt-3 text-sm text-rice/90">{t("tripComplete")}</p>
-    </motion.div>
+    </div>
   );
 }

@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { MATERIAL_STANDARD_EASE } from "@/lib/motion";
+import { useReducedMotion } from "@/lib/motion";
 
 const COLORS = ["#D42A34", "#D42A34", "#D42A34", "#F08A00", "#1F8A5D"];
 const PARTICLE_COUNT = 16;
@@ -44,29 +43,30 @@ export function ConfettiBurst({ trigger }: { trigger: number }) {
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-visible">
-      <AnimatePresence>
-        <motion.div key={trigger} className="absolute left-1/2 top-1/2">
-          {particles.map((p) => {
-            const rad = (p.angle * Math.PI) / 180;
-            const x = Math.cos(rad) * p.distance;
-            const y = Math.sin(rad) * p.distance;
-            return (
-              <motion.span
-                key={p.id}
-                className="absolute rounded-sm"
-                style={{
+      <div key={trigger} className="absolute left-1/2 top-1/2">
+        {particles.map((p) => {
+          const rad = (p.angle * Math.PI) / 180;
+          const x = Math.cos(rad) * p.distance;
+          const y = Math.sin(rad) * p.distance;
+          return (
+            <span
+              key={p.id}
+              className="absolute rounded-sm"
+              style={
+                {
                   width: p.size,
                   height: p.size,
                   backgroundColor: p.color,
-                }}
-                initial={{ x: 0, y: 0, opacity: 1, rotate: 0 }}
-                animate={{ x, y, opacity: 0, rotate: p.rotate }}
-                transition={{ duration: 0.6, ease: MATERIAL_STANDARD_EASE }}
-              />
-            );
-          })}
-        </motion.div>
-      </AnimatePresence>
+                  "--tx": `${x}px`,
+                  "--ty": `${y}px`,
+                  "--rot": `${p.rotate}deg`,
+                  animation: "confetti-burst-fly 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards",
+                } as React.CSSProperties
+              }
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }

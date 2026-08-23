@@ -1,11 +1,11 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { agendaItems, trips, tripMembers } from "@/db/schema";
 import { auth } from "@/lib/auth";
+import { generateInviteCode } from "@/lib/id";
 import { getTripRole } from "@/lib/actions/trip-membership";
 import { requireUserIsMember } from "@/lib/actions/group-membership";
 import { canManageTrip } from "@/lib/trips/permissions";
@@ -61,7 +61,7 @@ export async function createTrip(
         startDate: data.startDate,
         endDate: data.endDate,
         baseCurrency: data.baseCurrency,
-        inviteCode: nanoid(10),
+        inviteCode: generateInviteCode(10),
       })
       .returning({ id: trips.id });
 
@@ -202,7 +202,7 @@ export async function cloneTrip(
         startDate: parsed.data.newStartDate,
         endDate: cloned.newEndDate,
         baseCurrency: sourceTrip.baseCurrency,
-        inviteCode: nanoid(10),
+        inviteCode: generateInviteCode(10),
         clonedFromTripId: sourceTrip.id,
       })
       .returning({ id: trips.id });

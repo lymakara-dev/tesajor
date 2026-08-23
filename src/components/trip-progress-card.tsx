@@ -1,11 +1,12 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { useReducedMotion } from "@/lib/motion";
 import { CountUp } from "@/components/count-up";
 import { AchievementBadge } from "@/components/achievement-badges";
 import { BADGE_GALLERY, displayForAchievementKey } from "@/lib/trips/achievement-icons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export function TripProgressCard({
   completed,
@@ -33,13 +34,12 @@ export function TripProgressCard({
       <CardContent className="space-y-4">
         <div>
           <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
-            <motion.div
-              className="krama-pattern h-full"
-              initial={false}
-              animate={{ width: `${percent}%` }}
-              transition={
-                prefersReducedMotion ? { duration: 0 } : { type: "spring", stiffness: 120, damping: 18 }
-              }
+            <div
+              className={cn(
+                "krama-pattern h-full",
+                !prefersReducedMotion && "transition-[width] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]",
+              )}
+              style={{ width: `${percent}%` }}
             />
           </div>
           <p className="mt-2 text-sm text-muted-foreground" data-testid="stops-done">

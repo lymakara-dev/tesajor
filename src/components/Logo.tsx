@@ -1,8 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { MATERIAL_STANDARD_EASE } from "@/lib/motion";
+import { useReducedMotion } from "@/lib/motion";
 
 // Brand colors are fixed regardless of light/dark theme, unlike the rest
 // of the app — a logo shouldn't re-tint itself when the user flips a
@@ -31,51 +30,51 @@ function CurlMark({ path, strokeWidth, pinR, pinDotR, animate }: CurlMarkProps) 
   const prefersReducedMotion = useReducedMotion();
   const doAnimate = animate && !prefersReducedMotion;
 
-  if (!doAnimate) {
-    return (
-      <>
-        <path
-          d={path}
-          fill="none"
-          stroke={STROKE_COLOR}
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <circle cx={74} cy={30} r={pinR} fill={PIN_COLOR} />
-        <circle cx={74} cy={30} r={pinDotR} fill={STROKE_COLOR} />
-      </>
-    );
-  }
-
   return (
     <>
-      <motion.path
+      <path
         d={path}
         fill="none"
         stroke={STROKE_COLOR}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 0.5, ease: MATERIAL_STANDARD_EASE }}
+        style={
+          doAnimate
+            ? {
+                strokeDasharray: 200,
+                animation: "tesajor-curl-draw 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards",
+              }
+            : undefined
+        }
       />
-      <motion.circle
+      <circle
         cx={74}
         cy={30}
+        r={pinR}
         fill={PIN_COLOR}
-        initial={{ r: 0 }}
-        animate={{ r: pinR }}
-        transition={{ delay: 0.45, type: "spring", stiffness: 380, damping: 14 }}
+        style={
+          doAnimate
+            ? {
+                transformOrigin: "74px 30px",
+                animation: "tesajor-pin-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
+              }
+            : undefined
+        }
       />
-      <motion.circle
+      <circle
         cx={74}
         cy={30}
+        r={pinDotR}
         fill={STROKE_COLOR}
-        initial={{ r: 0 }}
-        animate={{ r: pinDotR }}
-        transition={{ delay: 0.5, type: "spring", stiffness: 380, damping: 14 }}
+        style={
+          doAnimate
+            ? {
+                transformOrigin: "74px 30px",
+                animation: "tesajor-pin-pop 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
+              }
+            : undefined
+        }
       />
     </>
   );

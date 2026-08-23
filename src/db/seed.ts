@@ -1,6 +1,6 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
-import { nanoid } from "nanoid";
+import { generateInviteCode } from "@/lib/id";
 import { db } from "./index";
 import { users, groups, groupMembers, activityLog } from "./schema";
 
@@ -24,7 +24,7 @@ async function main() {
     .values({
       name: "Friday Dinner Crew",
       baseCurrency: "USD",
-      inviteCode: nanoid(10),
+      inviteCode: generateInviteCode(10),
       createdBy: insertedUsers[0].id,
     })
     .returning();
